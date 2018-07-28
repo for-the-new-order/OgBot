@@ -1,0 +1,11 @@
+{
+    "name": "my-discord-bot",
+    "version": "1.0.0",
+    "description": "My unstructured Discord Bot experiements",
+    "main": "bot.js",
+    "author": "Carl-Hugo Marcotte",
+    "dependencies": {
+        "discord.js": "^11.3.2",
+        "express": "^4.16.3"
+    }
+}
