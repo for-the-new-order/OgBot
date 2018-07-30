@@ -23,11 +23,7 @@ bot.on('message', async message => {
     switch (cmd) {
         case 'init':
             currentChannel = message.channel;
-            message.channel.send(
-                'Web messages will now be send to this channel (ID: ' +
-                    message.channel.id +
-                    ')!'
-            );
+            message.channel.send('Web messages will now be send to this channel (ID: ' + message.channel.id + ')!');
             message.channel.send('Thanks');
         case 'whoami':
             sendCurrentUserInfo(message);
@@ -79,33 +75,15 @@ app.get('/send/:channelKey/:message', function(req, res) {
 });
 
 function sendGuildInfo(message) {
-    message.channel.send(
-        'Your current guild (or server) is **' +
-            message.guild.name +
-            '** (ID: ' +
-            message.guild.id +
-            ')'
-    );
+    message.channel.send('Your current guild (or server) is **' + message.guild.name + '** (ID: ' + message.guild.id + ')');
 }
 
 function sendChannelInfo(message) {
-    message.channel.send(
-        'The channel is **' +
-            message.channel.name +
-            '** (ID: ' +
-            message.channel.id +
-            ')'
-    );
+    message.channel.send('The channel is **' + message.channel.name + '** (ID: ' + message.channel.id + ')');
 }
 
 function sendCurrentUserInfo(message) {
-    message.channel.send(
-        'You are **' +
-            message.author.username +
-            '** (ID: ' +
-            message.author.id +
-            ')'
-    );
+    message.channel.send('You are **' + message.author.username + '** (ID: ' + message.author.id + ')');
 }
 // Mentions: <@USER ID>
 // Ex.:      <@123456789012345678>
