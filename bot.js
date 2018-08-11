@@ -2,6 +2,9 @@ var Discord = require('discord.js');
 var config = require('./config').configuration;
 var bot = new Discord.Client();
 
+var characterGen = require('./generators/character-generator.js');
+var characterGenerator = new characterGen.CharacterGenerator();
+
 bot.login(config.auth.token);
 
 bot.on('ready', function(evt) {
@@ -23,7 +26,11 @@ bot.on('message', async message => {
     switch (cmd) {
         case 'init':
             currentChannel = message.channel;
-            message.channel.send('Web messages will now be send to this channel (ID: ' + message.channel.id + ')!');
+            message.channel.send(
+                'Web messages will now be send to this channel (ID: ' +
+                    message.channel.id +
+                    ')!'
+            );
             message.channel.send('Thanks');
         case 'whoami':
             sendCurrentUserInfo(message);
@@ -40,6 +47,19 @@ bot.on('message', async message => {
             sendChannelInfo(message);
             sendGuildInfo(message);
             break;
+        case 'generate':
+        case 'gen':
+            var number = 1;
+            if (args.length > 0 && parseInt(args[0]) != NaN) {
+                number = parseInt(args[0]);
+                if (number > 3) {
+                    number = 3; // cap at 3
+                }
+            }
+            var results = [];
+            for (let index = 0; index < number; index++) {
+                generate(results, message);
+            }
     }
 });
 
@@ -74,16 +94,48 @@ app.get('/send/:channelKey/:message', function(req, res) {
     res.send('**[WebMsg]** ' + req.params.message);
 });
 
+function generate(results, message) {
+    var result = characterGenerator.generate();
+    results.push(result);
+    var json = JSON.stringify(result, null, 4);
+    message.author.createDM().then(c => {
+        c.send(`\`\`\`json
+${json}
+\`\`\``);
+        if (message.deletable) {
+            message.delete();
+        }
+    });
+}
+
 function sendGuildInfo(message) {
-    message.channel.send('Your current guild (or server) is **' + message.guild.name + '** (ID: ' + message.guild.id + ')');
+    message.channel.send(
+        'Your current guild (or server) is **' +
+            message.guild.name +
+            '** (ID: ' +
+            message.guild.id +
+            ')'
+    );
 }
 
 function sendChannelInfo(message) {
-    message.channel.send('The channel is **' + message.channel.name + '** (ID: ' + message.channel.id + ')');
+    message.channel.send(
+        'The channel is **' +
+            message.channel.name +
+            '** (ID: ' +
+            message.channel.id +
+            ')'
+    );
 }
 
 function sendCurrentUserInfo(message) {
-    message.channel.send('You are **' + message.author.username + '** (ID: ' + message.author.id + ')');
+    message.channel.send(
+        'You are **' +
+            message.author.username +
+            '** (ID: ' +
+            message.author.id +
+            ')'
+    );
 }
 // Mentions: <@USER ID>
 // Ex.:      <@123456789012345678>

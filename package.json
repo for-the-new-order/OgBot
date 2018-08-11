@@ -6,9 +6,12 @@
     "author": "Carl-Hugo Marcotte",
     "dependencies": {
         "discord.js": "^11.3.2",
-        "express": "^4.16.3"
+        "express": "^4.16.3",
+        "random-js": "^1.0.8"
     },
     "devDependencies": {
-        "merge-config": "^2.0.0"
+        "@types/random-js": "^1.0.30",
+        "merge-config": "^2.0.0",
+        "typescript": "^3.0.1"
     }
 }
