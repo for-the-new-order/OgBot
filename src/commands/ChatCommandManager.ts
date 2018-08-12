@@ -5,7 +5,7 @@ import { CommandArgs } from './CommandArgs';
 import { HelpText } from './HelpText';
 
 export class ChatCommandManager {
-    private trigger = 'ogbot';
+    private trigger = 'og';
     private commands: Array<ChatCommand>;
     constructor() {
         this.commands = new Array<ChatCommand>(
@@ -28,11 +28,12 @@ export class ChatCommandManager {
             return;
         }
 
-        const commandArgs = {
-            trigger: args[0].toLowerCase(),
-            command: args[1].toLowerCase(),
-            arguments: args.splice(2)
-        };
+        const commandArgs = new CommandArgs(
+            args[0].toLowerCase(),
+            args[1].toLowerCase(),
+            args.splice(2)
+        );
+
         if (commandArgs.trigger !== this.trigger) {
             this.echoHelp(message);
             return;

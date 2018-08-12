@@ -14,44 +14,76 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var ChatCommandBase_1 = require("./ChatCommandBase");
-var character_generator_1 = require("../generators/character-generator");
+var random_service_1 = require("../generators/random-service");
+var alien_names_generator_1 = require("../generators/alien-names-generator");
+var name_generator_1 = require("../generators/name-generator");
+var format_utility_1 = require("../generators/format-utility");
+var data_1 = require("../../data");
 var GenerateCommand = /** @class */ (function (_super) {
     __extends(GenerateCommand, _super);
     function GenerateCommand() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super.call(this) || this;
         _this.supportedCommands = ['generate', 'gen', 'g'];
-        _this.characterGenerator = new character_generator_1.CharacterGenerator();
+        _this.alienNamesGenerator = new alien_names_generator_1.AlienNamesGenerator(new format_utility_1.FormatUtility());
+        _this.randomService = new random_service_1.RandomService();
+        _this.nameGenerator = new name_generator_1.NameGenerator(_this.randomService);
         return _this;
     }
     GenerateCommand.prototype.handle = function (message, commandArgs) {
         var subCommand = null;
-        if (commandArgs.arguments.length > 0) {
-            subCommand = commandArgs.arguments[0];
+        if (commandArgs.args.length > 0) {
+            subCommand = commandArgs.args[0];
         }
         // Custom seed
-        var seedArgIndex = commandArgs.arguments.indexOf('-seed');
-        var providedSeed = null;
-        if (seedArgIndex > -1) {
-            providedSeed = parseInt(commandArgs.arguments[seedArgIndex + 1]);
+        if (commandArgs.argumentExists('seed')) {
+            this.randomService.seed = parseInt(commandArgs.findArgumentValue('seed'));
         }
-        var result = this.characterGenerator.generate(providedSeed);
+        var initialSeed = this.randomService.seed;
+        // count
+        var count = 1;
+        if (commandArgs.argumentExists('count')) {
+            count = parseInt(commandArgs.findArgumentValue('count'));
+        }
+        //const result = this.characterGenerator.generate(providedSeed);
         var json = '';
         var indent = 4;
         switch (subCommand) {
             case 'name':
-                json = JSON.stringify(this.withSeed(result.initialSeed, result.names), null, indent);
+                var names = [];
+                for (var i = 0; i < count; i++) {
+                    names.push(this.generateName());
+                }
+                json = JSON.stringify(this.withSeed(initialSeed, names), null, indent);
+                break;
+            case 'alienname':
+                var names = [];
+                for (var i = 0; i < count; i++) {
+                    names.push(this.generateAlienName());
+                }
+                json = JSON.stringify(this.withSeed(initialSeed, names), null, indent);
                 break;
             case 'motivation':
-                json = JSON.stringify(this.withSeed(result.initialSeed, result.motivation), null, indent);
+                var motivation = this.generateMotivation();
+                json = JSON.stringify(this.withSeed(initialSeed, motivation), null, indent);
                 break;
             case 'personality':
-                json = JSON.stringify(this.withSeed(result.initialSeed, result.personality), null, indent);
+                var personality = this.generatePersonality();
+                json = JSON.stringify(this.withSeed(initialSeed, personality), null, indent);
                 break;
             case 'place':
-                json = JSON.stringify(this.withSeed(result.initialSeed, result.places), null, indent);
+                var places = [];
+                for (var i = 0; i < count; i++) {
+                    places.push(this.generatePlace());
+                }
+                json = JSON.stringify(this.withSeed(initialSeed, places), null, indent);
                 break;
             default:
-                json = JSON.stringify(result, null, indent);
+                json = JSON.stringify({
+                    initialSeed: initialSeed,
+                    name: this.generateAnyName(),
+                    personality: this.generatePersonality(),
+                    motivation: this.generateMotivation()
+                }, null, indent);
                 break;
         }
         message.author.createDM().then(function (c) {
@@ -61,11 +93,38 @@ var GenerateCommand = /** @class */ (function (_super) {
             message.delete();
         }
     };
-    GenerateCommand.prototype.withSeed = function (initialSeed, value) {
+    GenerateCommand.prototype.generatePlace = function () {
+        return this.nameGenerator.place();
+    };
+    GenerateCommand.prototype.generateName = function () {
+        var name = this.nameGenerator.firstname();
+        name += ' ';
+        name += this.nameGenerator.surname();
+        return name;
+    };
+    GenerateCommand.prototype.generateAlienName = function () {
+        return this.alienNamesGenerator.generate();
+    };
+    GenerateCommand.prototype.generateAnyName = function () {
+        var isAlien = this.randomService.pickOne([true, false]);
+        return isAlien.value
+            ? this.alienNamesGenerator.generate()
+            : this.generateName();
+    };
+    GenerateCommand.prototype.generateMotivation = function () {
         return {
-            initialSeed: initialSeed,
-            value: value
+            desires: this.randomService.pickOne(data_1.motivations.desires).value,
+            fear: this.randomService.pickOne(data_1.motivations.fear).value,
+            strength: this.randomService.pickOne(data_1.motivations.strength).value,
+            flaw: this.randomService.pickOne(data_1.motivations.flaw).value
         };
+    };
+    GenerateCommand.prototype.generatePersonality = function () {
+        this.randomService.pickOne(data_1.personalityTraits).value;
+    };
+    GenerateCommand.prototype.withSeed = function (initialSeed, value) {
+        //return Object.assign(value, initialSeed);
+        return { value: value, initialSeed: initialSeed };
     };
     GenerateCommand.prototype.help = function () {
         return {
@@ -77,12 +136,16 @@ var GenerateCommand = /** @class */ (function (_super) {
                     description: 'Generate a character motivation.'
                 },
                 {
+                    syntax: 'alienname',
+                    description: 'Generate some alien names. Support the -count argument.'
+                },
+                {
                     syntax: 'name',
-                    description: 'Generate some names.'
+                    description: 'Generate some names. Support the -count argument.'
                 },
                 {
                     syntax: 'place',
-                    description: 'Generate some names.'
+                    description: 'Generate a place name. Support the -count argument.'
                 },
                 {
                     syntax: 'personality',

@@ -4,7 +4,7 @@ var random_js_1 = require("random-js");
 var RandomService = /** @class */ (function () {
     function RandomService() {
         this.randomEngine = random_js_1.engines.mt19937();
-        this.seed = Math.floor(Math.random() * Math.floor(5000));
+        this.seed = Math.floor(Math.random() * Math.floor(500000));
     }
     RandomService.prototype.pickOne = function (values) {
         var rnd = this.getRandomInt(0, values.length);

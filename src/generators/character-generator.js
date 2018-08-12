@@ -17,24 +17,31 @@ var CharacterGenerator = /** @class */ (function () {
             this.randomService.seed = seed;
         }
         var initialSeed = this.randomService.seed;
-        var alienNames = [];
-        var firstNames = [];
-        var surnames = [];
-        var places = [];
-        for (var index = 0; index < 5; index++) {
-            alienNames.push(this.alienNamesGenerator.generate());
-            firstNames.push(this.nameGenerator.firstname());
-            surnames.push(this.nameGenerator.surname());
-            places.push(this.nameGenerator.place());
+        var isAlien = this.randomService.pickOne([true, false]);
+        var name;
+        if (isAlien.value) {
+            name = this.alienNamesGenerator.generate();
         }
+        else {
+            name = this.nameGenerator.firstname();
+            name += ' ';
+            name += this.nameGenerator.surname();
+        }
+        var someImportantPlace = [this.nameGenerator.place()];
+        // const alienNames = [];
+        // const firstNames = [];
+        // const surnames = [];
+        // const places = [];
+        // for (let index = 0; index < 5; index++) {
+        //     alienNames.push(this.alienNamesGenerator.generate());
+        //     firstNames.push(this.nameGenerator.firstname());
+        //     surnames.push(this.nameGenerator.surname());
+        //     places.push(this.nameGenerator.place());
+        // }
         return {
             initialSeed: initialSeed,
-            names: {
-                aliens: alienNames,
-                firstNames: firstNames,
-                surnames: surnames
-            },
-            places: places,
+            name: name,
+            someImportantPlace: someImportantPlace,
             personality: this.randomService.pickOne(data_1.personalityTraits).value,
             motivation: {
                 desires: this.randomService.pickOne(data_1.motivations.desires).value,

@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var generate_command_1 = require("./generate-command");
+var CommandArgs_1 = require("./CommandArgs");
 var ChatCommandManager = /** @class */ (function () {
     function ChatCommandManager() {
-        this.trigger = 'ogbot';
+        this.trigger = 'og';
         this.commands = new Array(new generate_command_1.GenerateCommand(), 
         //
         // Default (echo help)
@@ -20,11 +21,7 @@ var ChatCommandManager = /** @class */ (function () {
             }
             return;
         }
-        var commandArgs = {
-            trigger: args[0].toLowerCase(),
-            command: args[1].toLowerCase(),
-            arguments: args.splice(2)
-        };
+        var commandArgs = new CommandArgs_1.CommandArgs(args[0].toLowerCase(), args[1].toLowerCase(), args.splice(2));
         if (commandArgs.trigger !== this.trigger) {
             this.echoHelp(message);
             return;
