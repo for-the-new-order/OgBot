@@ -4,27 +4,29 @@ var motivation_1 = require("./motivation");
 exports.motivations = motivation_1.motivations;
 var personality_1 = require("./personality");
 exports.personalityTraits = personality_1.personalityTraits;
-var surnameData = require("./us-census/surname");
-var femaleFirstname = require("./gutenberg/female-firstname");
-var gutenbergLastname = require("./gutenberg/lastname");
-var maleFirstname = require("./gutenberg/male-firstname");
-var placesData = require("./gutenberg/places");
+var ranks_1 = require("./ranks");
+exports.ranks = ranks_1.ranks;
+var surname_1 = require("./us-census/surname");
+var female_firstname_1 = require("./gutenberg/female-firstname");
+var lastname_1 = require("./gutenberg/lastname");
+var male_firstname_1 = require("./gutenberg/male-firstname");
+var places_1 = require("./gutenberg/places");
 exports.nameData = {
     usCensus: {
-        surname: surnameData.data
+        surname: surname_1.data
     },
     gutenberg: {
         firstname: {
-            female: femaleFirstname.data,
-            male: maleFirstname.data
+            female: female_firstname_1.data,
+            male: male_firstname_1.data
         },
-        surname: gutenbergLastname.data,
-        places: placesData.data
+        surname: lastname_1.data,
+        places: places_1.data
     },
     all: {
-        firstname: femaleFirstname.data.concat(maleFirstname.data),
-        surname: gutenbergLastname.data.concat(surnameData.data),
-        places: placesData.data
+        firstname: female_firstname_1.data.concat(male_firstname_1.data),
+        surname: lastname_1.data.concat(surname_1.data),
+        places: places_1.data
     }
 };
 //# sourceMappingURL=index.js.map

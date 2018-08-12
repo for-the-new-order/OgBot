@@ -7,7 +7,7 @@ var RandomService = /** @class */ (function () {
         this.seed = Math.floor(Math.random() * Math.floor(500000));
     }
     RandomService.prototype.pickOne = function (values) {
-        var rnd = this.getRandomInt(0, values.length);
+        var rnd = this.getRandomInt(0, values.length - 1);
         return {
             seed: rnd.seed,
             value: values[rnd.value]

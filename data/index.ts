@@ -1,27 +1,28 @@
 export { motivations } from './motivation';
 export { personalityTraits } from './personality';
+export { ranks } from './ranks';
 
-import * as surnameData from './us-census/surname';
-import * as femaleFirstname from './gutenberg/female-firstname';
-import * as gutenbergLastname from './gutenberg/lastname';
-import * as maleFirstname from './gutenberg/male-firstname';
-import * as placesData from './gutenberg/places';
+import { data as surnameData } from './us-census/surname';
+import { data as femaleFirstname } from './gutenberg/female-firstname';
+import { data as gutenbergLastname } from './gutenberg/lastname';
+import { data as maleFirstname } from './gutenberg/male-firstname';
+import { data as placesData } from './gutenberg/places';
 
 export const nameData = {
     usCensus: {
-        surname: surnameData.data
+        surname: surnameData
     },
     gutenberg: {
         firstname: {
-            female: femaleFirstname.data,
-            male: maleFirstname.data
+            female: femaleFirstname,
+            male: maleFirstname
         },
-        surname: gutenbergLastname.data,
-        places: placesData.data
+        surname: gutenbergLastname,
+        places: placesData
     },
     all: {
-        firstname: femaleFirstname.data.concat(maleFirstname.data),
-        surname: gutenbergLastname.data.concat(surnameData.data),
-        places: placesData.data
+        firstname: femaleFirstname.concat(maleFirstname),
+        surname: gutenbergLastname.concat(surnameData),
+        places: placesData
     }
 };

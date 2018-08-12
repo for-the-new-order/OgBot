@@ -10,7 +10,7 @@ export class RandomService {
     }
 
     public pickOne<T>(values: Array<T>): SeedableValue<T> {
-        const rnd = this.getRandomInt(0, values.length);
+        const rnd = this.getRandomInt(0, values.length - 1);
         return {
             seed: rnd.seed,
             value: values[rnd.value]

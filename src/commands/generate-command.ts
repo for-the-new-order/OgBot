@@ -7,7 +7,7 @@ import { RandomService } from '../generators/random-service';
 import { AlienNamesGenerator } from '../generators/alien-names-generator';
 import { NameGenerator } from '../generators/name-generator';
 import { FormatUtility } from '../generators/format-utility';
-import { motivations, personalityTraits } from '../../data';
+import { motivations, personalityTraits, ranks } from '../../data';
 
 export class GenerateCommand extends ChatCommandBase {
     protected supportedCommands = ['generate', 'gen', 'g'];
@@ -40,10 +40,8 @@ export class GenerateCommand extends ChatCommandBase {
             count = parseInt(commandArgs.findArgumentValue('count'));
         }
 
-        //const result = this.characterGenerator.generate(providedSeed);
         let json = '';
         const indent = 4;
-
         switch (subCommand) {
             case 'name':
                 var names: Array<string> = [];
@@ -90,10 +88,41 @@ export class GenerateCommand extends ChatCommandBase {
                     indent
                 );
                 break;
+            case 'rank':
+                // corp
+                let corpName: string;
+                if (commandArgs.argumentExists('corp')) {
+                    corpName = commandArgs.findArgumentValue('corp');
+                }
+
+                // // Find rank level
+                // let corpRanks: Array<{ level: number; name: string }>;
+                // if (corpName && ranks.hasOwnProperty(corpName)) {
+                //     corpRanks = ranks[corpName];
+                // } else {
+                const corpRanks = ranks.all;
+                // }
+
+                // Generate rank(s)
+                var generatedRanks: Array<{ level: number; name: string }> = [];
+                for (let i = 0; i < count; i++) {
+                    generatedRanks.push(this.generateRank(corpRanks));
+                }
+                json = JSON.stringify(
+                    this.withSeed(initialSeed, generatedRanks),
+                    null,
+                    indent
+                );
+                break;
+            case 'help':
+                const help = this.help();
+                json = JSON.stringify(help, null, indent);
+                break;
             default:
                 json = JSON.stringify(
                     {
                         initialSeed,
+                        rank: this.generateRank(ranks.empire.all),
                         name: this.generateAnyName(),
                         personality: this.generatePersonality(),
                         motivation: this.generateMotivation()
@@ -147,14 +176,34 @@ export class GenerateCommand extends ChatCommandBase {
     }
 
     private withSeed(initialSeed: number, value: any): any {
-        //return Object.assign(value, initialSeed);
         return { value, initialSeed };
+    }
+
+    private generateRank(
+        corpRanks: Array<{ level: number; name: string; clan: string }>,
+        range?: {
+            minLevel: number;
+            maxLevel: number;
+        }
+    ) {
+        let rndRanks = corpRanks;
+        if (range !== undefined) {
+            rndRanks = rndRanks.filter(
+                x => x.level >= range.minLevel && x.level <= range.maxLevel
+            );
+        }
+
+        if (rndRanks.length === 0) {
+            return this.generateRank(corpRanks);
+        }
+        return this.randomService.pickOne(rndRanks).value;
     }
 
     public help(): HelpText {
         return {
-            command: this.supportedCommands.join(', '),
-            description: 'Generate a random character.',
+            command: this.supportedCommands[0],
+            alias: this.supportedCommands.slice(1).join(', '),
+            description: 'Generate random stuff; by default a character.',
             args: [
                 {
                     syntax: 'motivation',
@@ -178,6 +227,11 @@ export class GenerateCommand extends ChatCommandBase {
                 {
                     syntax: 'personality',
                     description: 'Generate a personality.'
+                },
+                {
+                    syntax: 'rank',
+                    description:
+                        'Generate a rank. Support the -count argument. Support the -corp argument with value: navy|army|intelligence|COMPORN|governance|ancillary|appointments'
                 }
             ]
         };

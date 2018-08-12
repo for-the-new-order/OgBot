@@ -44,7 +44,6 @@ var GenerateCommand = /** @class */ (function (_super) {
         if (commandArgs.argumentExists('count')) {
             count = parseInt(commandArgs.findArgumentValue('count'));
         }
-        //const result = this.characterGenerator.generate(providedSeed);
         var json = '';
         var indent = 4;
         switch (subCommand) {
@@ -60,7 +59,7 @@ var GenerateCommand = /** @class */ (function (_super) {
                 for (var i = 0; i < count; i++) {
                     names.push(this.generateAlienName());
                 }
-                json = JSON.stringify(this.withSeed(initialSeed, names), null, indent);
+                json = JSON.stringify(names, null, indent);
                 break;
             case 'motivation':
                 var motivation = this.generateMotivation();
@@ -77,9 +76,34 @@ var GenerateCommand = /** @class */ (function (_super) {
                 }
                 json = JSON.stringify(this.withSeed(initialSeed, places), null, indent);
                 break;
+            case 'rank':
+                // corp
+                var corpName = void 0;
+                if (commandArgs.argumentExists('corp')) {
+                    corpName = commandArgs.findArgumentValue('corp');
+                }
+                // // Find rank level
+                // let corpRanks: Array<{ level: number; name: string }>;
+                // if (corpName && ranks.hasOwnProperty(corpName)) {
+                //     corpRanks = ranks[corpName];
+                // } else {
+                var corpRanks = data_1.ranks.all;
+                // }
+                // Generate rank(s)
+                var generatedRanks = [];
+                for (var i = 0; i < count; i++) {
+                    generatedRanks.push(this.generateRank(corpRanks));
+                }
+                json = JSON.stringify(this.withSeed(initialSeed, generatedRanks), null, indent);
+                break;
+            case 'help':
+                var help = this.help();
+                json = JSON.stringify(help, null, indent);
+                break;
             default:
                 json = JSON.stringify({
                     initialSeed: initialSeed,
+                    rank: this.generateRank(data_1.ranks.empire.all),
                     name: this.generateAnyName(),
                     personality: this.generatePersonality(),
                     motivation: this.generateMotivation()
@@ -123,13 +147,23 @@ var GenerateCommand = /** @class */ (function (_super) {
         this.randomService.pickOne(data_1.personalityTraits).value;
     };
     GenerateCommand.prototype.withSeed = function (initialSeed, value) {
-        //return Object.assign(value, initialSeed);
         return { value: value, initialSeed: initialSeed };
+    };
+    GenerateCommand.prototype.generateRank = function (corpRanks, range) {
+        var rndRanks = corpRanks;
+        if (range !== undefined) {
+            rndRanks = rndRanks.filter(function (x) { return x.level >= range.minLevel && x.level <= range.maxLevel; });
+        }
+        if (rndRanks.length === 0) {
+            return this.generateRank(corpRanks);
+        }
+        return this.randomService.pickOne(rndRanks).value;
     };
     GenerateCommand.prototype.help = function () {
         return {
-            command: this.supportedCommands.join(', '),
-            description: 'Generate a random character.',
+            command: this.supportedCommands[0],
+            alias: this.supportedCommands.slice(1).join(', '),
+            description: 'Generate random stuff; by default a character.',
             args: [
                 {
                     syntax: 'motivation',
@@ -150,6 +184,10 @@ var GenerateCommand = /** @class */ (function (_super) {
                 {
                     syntax: 'personality',
                     description: 'Generate a personality.'
+                },
+                {
+                    syntax: 'rank',
+                    description: 'Generate a rank. Support the -count argument. Support the -corp argument with value: navy|army|intelligence|COMPORN|governance|ancillary|appointments'
                 }
             ]
         };
