@@ -136,7 +136,7 @@ export class GenerateCommand extends ChatCommandBase {
                 const obj: any = {};
                 const generatedValues = {
                     initialSeed,
-                    image_path: `/assets/images/npcs/${rank.clan}.png`,
+                    image_path: `/assets/images/npcs/250x250-${rank.clan}.png`,
                     type,
                     rank: rank.name,
                     clan: this.formatUtility.capitalize(rank.clan),

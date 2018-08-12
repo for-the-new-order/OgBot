@@ -116,7 +116,7 @@ var GenerateCommand = /** @class */ (function (_super) {
                 var obj = {};
                 var generatedValues = {
                     initialSeed: initialSeed,
-                    image_path: "/assets/images/npcs/" + rank.clan + ".png",
+                    image_path: "/assets/images/npcs/250x250-" + rank.clan + ".png",
                     type: type,
                     rank: rank.name,
                     clan: this.formatUtility.capitalize(rank.clan),
