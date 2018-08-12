@@ -1,0 +1,1 @@
+{"version":3,"file":"ChatCommandBase.js","sourceRoot":"","sources":["ChatCommandBase.ts"],"names":[],"mappings":";;AAKA;IAAA;IAOA,CAAC;IALU,mCAAS,GAAhB,UAAiB,WAAwB;QACrC,OAAO,IAAI,CAAC,iBAAiB,CAAC,OAAO,CAAC,WAAW,CAAC,OAAO,CAAC,GAAG,CAAC,CAAC,CAAC;IACpE,CAAC;IAGL,sBAAC;AAAD,CAAC,AAPD,IAOC;AAPqB,0CAAe"}

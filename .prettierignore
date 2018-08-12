@@ -1,0 +1,4 @@
+generators/data/gutenberg/*.json
+generators/data/us-census/*.json
+generators/data/gutenberg/*.ts
+generators/data/us-census/*.ts

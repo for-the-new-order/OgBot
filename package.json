@@ -10,6 +10,7 @@
         "random-js": "^1.0.8"
     },
     "devDependencies": {
+        "@types/node": "^10.5.8",
         "@types/random-js": "^1.0.30",
         "merge-config": "^2.0.0",
         "typescript": "^3.0.1"
