@@ -49,6 +49,7 @@ export class GenerateCommand extends ChatCommandBase {
 
         let json = '';
         const indent = 4;
+        let messageSent = false;
         switch (subCommand) {
             case 'name':
                 var names: Array<string> = [];
@@ -121,6 +122,9 @@ export class GenerateCommand extends ChatCommandBase {
                     indent
                 );
                 break;
+            case 'default':
+                json = JSON.stringify(this.defaultValues, null, indent);
+                break;
             case 'help':
                 const help = this.help();
                 json = JSON.stringify(help, null, indent);
@@ -129,8 +133,8 @@ export class GenerateCommand extends ChatCommandBase {
                 const name = this.generateAnyName();
                 const rank = this.generateRank(ranks.all);
                 const type = this.getTypeBasedOnRank(rank);
-                var obj: any = {};
-                obj[name] = {
+                const obj: any = {};
+                const generatedValues = {
                     initialSeed,
                     image_path: `/assets/images/npcs/${rank.clan}.png`,
                     type,
@@ -139,19 +143,67 @@ export class GenerateCommand extends ChatCommandBase {
                     personality: this.generatePersonality(),
                     motivation: this.generateMotivation()
                 };
+                obj[name] = generatedValues;
                 json = JSON.stringify(obj, null, indent);
+
+                if (commandArgs.argumentExists('defaults')) {
+                    const defaultsObj: any = {};
+                    defaultsObj[name] = this.defaultValues;
+                    const defaultsJson = JSON.stringify(
+                        defaultsObj,
+                        null,
+                        indent
+                    );
+                    this.send(json, whisper, message);
+                    this.send(defaultsJson, whisper, message);
+                    messageSent = true;
+                }
                 break;
         }
-        var chatToSend = `\`\`\`json\n${json}\n\`\`\``;
+
+        if (!messageSent) {
+            this.send(json, whisper, message);
+        }
+        if (message.deletable) {
+            message.delete();
+        }
+    }
+
+    public get defaultValues() {
+        return {
+            attributes: {
+                wounds: 12,
+                defense: {
+                    melee: 0,
+                    ranged: 0
+                },
+                soak: 2,
+                strain: 12
+            },
+            characteristics: {
+                brawn: 2,
+                agility: 2,
+                intellect: 2,
+                cunning: 2,
+                willpower: 2,
+                presence: 2
+            },
+            skills: [],
+            talents: [],
+            abilities: [],
+            equipment: [],
+            description: ['TODO: describe the NPC here...']
+        };
+    }
+
+    private send(json: string, whisper: boolean, message: Message) {
+        const chatToSend = `\`\`\`json\n${json}\n\`\`\``;
         if (whisper) {
             message.author.createDM().then(c => {
                 c.send(chatToSend);
             });
         } else {
             message.reply(chatToSend);
-        }
-        if (message.deletable) {
-            message.delete();
         }
     }
 

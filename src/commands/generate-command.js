@@ -51,6 +51,7 @@ var GenerateCommand = /** @class */ (function (_super) {
             commandArgs.argumentExists('w');
         var json = '';
         var indent = 4;
+        var messageSent = false;
         switch (subCommand) {
             case 'name':
                 var names = [];
@@ -101,6 +102,9 @@ var GenerateCommand = /** @class */ (function (_super) {
                 }
                 json = JSON.stringify(this.withSeed(initialSeed, generatedRanks), null, indent);
                 break;
+            case 'default':
+                json = JSON.stringify(this.defaultValues, null, indent);
+                break;
             case 'help':
                 var help = this.help();
                 json = JSON.stringify(help, null, indent);
@@ -110,7 +114,7 @@ var GenerateCommand = /** @class */ (function (_super) {
                 var rank = this.generateRank(data_1.ranks.all);
                 var type = this.getTypeBasedOnRank(rank);
                 var obj = {};
-                obj[name_1] = {
+                var generatedValues = {
                     initialSeed: initialSeed,
                     image_path: "/assets/images/npcs/" + rank.clan + ".png",
                     type: type,
@@ -119,9 +123,56 @@ var GenerateCommand = /** @class */ (function (_super) {
                     personality: this.generatePersonality(),
                     motivation: this.generateMotivation()
                 };
+                obj[name_1] = generatedValues;
                 json = JSON.stringify(obj, null, indent);
+                if (commandArgs.argumentExists('defaults')) {
+                    var defaultsObj = {};
+                    defaultsObj[name_1] = this.defaultValues;
+                    var defaultsJson = JSON.stringify(defaultsObj, null, indent);
+                    this.send(json, whisper, message);
+                    this.send(defaultsJson, whisper, message);
+                    messageSent = true;
+                }
                 break;
         }
+        if (!messageSent) {
+            this.send(json, whisper, message);
+        }
+        if (message.deletable) {
+            message.delete();
+        }
+    };
+    Object.defineProperty(GenerateCommand.prototype, "defaultValues", {
+        get: function () {
+            return {
+                attributes: {
+                    wounds: 12,
+                    defense: {
+                        melee: 0,
+                        ranged: 0
+                    },
+                    soak: 2,
+                    strain: 12
+                },
+                characteristics: {
+                    brawn: 2,
+                    agility: 2,
+                    intellect: 2,
+                    cunning: 2,
+                    willpower: 2,
+                    presence: 2
+                },
+                skills: [],
+                talents: [],
+                abilities: [],
+                equipment: [],
+                description: ['TODO: describe the NPC here...']
+            };
+        },
+        enumerable: true,
+        configurable: true
+    });
+    GenerateCommand.prototype.send = function (json, whisper, message) {
         var chatToSend = "```json\n" + json + "\n```";
         if (whisper) {
             message.author.createDM().then(function (c) {
@@ -130,9 +181,6 @@ var GenerateCommand = /** @class */ (function (_super) {
         }
         else {
             message.reply(chatToSend);
-        }
-        if (message.deletable) {
-            message.delete();
         }
     };
     GenerateCommand.prototype.generatePlace = function () {
