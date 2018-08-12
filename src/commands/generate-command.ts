@@ -128,9 +128,12 @@ export class GenerateCommand extends ChatCommandBase {
             default:
                 const name = this.generateAnyName();
                 const rank = this.generateRank(ranks.all);
+                const type = this.getTypeBasedOnRank(rank);
                 var obj: any = {};
                 obj[name] = {
                     initialSeed,
+                    image_path: `/assets/images/npcs/${rank.clan}.png`,
+                    type,
                     rank: rank.name,
                     clan: this.formatUtility.capitalize(rank.clan),
                     personality: this.generatePersonality(),
@@ -211,11 +214,24 @@ export class GenerateCommand extends ChatCommandBase {
         return this.randomService.pickOne(rndRanks).value;
     }
 
+    private getTypeBasedOnRank(rank: {
+        level: number;
+        name: string;
+        clan: string;
+    }): string {
+        var findSteps = ranks[rank.clan].steps;
+        var mid = Math.ceil(findSteps.length / 2);
+        var step = findSteps[mid];
+        var threshold = step[0];
+        return rank.level > threshold ? 'NEMESIS' : 'RIVAL';
+    }
+
     public help(): HelpText {
         return {
             command: this.supportedCommands[0],
             alias: this.supportedCommands.slice(1).join(', '),
-            description: 'Generate random stuff; by default a character.',
+            description:
+                'Generate random stuff; by default a character. Add option -whisper or -w to get private results.',
             args: [
                 {
                     syntax: 'motivation',

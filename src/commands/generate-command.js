@@ -108,9 +108,12 @@ var GenerateCommand = /** @class */ (function (_super) {
             default:
                 var name_1 = this.generateAnyName();
                 var rank = this.generateRank(data_1.ranks.all);
+                var type = this.getTypeBasedOnRank(rank);
                 var obj = {};
                 obj[name_1] = {
                     initialSeed: initialSeed,
+                    image_path: "/assets/images/npcs/" + rank.clan + ".png",
+                    type: type,
                     rank: rank.name,
                     clan: this.formatUtility.capitalize(rank.clan),
                     personality: this.generatePersonality(),
@@ -174,11 +177,18 @@ var GenerateCommand = /** @class */ (function (_super) {
         }
         return this.randomService.pickOne(rndRanks).value;
     };
+    GenerateCommand.prototype.getTypeBasedOnRank = function (rank) {
+        var findSteps = data_1.ranks[rank.clan].steps;
+        var mid = Math.ceil(findSteps.length / 2);
+        var step = findSteps[mid];
+        var threshold = step[0];
+        return rank.level > threshold ? 'NEMESIS' : 'RIVAL';
+    };
     GenerateCommand.prototype.help = function () {
         return {
             command: this.supportedCommands[0],
             alias: this.supportedCommands.slice(1).join(', '),
-            description: 'Generate random stuff; by default a character.',
+            description: 'Generate random stuff; by default a character. Add option -whisper or -w to get private results.',
             args: [
                 {
                     syntax: 'motivation',
