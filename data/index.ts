@@ -1,6 +1,7 @@
 export { motivations } from './motivation';
 export { personalityTraits } from './personality';
 export { ranks } from './ranks';
+export { species } from './species';
 
 import { data as surnameData } from './us-census/surname';
 import { data as femaleFirstname } from './gutenberg/female-firstname';

@@ -6,7 +6,7 @@ import { RandomService } from '../generators/random-service';
 import { AlienNamesGenerator } from '../generators/alien-names-generator';
 import { NameGenerator } from '../generators/name-generator';
 import { FormatUtility } from '../generators/format-utility';
-import { motivations, personalityTraits, ranks } from '../../data';
+import { motivations, personalityTraits, ranks, species } from '../../data';
 
 export class GenerateCommand extends ChatCommandBase {
     protected supportedCommands = ['generate', 'gen', 'g'];
@@ -125,6 +125,13 @@ export class GenerateCommand extends ChatCommandBase {
             case 'default':
                 json = JSON.stringify(this.defaultValues, null, indent);
                 break;
+            case 'species':
+                const species: Array<Species> = [];
+                for (let i = 0; i < count; i++) {
+                    species.push(this.generateSpecies());
+                }
+                json = JSON.stringify(species, null, indent);
+                break;
             case 'help':
                 const help = this.help();
                 json = JSON.stringify(help, null, indent);
@@ -138,17 +145,18 @@ export class GenerateCommand extends ChatCommandBase {
                     initialSeed,
                     image_path: `/assets/images/npcs/250x250-${rank.clan}.png`,
                     type,
+                    species: name.species,
                     rank: rank.name,
                     clan: this.formatUtility.capitalize(rank.clan),
                     personality: this.generatePersonality(),
                     motivation: this.generateMotivation()
                 };
-                obj[name] = generatedValues;
+                obj[name.name] = generatedValues;
                 json = JSON.stringify(obj, null, indent);
 
                 if (commandArgs.argumentExists('defaults')) {
                     const defaultsObj: any = {};
-                    defaultsObj[name] = this.defaultValues;
+                    defaultsObj[name.name] = this.defaultValues;
                     const defaultsJson = JSON.stringify(
                         defaultsObj,
                         null,
@@ -222,11 +230,24 @@ export class GenerateCommand extends ChatCommandBase {
         return this.alienNamesGenerator.generate();
     }
 
-    private generateAnyName() {
-        const isAlien = this.randomService.pickOne([true, false]);
-        return isAlien.value
-            ? this.alienNamesGenerator.generate()
-            : this.generateName();
+    private generateAnyName(): {
+        name: string;
+        isAlien: boolean;
+        species: Species;
+    } {
+        const isAlien = this.randomService.getRandomInt(0, 20).value == 20;
+        return {
+            isAlien: isAlien,
+            name: isAlien
+                ? this.alienNamesGenerator.generate()
+                : this.generateName(),
+            species: isAlien ? this.generateSpecies() : { name: 'Human' }
+        };
+    }
+
+    private generateSpecies(): Species {
+        const specie = this.randomService.pickOne(species);
+        return specie.value;
     }
 
     private generateMotivation() {
@@ -312,8 +333,22 @@ export class GenerateCommand extends ChatCommandBase {
                     syntax: 'rank',
                     description:
                         'Generate a rank. Support the -count argument. Support the -corp argument with value: navy|army|intelligence|COMPORN|governance|ancillary|appointments'
+                },
+                {
+                    syntax: 'species',
+                    description:
+                        'Generate a species. Support the -count argument.'
+                },
+                {
+                    syntax: 'default',
+                    description:
+                        'Generate a default Jekyll formatted default values for NPCs.'
                 }
             ]
         };
     }
+}
+
+interface Species {
+    name: string;
 }

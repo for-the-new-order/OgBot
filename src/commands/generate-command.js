@@ -105,6 +105,13 @@ var GenerateCommand = /** @class */ (function (_super) {
             case 'default':
                 json = JSON.stringify(this.defaultValues, null, indent);
                 break;
+            case 'species':
+                var species_1 = [];
+                for (var i = 0; i < count; i++) {
+                    species_1.push(this.generateSpecies());
+                }
+                json = JSON.stringify(species_1, null, indent);
+                break;
             case 'help':
                 var help = this.help();
                 json = JSON.stringify(help, null, indent);
@@ -118,16 +125,17 @@ var GenerateCommand = /** @class */ (function (_super) {
                     initialSeed: initialSeed,
                     image_path: "/assets/images/npcs/250x250-" + rank.clan + ".png",
                     type: type,
+                    species: name_1.species,
                     rank: rank.name,
                     clan: this.formatUtility.capitalize(rank.clan),
                     personality: this.generatePersonality(),
                     motivation: this.generateMotivation()
                 };
-                obj[name_1] = generatedValues;
+                obj[name_1.name] = generatedValues;
                 json = JSON.stringify(obj, null, indent);
                 if (commandArgs.argumentExists('defaults')) {
                     var defaultsObj = {};
-                    defaultsObj[name_1] = this.defaultValues;
+                    defaultsObj[name_1.name] = this.defaultValues;
                     var defaultsJson = JSON.stringify(defaultsObj, null, indent);
                     this.send(json, whisper, message);
                     this.send(defaultsJson, whisper, message);
@@ -196,10 +204,18 @@ var GenerateCommand = /** @class */ (function (_super) {
         return this.alienNamesGenerator.generate();
     };
     GenerateCommand.prototype.generateAnyName = function () {
-        var isAlien = this.randomService.pickOne([true, false]);
-        return isAlien.value
-            ? this.alienNamesGenerator.generate()
-            : this.generateName();
+        var isAlien = this.randomService.getRandomInt(0, 20).value == 20;
+        return {
+            isAlien: isAlien,
+            name: isAlien
+                ? this.alienNamesGenerator.generate()
+                : this.generateName(),
+            species: isAlien ? this.generateSpecies() : { name: 'Human' }
+        };
+    };
+    GenerateCommand.prototype.generateSpecies = function () {
+        var specie = this.randomService.pickOne(data_1.species);
+        return specie.value;
     };
     GenerateCommand.prototype.generateMotivation = function () {
         return {
@@ -261,6 +277,14 @@ var GenerateCommand = /** @class */ (function (_super) {
                 {
                     syntax: 'rank',
                     description: 'Generate a rank. Support the -count argument. Support the -corp argument with value: navy|army|intelligence|COMPORN|governance|ancillary|appointments'
+                },
+                {
+                    syntax: 'species',
+                    description: 'Generate a species. Support the -count argument.'
+                },
+                {
+                    syntax: 'default',
+                    description: 'Generate a default Jekyll formatted default values for NPCs.'
                 }
             ]
         };
