@@ -103,7 +103,7 @@ var GenerateCommand = /** @class */ (function (_super) {
             default:
                 json = JSON.stringify({
                     initialSeed: initialSeed,
-                    rank: this.generateRank(data_1.ranks.empire.all),
+                    rank: this.generateRank(data_1.ranks.all),
                     name: this.generateAnyName(),
                     personality: this.generatePersonality(),
                     motivation: this.generateMotivation()
@@ -144,7 +144,7 @@ var GenerateCommand = /** @class */ (function (_super) {
         };
     };
     GenerateCommand.prototype.generatePersonality = function () {
-        this.randomService.pickOne(data_1.personalityTraits).value;
+        return this.randomService.pickOne(data_1.personalityTraits).value;
     };
     GenerateCommand.prototype.withSeed = function (initialSeed, value) {
         return { value: value, initialSeed: initialSeed };

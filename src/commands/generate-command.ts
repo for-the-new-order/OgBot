@@ -122,7 +122,7 @@ export class GenerateCommand extends ChatCommandBase {
                 json = JSON.stringify(
                     {
                         initialSeed,
-                        rank: this.generateRank(ranks.empire.all),
+                        rank: this.generateRank(ranks.all),
                         name: this.generateAnyName(),
                         personality: this.generatePersonality(),
                         motivation: this.generateMotivation()
@@ -172,7 +172,7 @@ export class GenerateCommand extends ChatCommandBase {
     }
 
     private generatePersonality() {
-        this.randomService.pickOne(personalityTraits).value;
+        return this.randomService.pickOne(personalityTraits).value;
     }
 
     private withSeed(initialSeed: number, value: any): any {
