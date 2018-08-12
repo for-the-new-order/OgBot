@@ -27,6 +27,8 @@ var GenerateCommand = /** @class */ (function (_super) {
         _this.alienNamesGenerator = new alien_names_generator_1.AlienNamesGenerator(new format_utility_1.FormatUtility());
         _this.randomService = new random_service_1.RandomService();
         _this.nameGenerator = new name_generator_1.NameGenerator(_this.randomService);
+        _this.formatUtility = new format_utility_1.FormatUtility();
+        _this.alienNamesGenerator = new alien_names_generator_1.AlienNamesGenerator(_this.formatUtility);
         return _this;
     }
     GenerateCommand.prototype.handle = function (message, commandArgs) {
@@ -44,6 +46,9 @@ var GenerateCommand = /** @class */ (function (_super) {
         if (commandArgs.argumentExists('count')) {
             count = parseInt(commandArgs.findArgumentValue('count'));
         }
+        // Whisper
+        var whisper = commandArgs.argumentExists('whisper') ||
+            commandArgs.argumentExists('w');
         var json = '';
         var indent = 4;
         switch (subCommand) {
@@ -101,18 +106,28 @@ var GenerateCommand = /** @class */ (function (_super) {
                 json = JSON.stringify(help, null, indent);
                 break;
             default:
-                json = JSON.stringify({
+                var name_1 = this.generateAnyName();
+                var rank = this.generateRank(data_1.ranks.all);
+                var obj = {};
+                obj[name_1] = {
                     initialSeed: initialSeed,
-                    rank: this.generateRank(data_1.ranks.all),
-                    name: this.generateAnyName(),
+                    rank: rank.name,
+                    clan: this.formatUtility.capitalize(rank.clan),
                     personality: this.generatePersonality(),
                     motivation: this.generateMotivation()
-                }, null, indent);
+                };
+                json = JSON.stringify(obj, null, indent);
                 break;
         }
-        message.author.createDM().then(function (c) {
-            c.send("```json\n" + json + "\n```");
-        });
+        var chatToSend = "```json\n" + json + "\n```";
+        if (whisper) {
+            message.author.createDM().then(function (c) {
+                c.send(chatToSend);
+            });
+        }
+        else {
+            message.reply(chatToSend);
+        }
         if (message.deletable) {
             message.delete();
         }

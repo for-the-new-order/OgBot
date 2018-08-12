@@ -4,11 +4,12 @@ var generate_command_1 = require("./generate-command");
 var CommandArgs_1 = require("./CommandArgs");
 var ChatCommandManager = /** @class */ (function () {
     function ChatCommandManager() {
+        var _this = this;
         this.trigger = 'og';
         this.commands = new Array(new generate_command_1.GenerateCommand(), 
         //
         // Default (echo help)
-        new DefaultChatCommand(this.echoHelp));
+        new DefaultChatCommand(function (message) { return _this.echoHelp(message); }));
     }
     ChatCommandManager.prototype.Handle = function (message) {
         var args = message.content.substring(1).split(' ');
@@ -35,7 +36,12 @@ var ChatCommandManager = /** @class */ (function () {
         }
     };
     ChatCommandManager.prototype.echoHelp = function (message) {
-        message.reply("Something went wrong; I may add some help some day... Stay tuned lol (or don't be wrong)");
+        message.reply('Something went wrong; I may add some more help some day... Stay tuned and do with the following until then!');
+        for (var i = 0; i < this.commands.length; i++) {
+            var command = this.commands[i];
+            var txt = JSON.stringify(command.help(), null, 4);
+            message.reply(txt);
+        }
     };
     return ChatCommandManager;
 }());

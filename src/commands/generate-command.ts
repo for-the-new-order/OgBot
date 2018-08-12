@@ -2,7 +2,6 @@ import { ChatCommandBase } from './ChatCommandBase';
 import { Message } from 'discord.js';
 import { CommandArgs } from './CommandArgs';
 import { HelpText } from './HelpText';
-import { CharacterGenerator } from '../generators/character-generator';
 import { RandomService } from '../generators/random-service';
 import { AlienNamesGenerator } from '../generators/alien-names-generator';
 import { NameGenerator } from '../generators/name-generator';
@@ -12,12 +11,15 @@ import { motivations, personalityTraits, ranks } from '../../data';
 export class GenerateCommand extends ChatCommandBase {
     protected supportedCommands = ['generate', 'gen', 'g'];
     private randomService: RandomService;
-    public alienNamesGenerator = new AlienNamesGenerator(new FormatUtility());
-    public nameGenerator: NameGenerator;
+    private formatUtility: FormatUtility;
+    private alienNamesGenerator = new AlienNamesGenerator(new FormatUtility());
+    private nameGenerator: NameGenerator;
     constructor() {
         super();
         this.randomService = new RandomService();
         this.nameGenerator = new NameGenerator(this.randomService);
+        this.formatUtility = new FormatUtility();
+        this.alienNamesGenerator = new AlienNamesGenerator(this.formatUtility);
     }
 
     public handle(message: Message, commandArgs: CommandArgs) {
@@ -39,6 +41,11 @@ export class GenerateCommand extends ChatCommandBase {
         if (commandArgs.argumentExists('count')) {
             count = parseInt(commandArgs.findArgumentValue('count'));
         }
+
+        // Whisper
+        const whisper =
+            commandArgs.argumentExists('whisper') ||
+            commandArgs.argumentExists('w');
 
         let json = '';
         const indent = 4;
@@ -119,22 +126,27 @@ export class GenerateCommand extends ChatCommandBase {
                 json = JSON.stringify(help, null, indent);
                 break;
             default:
-                json = JSON.stringify(
-                    {
-                        initialSeed,
-                        rank: this.generateRank(ranks.all),
-                        name: this.generateAnyName(),
-                        personality: this.generatePersonality(),
-                        motivation: this.generateMotivation()
-                    },
-                    null,
-                    indent
-                );
+                const name = this.generateAnyName();
+                const rank = this.generateRank(ranks.all);
+                var obj: any = {};
+                obj[name] = {
+                    initialSeed,
+                    rank: rank.name,
+                    clan: this.formatUtility.capitalize(rank.clan),
+                    personality: this.generatePersonality(),
+                    motivation: this.generateMotivation()
+                };
+                json = JSON.stringify(obj, null, indent);
                 break;
         }
-        message.author.createDM().then(c => {
-            c.send(`\`\`\`json\n${json}\n\`\`\``);
-        });
+        var chatToSend = `\`\`\`json\n${json}\n\`\`\``;
+        if (whisper) {
+            message.author.createDM().then(c => {
+                c.send(chatToSend);
+            });
+        } else {
+            message.reply(chatToSend);
+        }
         if (message.deletable) {
             message.delete();
         }

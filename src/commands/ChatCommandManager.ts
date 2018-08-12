@@ -12,7 +12,7 @@ export class ChatCommandManager {
             new GenerateCommand(),
             //
             // Default (echo help)
-            new DefaultChatCommand(this.echoHelp)
+            new DefaultChatCommand((message: Message) => this.echoHelp(message))
         );
     }
 
@@ -49,8 +49,13 @@ export class ChatCommandManager {
     }
     private echoHelp(message: Message) {
         message.reply(
-            "Something went wrong; I may add some help some day... Stay tuned lol (or don't be wrong)"
+            'Something went wrong; I may add some more help some day... Stay tuned and do with the following until then!'
         );
+        for (let i = 0; i < this.commands.length; i++) {
+            const command = this.commands[i];
+            var txt = JSON.stringify(command.help(), null, 4);
+            message.reply(txt);
+        }
     }
 }
 
