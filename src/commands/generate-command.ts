@@ -28,11 +28,14 @@ export class GenerateCommand extends ChatCommandBase {
             subCommand = commandArgs.args[0];
         }
 
-        // Custom seed
         if (commandArgs.argumentExists('seed')) {
+            // Custom seed
             this.randomService.seed = parseInt(
                 commandArgs.findArgumentValue('seed')
             );
+        } else {
+            // Re-randomize the random seed
+            this.randomService.reseed();
         }
         const initialSeed = this.randomService.seed;
 

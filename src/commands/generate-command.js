@@ -36,9 +36,13 @@ var GenerateCommand = /** @class */ (function (_super) {
         if (commandArgs.args.length > 0) {
             subCommand = commandArgs.args[0];
         }
-        // Custom seed
         if (commandArgs.argumentExists('seed')) {
+            // Custom seed
             this.randomService.seed = parseInt(commandArgs.findArgumentValue('seed'));
+        }
+        else {
+            // Re-randomize the random seed
+            this.randomService.reseed();
         }
         var initialSeed = this.randomService.seed;
         // count

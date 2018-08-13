@@ -6,7 +6,7 @@ export class RandomService {
     private randomEngine = engines.mt19937();
 
     constructor() {
-        this.seed = Math.floor(Math.random() * Math.floor(500000));
+        this.reseed();
     }
 
     public pickOne<T>(values: Array<T>): SeedableValue<T> {
@@ -32,6 +32,10 @@ export class RandomService {
     }
     public set seed(value: number) {
         this._seed = value;
+    }
+
+    public reseed(): void {
+        this.seed = Math.floor(Math.random() * Math.floor(500000));
     }
 }
 
