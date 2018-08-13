@@ -7,6 +7,7 @@ import { AlienNamesGenerator } from '../generators/alien-names-generator';
 import { NameGenerator } from '../generators/name-generator';
 import { FormatUtility } from '../generators/format-utility';
 import { motivations, personalityTraits, ranks, species } from '../../data';
+import { EchoHelpService } from './EchoHelpService';
 
 export class GenerateCommand extends ChatCommandBase {
     protected supportedCommands = ['generate', 'gen', 'g'];
@@ -14,6 +15,7 @@ export class GenerateCommand extends ChatCommandBase {
     private formatUtility: FormatUtility;
     private alienNamesGenerator = new AlienNamesGenerator(new FormatUtility());
     private nameGenerator: NameGenerator;
+    private echoHelpService = new EchoHelpService();
     constructor() {
         super();
         this.randomService = new RandomService();
@@ -137,17 +139,7 @@ export class GenerateCommand extends ChatCommandBase {
                 break;
             case 'help':
                 const help = this.help();
-                json = JSON.stringify(help, null, indent);
-                // TMP: split the output
-                const threshold = 1980;
-                const blockCount = Math.ceil(json.length / threshold);
-                for (let i = 0; i < blockCount; i++) {
-                    const block = json.substr(
-                        i * threshold,
-                        (i + 1) * threshold
-                    );
-                    this.send(block, whisper, message);
-                }
+                this.echoHelpService.echo(help, whisper, message);
                 messageSent = true;
                 break;
             default:
@@ -323,11 +315,17 @@ export class GenerateCommand extends ChatCommandBase {
             description:
                 'Use the specified seed to generate the specified item. This can be used to replay random generation.'
         };
+        const wisperOption = {
+            syntax: '-whisper',
+            alias: '-w',
+            description:
+                'The bot will whisper you the results instead of relying in the current channel.'
+        };
         return {
             command: this.supportedCommands[0],
             alias: this.supportedCommands.slice(1).join(', '),
-            description:
-                'Generate random stuff; by default a character. Add option -whisper or -w to get private results.',
+            description: 'Generate random stuff; by default a character.',
+            options: [wisperOption],
             args: [
                 {
                     syntax: 'motivation',
@@ -357,27 +355,31 @@ export class GenerateCommand extends ChatCommandBase {
                 {
                     syntax: 'rank',
                     description: 'Generate a rank.',
-                    options: [countOption, seedOption]
+                    options: [
+                        countOption,
+                        // {
+                        //     syntax:
+                        //         '-corp [navy|army|intelligence|COMPORN|governance|ancillary|appointments]',
+                        //     description:
+                        //         'Use a particular rank collectino to generate the rank in.'
+                        // },
+                        seedOption
+                    ]
                 },
                 {
                     syntax: 'species',
                     description: 'Generate a species.',
-                    options: [
-                        countOption,
-                        {
-                            syntax:
-                                '-corp [navy|army|intelligence|COMPORN|governance|ancillary|appointments]',
-                            description:
-                                'Use a particular rank collectino to generate the rank in.'
-                        },
-                        seedOption
-                    ]
+                    options: [countOption, seedOption]
                 },
                 {
                     syntax: 'default',
                     description:
                         'Generate a default Jekyll formatted default values for NPCs.',
                     options: [seedOption]
+                },
+                {
+                    syntax: 'help',
+                    description: 'Display the generate command help.'
                 }
             ]
         };

@@ -2,10 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var generate_command_1 = require("./generate-command");
 var CommandArgs_1 = require("./CommandArgs");
+var EchoHelpService_1 = require("./EchoHelpService");
 var ChatCommandManager = /** @class */ (function () {
     function ChatCommandManager() {
         var _this = this;
         this.trigger = 'og';
+        this.echoHelpService = new EchoHelpService_1.EchoHelpService();
         this.commands = new Array(new generate_command_1.GenerateCommand(), 
         //
         // Default (echo help)
@@ -39,8 +41,8 @@ var ChatCommandManager = /** @class */ (function () {
         message.reply('Something went wrong; I may add some more help some day... Stay tuned and do with the following until then!');
         for (var i = 0; i < this.commands.length; i++) {
             var command = this.commands[i];
-            var txt = JSON.stringify(command.help(), null, 4);
-            message.reply(txt);
+            var help = command.help();
+            this.echoHelpService.echo(help, false, message);
         }
     };
     return ChatCommandManager;

@@ -19,12 +19,14 @@ var alien_names_generator_1 = require("../generators/alien-names-generator");
 var name_generator_1 = require("../generators/name-generator");
 var format_utility_1 = require("../generators/format-utility");
 var data_1 = require("../../data");
+var EchoHelpService_1 = require("./EchoHelpService");
 var GenerateCommand = /** @class */ (function (_super) {
     __extends(GenerateCommand, _super);
     function GenerateCommand() {
         var _this = _super.call(this) || this;
         _this.supportedCommands = ['generate', 'gen', 'g'];
         _this.alienNamesGenerator = new alien_names_generator_1.AlienNamesGenerator(new format_utility_1.FormatUtility());
+        _this.echoHelpService = new EchoHelpService_1.EchoHelpService();
         _this.randomService = new random_service_1.RandomService();
         _this.nameGenerator = new name_generator_1.NameGenerator(_this.randomService);
         _this.formatUtility = new format_utility_1.FormatUtility();
@@ -118,14 +120,7 @@ var GenerateCommand = /** @class */ (function (_super) {
                 break;
             case 'help':
                 var help = this.help();
-                json = JSON.stringify(help, null, indent);
-                // TMP: split the output
-                var threshold = 1980;
-                var blockCount = Math.ceil(json.length / threshold);
-                for (var i = 0; i < blockCount; i++) {
-                    var block = json.substr(i * threshold, (i + 1) * threshold);
-                    this.send(block, whisper, message);
-                }
+                this.echoHelpService.echo(help, whisper, message);
                 messageSent = true;
                 break;
             default:
@@ -269,10 +264,16 @@ var GenerateCommand = /** @class */ (function (_super) {
             syntax: '-seed [some random seed]',
             description: 'Use the specified seed to generate the specified item. This can be used to replay random generation.'
         };
+        var wisperOption = {
+            syntax: '-whisper',
+            alias: '-w',
+            description: 'The bot will whisper you the results instead of relying in the current channel.'
+        };
         return {
             command: this.supportedCommands[0],
             alias: this.supportedCommands.slice(1).join(', '),
-            description: 'Generate random stuff; by default a character. Add option -whisper or -w to get private results.',
+            description: 'Generate random stuff; by default a character.',
+            options: [wisperOption],
             args: [
                 {
                     syntax: 'motivation',
@@ -302,24 +303,30 @@ var GenerateCommand = /** @class */ (function (_super) {
                 {
                     syntax: 'rank',
                     description: 'Generate a rank.',
-                    options: [countOption, seedOption]
+                    options: [
+                        countOption,
+                        // {
+                        //     syntax:
+                        //         '-corp [navy|army|intelligence|COMPORN|governance|ancillary|appointments]',
+                        //     description:
+                        //         'Use a particular rank collectino to generate the rank in.'
+                        // },
+                        seedOption
+                    ]
                 },
                 {
                     syntax: 'species',
                     description: 'Generate a species.',
-                    options: [
-                        countOption,
-                        {
-                            syntax: '-corp [navy|army|intelligence|COMPORN|governance|ancillary|appointments]',
-                            description: 'Use a particular rank collectino to generate the rank in.'
-                        },
-                        seedOption
-                    ]
+                    options: [countOption, seedOption]
                 },
                 {
                     syntax: 'default',
                     description: 'Generate a default Jekyll formatted default values for NPCs.',
                     options: [seedOption]
+                },
+                {
+                    syntax: 'help',
+                    description: 'Display the generate command help.'
                 }
             ]
         };

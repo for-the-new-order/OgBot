@@ -3,10 +3,12 @@ import { GenerateCommand } from './generate-command';
 import { ChatCommand } from './ChatCommand';
 import { CommandArgs } from './CommandArgs';
 import { HelpText } from './HelpText';
+import { EchoHelpService } from './EchoHelpService';
 
 export class ChatCommandManager {
     private trigger = 'og';
     private commands: Array<ChatCommand>;
+    private echoHelpService = new EchoHelpService();
     constructor() {
         this.commands = new Array<ChatCommand>(
             new GenerateCommand(),
@@ -53,8 +55,8 @@ export class ChatCommandManager {
         );
         for (let i = 0; i < this.commands.length; i++) {
             const command = this.commands[i];
-            var txt = JSON.stringify(command.help(), null, 4);
-            message.reply(txt);
+            const help = command.help();
+            this.echoHelpService.echo(help, false, message);
         }
     }
 }
