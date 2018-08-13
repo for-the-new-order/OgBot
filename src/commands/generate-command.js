@@ -54,7 +54,7 @@ var GenerateCommand = /** @class */ (function (_super) {
         var whisper = commandArgs.argumentExists('whisper') ||
             commandArgs.argumentExists('w');
         var json = '';
-        var indent = 4;
+        var indent = 2;
         var messageSent = false;
         switch (subCommand) {
             case 'name':
@@ -119,6 +119,14 @@ var GenerateCommand = /** @class */ (function (_super) {
             case 'help':
                 var help = this.help();
                 json = JSON.stringify(help, null, indent);
+                // TMP: split the output
+                var threshold = 1980;
+                var blockCount = Math.ceil(json.length / threshold);
+                for (var i = 0; i < blockCount; i++) {
+                    var block = json.substr(i * threshold, (i + 1) * threshold);
+                    this.send(block, whisper, message);
+                }
+                messageSent = true;
                 break;
             default:
                 var name_1 = this.generateAnyName();
@@ -253,6 +261,14 @@ var GenerateCommand = /** @class */ (function (_super) {
         return rank.level > threshold ? 'NEMESIS' : 'RIVAL';
     };
     GenerateCommand.prototype.help = function () {
+        var countOption = {
+            syntax: '-count [some number]',
+            description: 'Generate the specified number of result.'
+        };
+        var seedOption = {
+            syntax: '-seed [some random seed]',
+            description: 'Use the specified seed to generate the specified item. This can be used to replay random generation.'
+        };
         return {
             command: this.supportedCommands[0],
             alias: this.supportedCommands.slice(1).join(', '),
@@ -260,35 +276,50 @@ var GenerateCommand = /** @class */ (function (_super) {
             args: [
                 {
                     syntax: 'motivation',
-                    description: 'Generate a character motivation.'
+                    description: 'Generate a character motivation.',
+                    options: [seedOption]
                 },
                 {
                     syntax: 'alienname',
-                    description: 'Generate some alien names. Support the -count argument.'
+                    description: 'Generate some alien names.',
+                    options: [countOption]
                 },
                 {
                     syntax: 'name',
-                    description: 'Generate some names. Support the -count argument.'
+                    description: 'Generate some names.',
+                    options: [countOption, seedOption]
                 },
                 {
                     syntax: 'place',
-                    description: 'Generate a place name. Support the -count argument.'
+                    description: 'Generate a place name.',
+                    options: [countOption, seedOption]
                 },
                 {
                     syntax: 'personality',
-                    description: 'Generate a personality.'
+                    description: 'Generate a personality.',
+                    options: [seedOption]
                 },
                 {
                     syntax: 'rank',
-                    description: 'Generate a rank. Support the -count argument. Support the -corp argument with value: navy|army|intelligence|COMPORN|governance|ancillary|appointments'
+                    description: 'Generate a rank.',
+                    options: [countOption, seedOption]
                 },
                 {
                     syntax: 'species',
-                    description: 'Generate a species. Support the -count argument.'
+                    description: 'Generate a species.',
+                    options: [
+                        countOption,
+                        {
+                            syntax: '-corp [navy|army|intelligence|COMPORN|governance|ancillary|appointments]',
+                            description: 'Use a particular rank collectino to generate the rank in.'
+                        },
+                        seedOption
+                    ]
                 },
                 {
                     syntax: 'default',
-                    description: 'Generate a default Jekyll formatted default values for NPCs.'
+                    description: 'Generate a default Jekyll formatted default values for NPCs.',
+                    options: [seedOption]
                 }
             ]
         };

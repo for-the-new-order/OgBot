@@ -8,4 +8,10 @@ export interface HelpText {
 export interface HelpArgument {
     syntax: string;
     description: string;
+    options?: Array<HelpOption>;
+}
+
+export interface HelpOption {
+    syntax: string;
+    description: string;
 }
