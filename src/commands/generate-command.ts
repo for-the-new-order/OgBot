@@ -4,7 +4,7 @@ import { CommandArgs } from './CommandArgs';
 import { HelpText } from './HelpText';
 import { RandomService } from '../generators/random-service';
 import { AlienNamesGenerator } from '../generators/alien-names-generator';
-import { NameGenerator } from '../generators/name-generator';
+import { NameGenerator, Gender } from '../generators/name-generator';
 import { FormatUtility } from '../generators/format-utility';
 import { motivations, personalityTraits, ranks, species } from '../../data';
 import { EchoHelpService } from './EchoHelpService';
@@ -57,9 +57,10 @@ export class GenerateCommand extends ChatCommandBase {
         let messageSent = false;
         switch (subCommand) {
             case 'name':
-                var names: Array<string> = [];
+                const names: Array<{ name: string, gender: Gender }> = [];
                 for (let i = 0; i < count; i++) {
-                    names.push(this.generateName());
+                    const gender = this.generateGender();
+                    names.push(this.generateName(gender));
                 }
                 json = JSON.stringify(
                     this.withSeed(initialSeed, names),
@@ -68,11 +69,11 @@ export class GenerateCommand extends ChatCommandBase {
                 );
                 break;
             case 'alienname':
-                var names: Array<string> = [];
+                var aliennames: Array<string> = [];
                 for (let i = 0; i < count; i++) {
-                    names.push(this.generateAlienName());
+                    aliennames.push(this.generateAlienName());
                 }
-                json = JSON.stringify(names, null, indent);
+                json = JSON.stringify(aliennames, null, indent);
                 break;
             case 'motivation':
                 var motivation = this.generateMotivation();
@@ -153,6 +154,7 @@ export class GenerateCommand extends ChatCommandBase {
                     type,
                     species: name.species,
                     rank: rank.name,
+                    gender: name.gender,
                     clan: this.formatUtility.capitalize(rank.clan),
                     personality: this.generatePersonality(),
                     motivation: this.generateMotivation()
@@ -225,11 +227,11 @@ export class GenerateCommand extends ChatCommandBase {
         return this.nameGenerator.place();
     }
 
-    private generateName() {
-        let name = this.nameGenerator.firstname();
+    private generateName(gender: Gender): { name: string, gender: Gender } {
+        let name = this.nameGenerator.firstname(gender);
         name += ' ';
         name += this.nameGenerator.surname();
-        return name;
+        return { name, gender };
     }
 
     private generateAlienName() {
@@ -240,15 +242,30 @@ export class GenerateCommand extends ChatCommandBase {
         name: string;
         isAlien: boolean;
         species: Species;
+        gender: Gender;
     } {
         const isAlien = this.randomService.getRandomInt(0, 20).value == 20;
+        if (isAlien) {
+            const alienName = this.alienNamesGenerator.generate();
+            return {
+                isAlien: isAlien,
+                name: alienName,
+                species: this.generateSpecies(),
+                gender: Gender.Unknown
+            };
+        }
+        const gender = this.generateGender();
+        const humanName = this.generateName(gender);
         return {
             isAlien: isAlien,
-            name: isAlien
-                ? this.alienNamesGenerator.generate()
-                : this.generateName(),
-            species: isAlien ? this.generateSpecies() : { name: 'Human' }
+            name: humanName.name,
+            species: { name: 'Human' },
+            gender
         };
+    }
+
+    private generateGender() {
+        return this.randomService.pickOne([Gender.Male, Gender.Male, Gender.Female]).value;
     }
 
     private generateSpecies(): Species {

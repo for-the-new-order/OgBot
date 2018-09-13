@@ -62,16 +62,17 @@ var GenerateCommand = /** @class */ (function (_super) {
             case 'name':
                 var names = [];
                 for (var i = 0; i < count; i++) {
-                    names.push(this.generateName());
+                    var gender = this.generateGender();
+                    names.push(this.generateName(gender));
                 }
                 json = JSON.stringify(this.withSeed(initialSeed, names), null, indent);
                 break;
             case 'alienname':
-                var names = [];
+                var aliennames = [];
                 for (var i = 0; i < count; i++) {
-                    names.push(this.generateAlienName());
+                    aliennames.push(this.generateAlienName());
                 }
-                json = JSON.stringify(names, null, indent);
+                json = JSON.stringify(aliennames, null, indent);
                 break;
             case 'motivation':
                 var motivation = this.generateMotivation();
@@ -134,6 +135,7 @@ var GenerateCommand = /** @class */ (function (_super) {
                     type: type,
                     species: name_1.species,
                     rank: rank.name,
+                    gender: name_1.gender,
                     clan: this.formatUtility.capitalize(rank.clan),
                     personality: this.generatePersonality(),
                     motivation: this.generateMotivation()
@@ -201,24 +203,37 @@ var GenerateCommand = /** @class */ (function (_super) {
     GenerateCommand.prototype.generatePlace = function () {
         return this.nameGenerator.place();
     };
-    GenerateCommand.prototype.generateName = function () {
-        var name = this.nameGenerator.firstname();
+    GenerateCommand.prototype.generateName = function (gender) {
+        var name = this.nameGenerator.firstname(gender);
         name += ' ';
         name += this.nameGenerator.surname();
-        return name;
+        return { name: name, gender: gender };
     };
     GenerateCommand.prototype.generateAlienName = function () {
         return this.alienNamesGenerator.generate();
     };
     GenerateCommand.prototype.generateAnyName = function () {
         var isAlien = this.randomService.getRandomInt(0, 20).value == 20;
+        if (isAlien) {
+            var alienName = this.alienNamesGenerator.generate();
+            return {
+                isAlien: isAlien,
+                name: alienName,
+                species: this.generateSpecies(),
+                gender: name_generator_1.Gender.Unknown
+            };
+        }
+        var gender = this.generateGender();
+        var humanName = this.generateName(gender);
         return {
             isAlien: isAlien,
-            name: isAlien
-                ? this.alienNamesGenerator.generate()
-                : this.generateName(),
-            species: isAlien ? this.generateSpecies() : { name: 'Human' }
+            name: humanName.name,
+            species: { name: 'Human' },
+            gender: gender
         };
+    };
+    GenerateCommand.prototype.generateGender = function () {
+        return this.randomService.pickOne([name_generator_1.Gender.Male, name_generator_1.Gender.Male, name_generator_1.Gender.Female]).value;
     };
     GenerateCommand.prototype.generateSpecies = function () {
         var specie = this.randomService.pickOne(data_1.species);
