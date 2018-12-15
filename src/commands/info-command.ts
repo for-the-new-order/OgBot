@@ -1,25 +1,25 @@
-import { ChatCommandBase } from "./ChatCommandBase";
+import { ChatCommandBase } from './ChatCommandBase';
 import { Message, TextChannel } from 'discord.js';
 import { CommandArgs } from './CommandArgs';
 import { HelpText } from './HelpText';
 
 export class InfoCommand extends ChatCommandBase {
-    protected supportedCommands: string[] = ["info"];
+    protected supportedCommands: string[] = ['info'];
     public async handle(message: Message, commandArgs: CommandArgs) {
         if (commandArgs.args.length === 0) {
-            await message.reply("You must specify the message type(s).");
+            await message.reply('You must specify the message type(s).');
             return Promise.reject();
         }
         for (let i = 0; i < commandArgs.args.length; i++) {
             const element = commandArgs.args[i];
             switch (element) {
-                case "channel":
+                case 'channel':
                     await this.sendChannelInfo(message);
                     break;
-                case "author":
+                case 'author':
                     await this.sendAuthorInfo(message);
                     break;
-                case "guild":
+                case 'guild':
                     await this.sendGuildInfo(message);
                     break;
                 default:
@@ -31,11 +31,14 @@ export class InfoCommand extends ChatCommandBase {
     public help(): HelpText {
         return {
             command: this.supportedCommands[0],
-            description: "Get some information.",
-            options: [{
-                syntax: "[information types]",
-                description: "The type of information that you want (channel, author, guild). You can pass more than one by separating types by a space, ex.: `!og info channel guild`"
-            }]
+            description: 'Get some information.',
+            options: [
+                {
+                    command: '[information types]',
+                    description:
+                        'The type of information that you want (channel, author, guild). You can pass more than one by separating types by a space, ex.: `!og info channel guild`'
+                }
+            ]
             // ,
             // args: [{
             //     syntax: "-purge",
@@ -56,4 +59,3 @@ export class InfoCommand extends ChatCommandBase {
         return message.channel.send(`Author: **${message.author}** (ID: ${message.author.id})`);
     }
 }
-

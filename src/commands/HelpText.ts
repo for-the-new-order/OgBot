@@ -7,7 +7,7 @@ export interface HelpText {
 }
 
 export interface HelpArgument {
-    syntax: string;
+    command: string;
     alias?: string;
     description: string;
     options?: Array<HelpArgument>;

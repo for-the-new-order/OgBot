@@ -14,6 +14,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var ChatCommandBase_1 = require("./ChatCommandBase");
+var CommandArgs_1 = require("./CommandArgs");
 var random_service_1 = require("../generators/random-service");
 var alien_names_generator_1 = require("../generators/alien-names-generator");
 var name_generator_1 = require("../generators/name-generator");
@@ -60,17 +61,16 @@ var GenerateCommand = /** @class */ (function (_super) {
         var messageSent = false;
         switch (subCommand) {
             case 'adventure':
-                var hasAdventureElement = commandArgs.argumentExists('element') || commandArgs.argumentExists('el');
-                if (hasAdventureElement) {
-                    var rawAdventureElement = commandArgs.findArgumentValue('element') || commandArgs.findArgumentValue('el');
-                    var adventureElement = rawAdventureElement;
-                    if (adventureElement) {
-                        var distinct = commandArgs.argumentExists('distinct');
-                        json = JSON.stringify(this.starWarsAdventureGenerator.generateAdventureElement(adventureElement, count, distinct), null, indent);
-                    }
-                    else {
-                        json = JSON.stringify({ error: rawAdventureElement + " is not a valid adventure element." }, null, indent);
-                    }
+                // Create sub-command object (this could become recursive to create a "command-tree" of sort)
+                var adventureCommand = new CommandArgs_1.CommandArgs(commandArgs.args[0].toLowerCase(), commandArgs.args.length > 1 ? commandArgs.args[1].toLowerCase() : null, commandArgs.args.splice(2));
+                // Execute command
+                var adventureElement = adventureCommand.command;
+                if (adventureElement) {
+                    var distinct = adventureCommand.argumentExists('distinct');
+                    json = JSON.stringify(this.starWarsAdventureGenerator.generateAdventureElement(adventureElement, count, distinct), null, indent);
+                }
+                else if (adventureCommand.command != null && !adventureCommand.command.startsWith('-')) {
+                    json = JSON.stringify({ error: adventureCommand.command + " is not a valid adventure element." }, null, indent);
                 }
                 else {
                     json = JSON.stringify(this.starWarsAdventureGenerator.generateAdventure(), null, indent);
@@ -295,15 +295,15 @@ var GenerateCommand = /** @class */ (function (_super) {
     };
     GenerateCommand.prototype.help = function (commandArgs) {
         var countOption = {
-            syntax: '-count [some number]',
+            command: '-count [some number]',
             description: 'Generate the specified number of result.'
         };
         var seedOption = {
-            syntax: '-seed [some random seed]',
+            command: '-seed [some random seed]',
             description: 'Use the specified seed to generate the specified item. This can be used to replay random generation.'
         };
         var wisperOption = {
-            syntax: '-whisper',
+            command: '-whisper',
             alias: '-w',
             description: 'The bot will whisper you the results instead of relying in the current channel.'
         };
@@ -314,17 +314,16 @@ var GenerateCommand = /** @class */ (function (_super) {
             options: [wisperOption],
             args: [
                 {
-                    syntax: 'adventure',
+                    command: 'adventure',
                     description: 'Generate a Star Wars adventure.',
                     options: [
                         {
-                            syntax: "-element ['contract' | 'theme' | 'location' | 'macguffin' | 'victimsAndNPCs' | 'antagonistOrTarget' | 'twistsOrComplications' | 'dramaticReveal']",
-                            alias: '-el',
-                            description: 'Generate only the specified adventure element (optionally: the specified the number of time).',
+                            command: '[contract|theme|location|macguffin|victimsAndNPCs|antagonistOrTarget|twistsOrComplications|dramaticReveal]',
+                            description: '(optional) Generate only the specified adventure element.',
                             options: [
                                 countOption,
                                 {
-                                    syntax: '-distinct',
+                                    command: '-distinct',
                                     description: 'Remove duplicate entries.'
                                 }
                             ]
@@ -332,37 +331,37 @@ var GenerateCommand = /** @class */ (function (_super) {
                     ]
                 },
                 {
-                    syntax: 'motivation',
+                    command: 'motivation',
                     description: 'Generate a character motivation.',
                     options: [seedOption]
                 },
                 {
-                    syntax: 'alienname',
+                    command: 'alienname',
                     description: 'Generate some alien names.',
                     options: [countOption]
                 },
                 {
-                    syntax: 'name',
+                    command: 'name',
                     description: 'Generate some names.',
                     options: [countOption, seedOption]
                 },
                 {
-                    syntax: 'place',
+                    command: 'place',
                     description: 'Generate a place name.',
                     options: [countOption, seedOption]
                 },
                 {
-                    syntax: 'personality',
+                    command: 'personality',
                     description: 'Generate a personality.',
                     options: [seedOption]
                 },
                 {
-                    syntax: 'rank',
+                    command: 'rank',
                     description: 'Generate a rank.',
                     options: [
                         countOption,
                         // {
-                        //     syntax:
+                        //     command:
                         //         '-corp [navy|army|intelligence|COMPORN|governance|ancillary|appointments]',
                         //     description:
                         //         'Use a particular rank collectino to generate the rank in.'
@@ -371,17 +370,17 @@ var GenerateCommand = /** @class */ (function (_super) {
                     ]
                 },
                 {
-                    syntax: 'species',
+                    command: 'species',
                     description: 'Generate a species.',
                     options: [countOption, seedOption]
                 },
                 {
-                    syntax: 'default',
+                    command: 'default',
                     description: 'Generate a default Jekyll formatted default values for NPCs.',
                     options: [seedOption]
                 },
                 {
-                    syntax: 'help',
+                    command: 'help',
                     description: 'Display the generate command help.'
                 }
             ]
@@ -391,7 +390,7 @@ var GenerateCommand = /** @class */ (function (_super) {
             var firsArg = commandArgs.args[0];
             for (var i = 0; i < helpObject.args.length; i++) {
                 var element = helpObject.args[i];
-                if (element.syntax === firsArg) {
+                if (element.command === firsArg) {
                     helpObject.args = [element];
                     break;
                 }

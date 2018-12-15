@@ -56,20 +56,23 @@ export class GenerateCommand extends ChatCommandBase {
         let messageSent = false;
         switch (subCommand) {
             case 'adventure':
-                const hasAdventureElement = commandArgs.argumentExists('element') || commandArgs.argumentExists('el');
-                if (hasAdventureElement) {
-                    const rawAdventureElement = commandArgs.findArgumentValue('element') || commandArgs.findArgumentValue('el');
-                    const adventureElement = rawAdventureElement as AdventureProperties;
-                    if (adventureElement) {
-                        var distinct = commandArgs.argumentExists('distinct');
-                        json = JSON.stringify(
-                            this.starWarsAdventureGenerator.generateAdventureElement(adventureElement, count, distinct),
-                            null,
-                            indent
-                        );
-                    } else {
-                        json = JSON.stringify({ error: `${rawAdventureElement} is not a valid adventure element.` }, null, indent);
-                    }
+                // Create sub-command object (this could become recursive to create a "command-tree" of sort)
+                var adventureCommand = new CommandArgs(
+                    commandArgs.args[0].toLowerCase(),
+                    commandArgs.args.length > 1 ? commandArgs.args[1].toLowerCase() : null,
+                    commandArgs.args.splice(2)
+                );
+                // Execute command
+                var adventureElement = adventureCommand.command as AdventureProperties;
+                if (adventureElement) {
+                    var distinct = adventureCommand.argumentExists('distinct');
+                    json = JSON.stringify(
+                        this.starWarsAdventureGenerator.generateAdventureElement(adventureElement, count, distinct),
+                        null,
+                        indent
+                    );
+                } else if (adventureCommand.command != null && !adventureCommand.command.startsWith('-')) {
+                    json = JSON.stringify({ error: `${adventureCommand.command} is not a valid adventure element.` }, null, indent);
                 } else {
                     json = JSON.stringify(this.starWarsAdventureGenerator.generateAdventure(), null, indent);
                 }
@@ -318,15 +321,15 @@ export class GenerateCommand extends ChatCommandBase {
 
     public help(commandArgs: CommandArgs): HelpText {
         const countOption = {
-            syntax: '-count [some number]',
+            command: '-count [some number]',
             description: 'Generate the specified number of result.'
         };
         const seedOption = {
-            syntax: '-seed [some random seed]',
+            command: '-seed [some random seed]',
             description: 'Use the specified seed to generate the specified item. This can be used to replay random generation.'
         };
         const wisperOption = {
-            syntax: '-whisper',
+            command: '-whisper',
             alias: '-w',
             description: 'The bot will whisper you the results instead of relying in the current channel.'
         };
@@ -337,18 +340,17 @@ export class GenerateCommand extends ChatCommandBase {
             options: [wisperOption],
             args: [
                 {
-                    syntax: 'adventure',
+                    command: 'adventure',
                     description: 'Generate a Star Wars adventure.',
                     options: [
                         {
-                            syntax:
-                                "-element ['contract' | 'theme' | 'location' | 'macguffin' | 'victimsAndNPCs' | 'antagonistOrTarget' | 'twistsOrComplications' | 'dramaticReveal']",
-                            alias: '-el',
-                            description: 'Generate only the specified adventure element (optionally: the specified the number of time).',
+                            command:
+                                '[contract|theme|location|macguffin|victimsAndNPCs|antagonistOrTarget|twistsOrComplications|dramaticReveal]',
+                            description: '(optional) Generate only the specified adventure element.',
                             options: [
                                 countOption,
                                 {
-                                    syntax: '-distinct',
+                                    command: '-distinct',
                                     description: 'Remove duplicate entries.'
                                 }
                             ]
@@ -356,37 +358,37 @@ export class GenerateCommand extends ChatCommandBase {
                     ]
                 },
                 {
-                    syntax: 'motivation',
+                    command: 'motivation',
                     description: 'Generate a character motivation.',
                     options: [seedOption]
                 },
                 {
-                    syntax: 'alienname',
+                    command: 'alienname',
                     description: 'Generate some alien names.',
                     options: [countOption]
                 },
                 {
-                    syntax: 'name',
+                    command: 'name',
                     description: 'Generate some names.',
                     options: [countOption, seedOption]
                 },
                 {
-                    syntax: 'place',
+                    command: 'place',
                     description: 'Generate a place name.',
                     options: [countOption, seedOption]
                 },
                 {
-                    syntax: 'personality',
+                    command: 'personality',
                     description: 'Generate a personality.',
                     options: [seedOption]
                 },
                 {
-                    syntax: 'rank',
+                    command: 'rank',
                     description: 'Generate a rank.',
                     options: [
                         countOption,
                         // {
-                        //     syntax:
+                        //     command:
                         //         '-corp [navy|army|intelligence|COMPORN|governance|ancillary|appointments]',
                         //     description:
                         //         'Use a particular rank collectino to generate the rank in.'
@@ -395,17 +397,17 @@ export class GenerateCommand extends ChatCommandBase {
                     ]
                 },
                 {
-                    syntax: 'species',
+                    command: 'species',
                     description: 'Generate a species.',
                     options: [countOption, seedOption]
                 },
                 {
-                    syntax: 'default',
+                    command: 'default',
                     description: 'Generate a default Jekyll formatted default values for NPCs.',
                     options: [seedOption]
                 },
                 {
-                    syntax: 'help',
+                    command: 'help',
                     description: 'Display the generate command help.'
                 }
             ]
@@ -416,7 +418,7 @@ export class GenerateCommand extends ChatCommandBase {
             const firsArg = commandArgs.args[0];
             for (let i = 0; i < helpObject.args.length; i++) {
                 const element = helpObject.args[i];
-                if (element.syntax === firsArg) {
+                if (element.command === firsArg) {
                     helpObject.args = [element];
                     break;
                 }

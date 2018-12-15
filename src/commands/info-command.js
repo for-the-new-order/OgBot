@@ -53,7 +53,7 @@ var InfoCommand = /** @class */ (function (_super) {
     __extends(InfoCommand, _super);
     function InfoCommand() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.supportedCommands = ["info"];
+        _this.supportedCommands = ['info'];
         return _this;
     }
     InfoCommand.prototype.handle = function (message, commandArgs) {
@@ -63,7 +63,7 @@ var InfoCommand = /** @class */ (function (_super) {
                 switch (_b.label) {
                     case 0:
                         if (!(commandArgs.args.length === 0)) return [3 /*break*/, 2];
-                        return [4 /*yield*/, message.reply("You must specify the message type(s).")];
+                        return [4 /*yield*/, message.reply('You must specify the message type(s).')];
                     case 1:
                         _b.sent();
                         return [2 /*return*/, Promise.reject()];
@@ -75,9 +75,9 @@ var InfoCommand = /** @class */ (function (_super) {
                         element = commandArgs.args[i];
                         _a = element;
                         switch (_a) {
-                            case "channel": return [3 /*break*/, 4];
-                            case "author": return [3 /*break*/, 6];
-                            case "guild": return [3 /*break*/, 8];
+                            case 'channel': return [3 /*break*/, 4];
+                            case 'author': return [3 /*break*/, 6];
+                            case 'guild': return [3 /*break*/, 8];
                         }
                         return [3 /*break*/, 10];
                     case 4: return [4 /*yield*/, this.sendChannelInfo(message)];
@@ -107,11 +107,13 @@ var InfoCommand = /** @class */ (function (_super) {
     InfoCommand.prototype.help = function () {
         return {
             command: this.supportedCommands[0],
-            description: "Get some information.",
-            options: [{
-                    syntax: "[information types]",
-                    description: "The type of information that you want (channel, author, guild). You can pass more than one by separating types by a space, ex.: `!og info channel guild`"
-                }]
+            description: 'Get some information.',
+            options: [
+                {
+                    command: '[information types]',
+                    description: 'The type of information that you want (channel, author, guild). You can pass more than one by separating types by a space, ex.: `!og info channel guild`'
+                }
+            ]
             // ,
             // args: [{
             //     syntax: "-purge",

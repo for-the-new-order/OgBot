@@ -49,12 +49,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var ChatCommandBase_1 = require("./ChatCommandBase");
-// !og clean 489620009249800194 
+// !og clean 489620009249800194
 var CleanChannelCommand = /** @class */ (function (_super) {
     __extends(CleanChannelCommand, _super);
     function CleanChannelCommand() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.supportedCommands = ["clean"];
+        _this.supportedCommands = ['clean'];
         return _this;
     }
     CleanChannelCommand.prototype.handle = function (message, commandArgs) {
@@ -64,7 +64,7 @@ var CleanChannelCommand = /** @class */ (function (_super) {
                 switch (_a.label) {
                     case 0:
                         if (!(commandArgs.args.length === 0)) return [3 /*break*/, 2];
-                        return [4 /*yield*/, message.reply("You must specify the current channel ID.")];
+                        return [4 /*yield*/, message.reply('You must specify the current channel ID.')];
                     case 1:
                         _a.sent();
                         return [2 /*return*/];
@@ -72,23 +72,23 @@ var CleanChannelCommand = /** @class */ (function (_super) {
                         channel = message.channel;
                         expectedChannelId = commandArgs.args[0];
                         if (!(channel.id !== expectedChannelId)) return [3 /*break*/, 4];
-                        return [4 /*yield*/, message.reply("The specified channel ID is not the same as the current channel ID.")];
+                        return [4 /*yield*/, message.reply('The specified channel ID is not the same as the current channel ID.')];
                     case 3:
                         _a.sent();
                         return [2 /*return*/];
                     case 4:
-                        if (!commandArgs.argumentExists("purge")) return [3 /*break*/, 10];
+                        if (!commandArgs.argumentExists('purge')) return [3 /*break*/, 10];
                         permissionOverwrites = channel.permissionOverwrites.array();
-                        return [4 /*yield*/, message.guild.createChannel(channel.name, "text", permissionOverwrites)];
+                        return [4 /*yield*/, message.guild.createChannel(channel.name, 'text', permissionOverwrites)];
                     case 5:
-                        newChannel = _a.sent();
+                        newChannel = (_a.sent());
                         return [4 /*yield*/, newChannel.setParent(channel.parent)];
                     case 6:
                         _a.sent();
                         return [4 /*yield*/, newChannel.setPosition(channel.position)];
                     case 7:
                         _a.sent();
-                        return [4 /*yield*/, channel.delete("OgBot Chat Purge")];
+                        return [4 /*yield*/, channel.delete('OgBot Chat Purge')];
                     case 8:
                         _a.sent();
                         return [4 /*yield*/, newChannel.send("Channel " + newChannel.id + " created to replace deleted channel " + channel.id + ".")];
@@ -118,15 +118,19 @@ var CleanChannelCommand = /** @class */ (function (_super) {
     CleanChannelCommand.prototype.help = function () {
         return {
             command: this.supportedCommands[0],
-            description: "Delete all messages of the specified channel (14 days old max). Use with caution.",
-            options: [{
-                    syntax: "[Channel ID]",
-                    description: "The channel ID that you are in and that you want to clean."
-                }],
-            args: [{
-                    syntax: "-purge",
-                    description: "By using this switch, you will delete and recrete the channel. This is useful to purse older than 14 days messages."
-                }]
+            description: 'Delete all messages of the specified channel (14 days old max). Use with caution.',
+            options: [
+                {
+                    command: '[Channel ID]',
+                    description: 'The channel ID that you are in and that you want to clean.'
+                }
+            ],
+            args: [
+                {
+                    command: '-purge',
+                    description: 'By using this switch, you will delete and recrete the channel. This is useful to purse older than 14 days messages.'
+                }
+            ]
         };
     };
     return CleanChannelCommand;
