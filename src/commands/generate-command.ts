@@ -61,7 +61,11 @@ export class GenerateCommand extends ChatCommandBase {
                     const rawAdventureElement = commandArgs.findArgumentValue('element') || commandArgs.findArgumentValue('el');
                     const adventureElement = rawAdventureElement as AdventureProperties;
                     if (adventureElement) {
-                        json = JSON.stringify(this.starWarsAdventureGenerator.generateAdventureElement(adventureElement), null, indent);
+                        json = JSON.stringify(
+                            this.starWarsAdventureGenerator.generateAdventureElement(adventureElement, count),
+                            null,
+                            indent
+                        );
                     } else {
                         json = JSON.stringify({ error: `${rawAdventureElement} is not a valid adventure element.` }, null, indent);
                     }
@@ -325,6 +329,19 @@ export class GenerateCommand extends ChatCommandBase {
             description: 'Generate random stuff; by default a character.',
             options: [wisperOption],
             args: [
+                {
+                    syntax: 'adventure',
+                    description: 'Generate a Star Wars adventure.',
+                    options: [
+                        {
+                            syntax:
+                                "-element ['contract' | 'theme' | 'location' | 'macguffin' | 'victimsAndNPCs' | 'antagonistOrTarget' | 'twistsOrComplications' | 'dramaticReveal']",
+                            alias: '-el',
+                            description: 'Generate only the specified adventure element (optionally: the specified the number of time).',
+                            options: [countOption]
+                        }
+                    ]
+                },
                 {
                     syntax: 'motivation',
                     description: 'Generate a character motivation.',

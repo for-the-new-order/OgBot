@@ -65,7 +65,7 @@ var GenerateCommand = /** @class */ (function (_super) {
                     var rawAdventureElement = commandArgs.findArgumentValue('element') || commandArgs.findArgumentValue('el');
                     var adventureElement = rawAdventureElement;
                     if (adventureElement) {
-                        json = JSON.stringify(this.starWarsAdventureGenerator.generateAdventureElement(adventureElement), null, indent);
+                        json = JSON.stringify(this.starWarsAdventureGenerator.generateAdventureElement(adventureElement, count), null, indent);
                     }
                     else {
                         json = JSON.stringify({ error: rawAdventureElement + " is not a valid adventure element." }, null, indent);
@@ -306,6 +306,18 @@ var GenerateCommand = /** @class */ (function (_super) {
             description: 'Generate random stuff; by default a character.',
             options: [wisperOption],
             args: [
+                {
+                    syntax: 'adventure',
+                    description: 'Generate a Star Wars adventure.',
+                    options: [
+                        {
+                            syntax: "-element ['contract' | 'theme' | 'location' | 'macguffin' | 'victimsAndNPCs' | 'antagonistOrTarget' | 'twistsOrComplications' | 'dramaticReveal']",
+                            alias: '-el',
+                            description: 'Generate only the specified adventure element (optionally: the specified the number of time).',
+                            options: [countOption]
+                        }
+                    ]
+                },
                 {
                     syntax: 'motivation',
                     description: 'Generate a character motivation.',

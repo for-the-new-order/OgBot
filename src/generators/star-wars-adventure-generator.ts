@@ -142,13 +142,13 @@ export class StarWarsAdventureGenerator {
         };
     }
 
-    public generateAdventureElement(elementName: AdventureProperties): AdventureElement {
+    public generateAdventureElement(elementName: AdventureProperties, amount?: number): AdventureElement {
         const property = elementName + 'Selector';
         if ((this as any)[property]) {
             const selectionService = (this as any)[property] as randomSelectionService;
             if (selectionService) {
                 const value: AdventureElement = {};
-                value[elementName] = selectionService.select();
+                value[elementName] = selectionService.select(amount);
                 return value;
             }
         }
