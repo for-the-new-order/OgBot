@@ -136,7 +136,7 @@ var GenerateCommand = /** @class */ (function (_super) {
                 json = JSON.stringify(species_1, null, indent);
                 break;
             case 'help':
-                var help = this.help();
+                var help = this.help(commandArgs);
                 this.echoHelpService.echo(help, whisper, message);
                 messageSent = true;
                 break;
@@ -286,7 +286,7 @@ var GenerateCommand = /** @class */ (function (_super) {
         var threshold = step[0];
         return rank.level > threshold ? 'NEMESIS' : 'RIVAL';
     };
-    GenerateCommand.prototype.help = function () {
+    GenerateCommand.prototype.help = function (commandArgs) {
         var countOption = {
             syntax: '-count [some number]',
             description: 'Generate the specified number of result.'
@@ -300,7 +300,7 @@ var GenerateCommand = /** @class */ (function (_super) {
             alias: '-w',
             description: 'The bot will whisper you the results instead of relying in the current channel.'
         };
-        return {
+        var helpObject = {
             command: this.supportedCommands[0],
             alias: this.supportedCommands.slice(1).join(', '),
             description: 'Generate random stuff; by default a character.',
@@ -373,6 +373,18 @@ var GenerateCommand = /** @class */ (function (_super) {
                 }
             ]
         };
+        // Some sub-command filter; this should be extracted in some sort of sub-command (along with the sub-command themselves).
+        if (commandArgs.args.length > 0) {
+            var firsArg = commandArgs.args[0];
+            for (var i = 0; i < helpObject.args.length; i++) {
+                var element = helpObject.args[i];
+                if (element.syntax === firsArg) {
+                    helpObject.args = [element];
+                    break;
+                }
+            }
+        }
+        return helpObject;
     };
     return GenerateCommand;
 }(ChatCommandBase_1.ChatCommandBase));

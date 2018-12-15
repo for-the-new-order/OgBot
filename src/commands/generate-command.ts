@@ -136,7 +136,7 @@ export class GenerateCommand extends ChatCommandBase {
                 json = JSON.stringify(species, null, indent);
                 break;
             case 'help':
-                const help = this.help();
+                const help = this.help(commandArgs);
                 this.echoHelpService.echo(help, whisper, message);
                 messageSent = true;
                 break;
@@ -309,7 +309,7 @@ export class GenerateCommand extends ChatCommandBase {
         return rank.level > threshold ? 'NEMESIS' : 'RIVAL';
     }
 
-    public help(): HelpText {
+    public help(commandArgs: CommandArgs): HelpText {
         const countOption = {
             syntax: '-count [some number]',
             description: 'Generate the specified number of result.'
@@ -323,7 +323,7 @@ export class GenerateCommand extends ChatCommandBase {
             alias: '-w',
             description: 'The bot will whisper you the results instead of relying in the current channel.'
         };
-        return {
+        const helpObject = {
             command: this.supportedCommands[0],
             alias: this.supportedCommands.slice(1).join(', '),
             description: 'Generate random stuff; by default a character.',
@@ -397,6 +397,19 @@ export class GenerateCommand extends ChatCommandBase {
                 }
             ]
         };
+
+        // Some sub-command filter; this should be extracted in some sort of sub-command (along with the sub-command themselves).
+        if (commandArgs.args.length > 0) {
+            const firsArg = commandArgs.args[0];
+            for (let i = 0; i < helpObject.args.length; i++) {
+                const element = helpObject.args[i];
+                if (element.syntax === firsArg) {
+                    helpObject.args = [element];
+                    break;
+                }
+            }
+        }
+        return helpObject;
     }
 }
 

@@ -9,5 +9,5 @@ export abstract class ChatCommandBase implements ChatCommand {
         return this.supportedCommands.indexOf(commandArgs.command) > -1;
     }
     protected abstract get supportedCommands(): Array<string>;
-    public abstract help(): HelpText;
+    public abstract help(commandArgs: CommandArgs): HelpText;
 }
