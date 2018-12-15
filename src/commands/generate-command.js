@@ -92,7 +92,7 @@ var GenerateCommand = /** @class */ (function (_super) {
                 json = JSON.stringify(aliennames, null, indent);
                 break;
             case 'motivation':
-                var motivation = this.generateMotivation();
+                var motivation = this.generateMotivations();
                 json = JSON.stringify(this.withSeed(initialSeed, motivation), null, indent);
                 break;
             case 'personality':
@@ -155,7 +155,7 @@ var GenerateCommand = /** @class */ (function (_super) {
                     gender: name_1.gender,
                     clan: this.formatUtility.capitalize(rank.clan),
                     personality: this.generatePersonality(),
-                    motivation: this.generateMotivation()
+                    motivation: this.generateMotivations(type)
                 };
                 obj[name_1.name] = generatedValues;
                 json = JSON.stringify(obj, null, indent);
@@ -256,7 +256,13 @@ var GenerateCommand = /** @class */ (function (_super) {
         var specie = this.randomService.pickOne(data_1.species);
         return specie.value;
     };
-    GenerateCommand.prototype.generateMotivation = function () {
+    GenerateCommand.prototype.generateMotivations = function (type) {
+        if (type === NpcType.Rival) {
+            return {
+                strength: this.randomService.pickOne(data_1.motivations.strength).value,
+                flaw: this.randomService.pickOne(data_1.motivations.flaw).value
+            };
+        }
         return {
             desires: this.randomService.pickOne(data_1.motivations.desires).value,
             fear: this.randomService.pickOne(data_1.motivations.fear).value,
@@ -285,7 +291,7 @@ var GenerateCommand = /** @class */ (function (_super) {
         var mid = Math.ceil(findSteps.length / 2);
         var step = findSteps[mid];
         var threshold = step[0];
-        return rank.level > threshold ? 'NEMESIS' : 'RIVAL';
+        return rank.level > threshold ? NpcType.Nemesis : NpcType.Rival;
     };
     GenerateCommand.prototype.help = function (commandArgs) {
         var countOption = {
@@ -396,4 +402,10 @@ var GenerateCommand = /** @class */ (function (_super) {
     return GenerateCommand;
 }(ChatCommandBase_1.ChatCommandBase));
 exports.GenerateCommand = GenerateCommand;
+var NpcType;
+(function (NpcType) {
+    NpcType["Nemesis"] = "NEMESIS";
+    NpcType["Rival"] = "RIVAL";
+    NpcType["Minion"] = "MINION";
+})(NpcType || (NpcType = {}));
 //# sourceMappingURL=generate-command.js.map

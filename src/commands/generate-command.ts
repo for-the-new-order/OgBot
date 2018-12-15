@@ -90,7 +90,7 @@ export class GenerateCommand extends ChatCommandBase {
                 json = JSON.stringify(aliennames, null, indent);
                 break;
             case 'motivation':
-                var motivation = this.generateMotivation();
+                var motivation = this.generateMotivations();
                 json = JSON.stringify(this.withSeed(initialSeed, motivation), null, indent);
                 break;
             case 'personality':
@@ -155,7 +155,7 @@ export class GenerateCommand extends ChatCommandBase {
                     gender: name.gender,
                     clan: this.formatUtility.capitalize(rank.clan),
                     personality: this.generatePersonality(),
-                    motivation: this.generateMotivation()
+                    motivation: this.generateMotivations(type)
                 };
                 obj[name.name] = generatedValues;
                 json = JSON.stringify(obj, null, indent);
@@ -267,7 +267,13 @@ export class GenerateCommand extends ChatCommandBase {
         return specie.value;
     }
 
-    private generateMotivation() {
+    private generateMotivations(type?: NpcType): Motivations {
+        if (type === NpcType.Rival) {
+            return {
+                strength: this.randomService.pickOne(motivations.strength).value,
+                flaw: this.randomService.pickOne(motivations.flaw).value
+            };
+        }
         return {
             desires: this.randomService.pickOne(motivations.desires).value,
             fear: this.randomService.pickOne(motivations.fear).value,
@@ -302,12 +308,12 @@ export class GenerateCommand extends ChatCommandBase {
         return this.randomService.pickOne(rndRanks).value;
     }
 
-    private getTypeBasedOnRank(rank: { level: number; name: string; clan: string }): string {
+    private getTypeBasedOnRank(rank: { level: number; name: string; clan: string }): NpcType {
         var findSteps = ranks[rank.clan].steps;
         var mid = Math.ceil(findSteps.length / 2);
         var step = findSteps[mid];
         var threshold = step[0];
-        return rank.level > threshold ? 'NEMESIS' : 'RIVAL';
+        return rank.level > threshold ? NpcType.Nemesis : NpcType.Rival;
     }
 
     public help(commandArgs: CommandArgs): HelpText {
@@ -422,4 +428,22 @@ export class GenerateCommand extends ChatCommandBase {
 
 interface Species {
     name: string;
+}
+
+enum NpcType {
+    Nemesis = 'NEMESIS',
+    Rival = 'RIVAL',
+    Minion = 'MINION'
+}
+
+interface Motivations {
+    desires?: Motivation;
+    fear?: Motivation;
+    strength: Motivation;
+    flaw: Motivation;
+}
+
+interface Motivation {
+    name: string;
+    description: string;
 }
