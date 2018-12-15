@@ -53,7 +53,7 @@ var EchoHelpService = /** @class */ (function () {
                         _a.label = 1;
                     case 1:
                         if (!(i < blockCount)) return [3 /*break*/, 4];
-                        block = json.substr(i * threshold, (i + 1) * threshold);
+                        block = json.substring(i * threshold, (i + 1) * threshold);
                         return [4 /*yield*/, this.send(block, whisper, message)];
                     case 2:
                         _a.sent();
