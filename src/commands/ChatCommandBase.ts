@@ -1,7 +1,7 @@
 import { Message } from 'discord.js';
 import { CommandArgs } from './CommandArgs';
 import { ChatCommand } from './ChatCommand';
-import { HelpText } from './HelpText';
+import { CommandHelpDescriptor } from './HelpText';
 
 export abstract class ChatCommandBase implements ChatCommand {
     public abstract handle(message: Message, commandArgs: CommandArgs);
@@ -9,5 +9,5 @@ export abstract class ChatCommandBase implements ChatCommand {
         return this.supportedCommands.indexOf(commandArgs.command) > -1;
     }
     protected abstract get supportedCommands(): Array<string>;
-    public abstract help(commandArgs: CommandArgs): HelpText;
+    public abstract help(commandArgs: CommandArgs): CommandHelpDescriptor;
 }

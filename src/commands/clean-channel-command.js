@@ -49,7 +49,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var ChatCommandBase_1 = require("./ChatCommandBase");
-// !og clean 489620009249800194
 var CleanChannelCommand = /** @class */ (function (_super) {
     __extends(CleanChannelCommand, _super);
     function CleanChannelCommand() {
@@ -125,7 +124,7 @@ var CleanChannelCommand = /** @class */ (function (_super) {
                     description: 'The channel ID that you are in and that you want to clean.'
                 }
             ],
-            args: [
+            subcommands: [
                 {
                     command: '-purge',
                     description: 'By using this switch, you will delete and recrete the channel. This is useful to purse older than 14 days messages.'

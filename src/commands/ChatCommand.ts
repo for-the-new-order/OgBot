@@ -1,4 +1,4 @@
-import { HelpText } from './HelpText';
+import { CommandHelpDescriptor } from './HelpText';
 
 import { Message } from 'discord.js';
 import { CommandArgs } from './CommandArgs';
@@ -6,5 +6,5 @@ import { CommandArgs } from './CommandArgs';
 export interface ChatCommand {
     handle(message: Message, commandArgs: CommandArgs);
     canHandle(commandArgs: CommandArgs): boolean;
-    help(commandArgs: CommandArgs): HelpText;
+    help(commandArgs: CommandArgs): CommandHelpDescriptor;
 }

@@ -1,7 +1,7 @@
 import { ChatCommandBase } from './ChatCommandBase';
 import { Message } from 'discord.js';
 import { CommandArgs } from './CommandArgs';
-import { HelpText } from './HelpText';
+import { CommandHelpDescriptor } from './HelpText';
 import { RandomService } from '../generators/random-service';
 import { AlienNamesGenerator } from '../generators/alien-names-generator';
 import { NameGenerator, Gender } from '../generators/name-generator';
@@ -138,11 +138,6 @@ export class GenerateCommand extends ChatCommandBase {
                     species.push(this.generateSpecies());
                 }
                 json = JSON.stringify(species, null, indent);
-                break;
-            case 'help':
-                const help = this.help(commandArgs);
-                this.echoHelpService.echo(help, whisper, message);
-                messageSent = true;
                 break;
             default:
                 const name = this.generateAnyName();
@@ -319,7 +314,7 @@ export class GenerateCommand extends ChatCommandBase {
         return rank.level > threshold ? NpcType.Nemesis : NpcType.Rival;
     }
 
-    public help(commandArgs: CommandArgs): HelpText {
+    public help(commandArgs: CommandArgs): CommandHelpDescriptor {
         const countOption = {
             command: '-count [some number]',
             description: 'Generate the specified number of result.'
@@ -333,20 +328,21 @@ export class GenerateCommand extends ChatCommandBase {
             alias: '-w',
             description: 'The bot will whisper you the results instead of relying in the current channel.'
         };
-        const helpObject = {
+        const helpObject: CommandHelpDescriptor = {
             command: this.supportedCommands[0],
             alias: this.supportedCommands.slice(1).join(', '),
             description: 'Generate random stuff; by default a character.',
             options: [wisperOption],
-            args: [
+            subcommands: [
                 {
                     command: 'adventure',
                     description: 'Generate a Star Wars adventure.',
-                    options: [
+                    subcommands: [
                         {
                             command:
                                 '[contract|theme|location|macguffin|victimsAndNPCs|antagonistOrTarget|twistsOrComplications|dramaticReveal]',
                             description: '(optional) Generate only the specified adventure element.',
+                            isOptional: true,
                             options: [
                                 countOption,
                                 {
@@ -405,10 +401,6 @@ export class GenerateCommand extends ChatCommandBase {
                     command: 'default',
                     description: 'Generate a default Jekyll formatted default values for NPCs.',
                     options: [seedOption]
-                },
-                {
-                    command: 'help',
-                    description: 'Display the generate command help.'
                 }
             ]
         };
@@ -416,10 +408,10 @@ export class GenerateCommand extends ChatCommandBase {
         // Some sub-command filter; this should be extracted in some sort of sub-command (along with the sub-command themselves).
         if (commandArgs.args.length > 0) {
             const firsArg = commandArgs.args[0];
-            for (let i = 0; i < helpObject.args.length; i++) {
-                const element = helpObject.args[i];
+            for (let i = 0; i < helpObject.subcommands.length; i++) {
+                const element = helpObject.subcommands[i];
                 if (element.command === firsArg) {
-                    helpObject.args = [element];
+                    helpObject.subcommands = [element];
                     break;
                 }
             }

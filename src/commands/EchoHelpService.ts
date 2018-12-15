@@ -1,9 +1,9 @@
-import { HelpText } from './HelpText';
+import { CommandHelpDescriptor } from './HelpText';
 import { Message } from 'discord.js';
 
 export class EchoHelpService {
     constructor(private indent = 2) {}
-    public async echo(help: HelpText, whisper: boolean, message: Message) {
+    public async echo(help: CommandHelpDescriptor, whisper: boolean, message: Message) {
         const json = JSON.stringify(help, null, this.indent);
         // Split the output when needed
         const threshold = 1900;

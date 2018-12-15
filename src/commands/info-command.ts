@@ -1,7 +1,7 @@
 import { ChatCommandBase } from './ChatCommandBase';
 import { Message, TextChannel } from 'discord.js';
 import { CommandArgs } from './CommandArgs';
-import { HelpText } from './HelpText';
+import { CommandHelpDescriptor } from './HelpText';
 
 export class InfoCommand extends ChatCommandBase {
     protected supportedCommands: string[] = ['info'];
@@ -28,7 +28,7 @@ export class InfoCommand extends ChatCommandBase {
             }
         }
     }
-    public help(): HelpText {
+    public help(): CommandHelpDescriptor {
         return {
             command: this.supportedCommands[0],
             description: 'Get some information.',

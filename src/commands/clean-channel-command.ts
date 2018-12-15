@@ -1,9 +1,7 @@
 import { ChatCommandBase } from './ChatCommandBase';
 import { Message, TextChannel } from 'discord.js';
 import { CommandArgs } from './CommandArgs';
-import { HelpText } from './HelpText';
-
-// !og clean 489620009249800194
+import { CommandHelpDescriptor } from './HelpText';
 
 export class CleanChannelCommand extends ChatCommandBase {
     protected supportedCommands: string[] = ['clean'];
@@ -41,7 +39,7 @@ export class CleanChannelCommand extends ChatCommandBase {
         } while (deletableMessages.size > 0);
     }
 
-    public help(): HelpText {
+    public help(): CommandHelpDescriptor {
         return {
             command: this.supportedCommands[0],
             description: 'Delete all messages of the specified channel (14 days old max). Use with caution.',
@@ -51,7 +49,7 @@ export class CleanChannelCommand extends ChatCommandBase {
                     description: 'The channel ID that you are in and that you want to clean.'
                 }
             ],
-            args: [
+            subcommands: [
                 {
                     command: '-purge',
                     description:

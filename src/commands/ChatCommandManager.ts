@@ -2,7 +2,7 @@ import { Message } from 'discord.js';
 import { GenerateCommand } from './generate-command';
 import { ChatCommand } from './ChatCommand';
 import { CommandArgs } from './CommandArgs';
-import { HelpText } from './HelpText';
+import { CommandHelpDescriptor } from './HelpText';
 import { EchoHelpService } from './EchoHelpService';
 import { CleanChannelCommand } from './clean-channel-command';
 import { InfoCommand } from './info-command';
@@ -92,7 +92,7 @@ class DefaultChatCommand implements ChatCommand {
     public canHandle(commandArgs: CommandArgs): boolean {
         return true;
     }
-    public help(commandArgs: CommandArgs): HelpText {
+    public help(commandArgs: CommandArgs): CommandHelpDescriptor {
         return {
             command: '!og [command] -h',
             description:

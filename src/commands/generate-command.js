@@ -136,11 +136,6 @@ var GenerateCommand = /** @class */ (function (_super) {
                 }
                 json = JSON.stringify(species_1, null, indent);
                 break;
-            case 'help':
-                var help = this.help(commandArgs);
-                this.echoHelpService.echo(help, whisper, message);
-                messageSent = true;
-                break;
             default:
                 var name_1 = this.generateAnyName();
                 var rank = this.generateRank(data_1.ranks.all);
@@ -312,14 +307,15 @@ var GenerateCommand = /** @class */ (function (_super) {
             alias: this.supportedCommands.slice(1).join(', '),
             description: 'Generate random stuff; by default a character.',
             options: [wisperOption],
-            args: [
+            subcommands: [
                 {
                     command: 'adventure',
                     description: 'Generate a Star Wars adventure.',
-                    options: [
+                    subcommands: [
                         {
                             command: '[contract|theme|location|macguffin|victimsAndNPCs|antagonistOrTarget|twistsOrComplications|dramaticReveal]',
                             description: '(optional) Generate only the specified adventure element.',
+                            isOptional: true,
                             options: [
                                 countOption,
                                 {
@@ -378,20 +374,16 @@ var GenerateCommand = /** @class */ (function (_super) {
                     command: 'default',
                     description: 'Generate a default Jekyll formatted default values for NPCs.',
                     options: [seedOption]
-                },
-                {
-                    command: 'help',
-                    description: 'Display the generate command help.'
                 }
             ]
         };
         // Some sub-command filter; this should be extracted in some sort of sub-command (along with the sub-command themselves).
         if (commandArgs.args.length > 0) {
             var firsArg = commandArgs.args[0];
-            for (var i = 0; i < helpObject.args.length; i++) {
-                var element = helpObject.args[i];
+            for (var i = 0; i < helpObject.subcommands.length; i++) {
+                var element = helpObject.subcommands[i];
                 if (element.command === firsArg) {
-                    helpObject.args = [element];
+                    helpObject.subcommands = [element];
                     break;
                 }
             }

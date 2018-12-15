@@ -1,14 +1,15 @@
-export interface HelpText {
+export interface CommandHelpDescriptor {
     command: string;
     alias?: string;
     description: string;
-    args?: Array<HelpArgument>;
-    options?: Array<HelpArgument>;
+    subcommands?: Array<CommandHelpDescriptor>;
+    options?: Array<CommandOptionHelpDescriptor>;
+    isOptional?: boolean;
 }
 
-export interface HelpArgument {
+export interface CommandOptionHelpDescriptor {
     command: string;
     alias?: string;
     description: string;
-    options?: Array<HelpArgument>;
+    options?: Array<CommandOptionHelpDescriptor>;
 }
