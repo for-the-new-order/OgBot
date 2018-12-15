@@ -8,20 +8,23 @@ import { NameGenerator, Gender } from '../generators/name-generator';
 import { FormatUtility } from '../generators/format-utility';
 import { motivations, personalityTraits, ranks, species } from '../../data';
 import { EchoHelpService } from './EchoHelpService';
+import { StarWarsAdventureGenerator, AdventureProperties } from '../generators/star-wars-adventure-generator';
 
 export class GenerateCommand extends ChatCommandBase {
     protected supportedCommands = ['generate', 'gen', 'g'];
     private randomService: RandomService;
     private formatUtility: FormatUtility;
-    private alienNamesGenerator = new AlienNamesGenerator(new FormatUtility());
+    private alienNamesGenerator: AlienNamesGenerator; // = new AlienNamesGenerator(new FormatUtility());
     private nameGenerator: NameGenerator;
     private echoHelpService = new EchoHelpService();
+    private starWarsAdventureGenerator: StarWarsAdventureGenerator;
     constructor() {
         super();
         this.randomService = new RandomService();
         this.nameGenerator = new NameGenerator(this.randomService);
         this.formatUtility = new FormatUtility();
         this.alienNamesGenerator = new AlienNamesGenerator(this.formatUtility);
+        this.starWarsAdventureGenerator = new StarWarsAdventureGenerator(this.randomService);
     }
 
     public handle(message: Message, commandArgs: CommandArgs) {
@@ -32,9 +35,7 @@ export class GenerateCommand extends ChatCommandBase {
 
         if (commandArgs.argumentExists('seed')) {
             // Custom seed
-            this.randomService.seed = parseInt(
-                commandArgs.findArgumentValue('seed')
-            );
+            this.randomService.seed = parseInt(commandArgs.findArgumentValue('seed'));
         } else {
             // Re-randomize the random seed
             this.randomService.reseed();
@@ -48,25 +49,33 @@ export class GenerateCommand extends ChatCommandBase {
         }
 
         // Whisper
-        const whisper =
-            commandArgs.argumentExists('whisper') ||
-            commandArgs.argumentExists('w');
+        const whisper = commandArgs.argumentExists('whisper') || commandArgs.argumentExists('w');
 
         let json = '';
         const indent = 2;
         let messageSent = false;
         switch (subCommand) {
+            case 'adventure':
+                const hasAdventureElement = commandArgs.argumentExists('element') || commandArgs.argumentExists('el');
+                if (hasAdventureElement) {
+                    const rawAdventureElement = commandArgs.findArgumentValue('element') || commandArgs.findArgumentValue('el');
+                    const adventureElement = rawAdventureElement as AdventureProperties;
+                    if (adventureElement) {
+                        json = JSON.stringify(this.starWarsAdventureGenerator.generateAdventureElement(adventureElement), null, indent);
+                    } else {
+                        json = JSON.stringify({ error: `${rawAdventureElement} is not a valid adventure element.` }, null, indent);
+                    }
+                } else {
+                    json = JSON.stringify(this.starWarsAdventureGenerator.generateAdventure(), null, indent);
+                }
+                break;
             case 'name':
-                const names: Array<{ name: string, gender: Gender }> = [];
+                const names: Array<{ name: string; gender: Gender }> = [];
                 for (let i = 0; i < count; i++) {
                     const gender = this.generateGender();
                     names.push(this.generateName(gender));
                 }
-                json = JSON.stringify(
-                    this.withSeed(initialSeed, names),
-                    null,
-                    indent
-                );
+                json = JSON.stringify(this.withSeed(initialSeed, names), null, indent);
                 break;
             case 'alienname':
                 var aliennames: Array<string> = [];
@@ -77,30 +86,18 @@ export class GenerateCommand extends ChatCommandBase {
                 break;
             case 'motivation':
                 var motivation = this.generateMotivation();
-                json = JSON.stringify(
-                    this.withSeed(initialSeed, motivation),
-                    null,
-                    indent
-                );
+                json = JSON.stringify(this.withSeed(initialSeed, motivation), null, indent);
                 break;
             case 'personality':
                 var personality = this.generatePersonality();
-                json = JSON.stringify(
-                    this.withSeed(initialSeed, personality),
-                    null,
-                    indent
-                );
+                json = JSON.stringify(this.withSeed(initialSeed, personality), null, indent);
                 break;
             case 'place':
                 var places: Array<string> = [];
                 for (let i = 0; i < count; i++) {
                     places.push(this.generatePlace());
                 }
-                json = JSON.stringify(
-                    this.withSeed(initialSeed, places),
-                    null,
-                    indent
-                );
+                json = JSON.stringify(this.withSeed(initialSeed, places), null, indent);
                 break;
             case 'rank':
                 // corp
@@ -122,11 +119,7 @@ export class GenerateCommand extends ChatCommandBase {
                 for (let i = 0; i < count; i++) {
                     generatedRanks.push(this.generateRank(corpRanks));
                 }
-                json = JSON.stringify(
-                    this.withSeed(initialSeed, generatedRanks),
-                    null,
-                    indent
-                );
+                json = JSON.stringify(this.withSeed(initialSeed, generatedRanks), null, indent);
                 break;
             case 'default':
                 json = JSON.stringify(this.defaultValues, null, indent);
@@ -165,11 +158,7 @@ export class GenerateCommand extends ChatCommandBase {
                 if (commandArgs.argumentExists('defaults')) {
                     const defaultsObj: any = {};
                     defaultsObj[name.name] = this.defaultValues;
-                    const defaultsJson = JSON.stringify(
-                        defaultsObj,
-                        null,
-                        indent
-                    );
+                    const defaultsJson = JSON.stringify(defaultsObj, null, indent);
                     this.send(json, whisper, message);
                     this.send(defaultsJson, whisper, message);
                     messageSent = true;
@@ -227,7 +216,7 @@ export class GenerateCommand extends ChatCommandBase {
         return this.nameGenerator.place();
     }
 
-    private generateName(gender: Gender): { name: string, gender: Gender } {
+    private generateName(gender: Gender): { name: string; gender: Gender } {
         let name = this.nameGenerator.firstname(gender);
         name += ' ';
         name += this.nameGenerator.surname();
@@ -299,9 +288,7 @@ export class GenerateCommand extends ChatCommandBase {
     ) {
         let rndRanks = corpRanks;
         if (range !== undefined) {
-            rndRanks = rndRanks.filter(
-                x => x.level >= range.minLevel && x.level <= range.maxLevel
-            );
+            rndRanks = rndRanks.filter(x => x.level >= range.minLevel && x.level <= range.maxLevel);
         }
 
         if (rndRanks.length === 0) {
@@ -310,11 +297,7 @@ export class GenerateCommand extends ChatCommandBase {
         return this.randomService.pickOne(rndRanks).value;
     }
 
-    private getTypeBasedOnRank(rank: {
-        level: number;
-        name: string;
-        clan: string;
-    }): string {
+    private getTypeBasedOnRank(rank: { level: number; name: string; clan: string }): string {
         var findSteps = ranks[rank.clan].steps;
         var mid = Math.ceil(findSteps.length / 2);
         var step = findSteps[mid];
@@ -329,14 +312,12 @@ export class GenerateCommand extends ChatCommandBase {
         };
         const seedOption = {
             syntax: '-seed [some random seed]',
-            description:
-                'Use the specified seed to generate the specified item. This can be used to replay random generation.'
+            description: 'Use the specified seed to generate the specified item. This can be used to replay random generation.'
         };
         const wisperOption = {
             syntax: '-whisper',
             alias: '-w',
-            description:
-                'The bot will whisper you the results instead of relying in the current channel.'
+            description: 'The bot will whisper you the results instead of relying in the current channel.'
         };
         return {
             command: this.supportedCommands[0],
@@ -390,8 +371,7 @@ export class GenerateCommand extends ChatCommandBase {
                 },
                 {
                     syntax: 'default',
-                    description:
-                        'Generate a default Jekyll formatted default values for NPCs.',
+                    description: 'Generate a default Jekyll formatted default values for NPCs.',
                     options: [seedOption]
                 },
                 {

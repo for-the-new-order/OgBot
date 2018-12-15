@@ -20,17 +20,18 @@ var name_generator_1 = require("../generators/name-generator");
 var format_utility_1 = require("../generators/format-utility");
 var data_1 = require("../../data");
 var EchoHelpService_1 = require("./EchoHelpService");
+var star_wars_adventure_generator_1 = require("../generators/star-wars-adventure-generator");
 var GenerateCommand = /** @class */ (function (_super) {
     __extends(GenerateCommand, _super);
     function GenerateCommand() {
         var _this = _super.call(this) || this;
         _this.supportedCommands = ['generate', 'gen', 'g'];
-        _this.alienNamesGenerator = new alien_names_generator_1.AlienNamesGenerator(new format_utility_1.FormatUtility());
         _this.echoHelpService = new EchoHelpService_1.EchoHelpService();
         _this.randomService = new random_service_1.RandomService();
         _this.nameGenerator = new name_generator_1.NameGenerator(_this.randomService);
         _this.formatUtility = new format_utility_1.FormatUtility();
         _this.alienNamesGenerator = new alien_names_generator_1.AlienNamesGenerator(_this.formatUtility);
+        _this.starWarsAdventureGenerator = new star_wars_adventure_generator_1.StarWarsAdventureGenerator(_this.randomService);
         return _this;
     }
     GenerateCommand.prototype.handle = function (message, commandArgs) {
@@ -53,12 +54,27 @@ var GenerateCommand = /** @class */ (function (_super) {
             count = parseInt(commandArgs.findArgumentValue('count'));
         }
         // Whisper
-        var whisper = commandArgs.argumentExists('whisper') ||
-            commandArgs.argumentExists('w');
+        var whisper = commandArgs.argumentExists('whisper') || commandArgs.argumentExists('w');
         var json = '';
         var indent = 2;
         var messageSent = false;
         switch (subCommand) {
+            case 'adventure':
+                var hasAdventureElement = commandArgs.argumentExists('element') || commandArgs.argumentExists('el');
+                if (hasAdventureElement) {
+                    var rawAdventureElement = commandArgs.findArgumentValue('element') || commandArgs.findArgumentValue('el');
+                    var adventureElement = rawAdventureElement;
+                    if (adventureElement) {
+                        json = JSON.stringify(this.starWarsAdventureGenerator.generateAdventureElement(adventureElement), null, indent);
+                    }
+                    else {
+                        json = JSON.stringify({ error: rawAdventureElement + " is not a valid adventure element." }, null, indent);
+                    }
+                }
+                else {
+                    json = JSON.stringify(this.starWarsAdventureGenerator.generateAdventure(), null, indent);
+                }
+                break;
             case 'name':
                 var names = [];
                 for (var i = 0; i < count; i++) {
