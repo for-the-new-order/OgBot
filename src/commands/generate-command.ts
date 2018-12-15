@@ -61,8 +61,9 @@ export class GenerateCommand extends ChatCommandBase {
                     const rawAdventureElement = commandArgs.findArgumentValue('element') || commandArgs.findArgumentValue('el');
                     const adventureElement = rawAdventureElement as AdventureProperties;
                     if (adventureElement) {
+                        var distinct = commandArgs.argumentExists('distinct');
                         json = JSON.stringify(
-                            this.starWarsAdventureGenerator.generateAdventureElement(adventureElement, count),
+                            this.starWarsAdventureGenerator.generateAdventureElement(adventureElement, count, distinct),
                             null,
                             indent
                         );
@@ -338,7 +339,13 @@ export class GenerateCommand extends ChatCommandBase {
                                 "-element ['contract' | 'theme' | 'location' | 'macguffin' | 'victimsAndNPCs' | 'antagonistOrTarget' | 'twistsOrComplications' | 'dramaticReveal']",
                             alias: '-el',
                             description: 'Generate only the specified adventure element (optionally: the specified the number of time).',
-                            options: [countOption]
+                            options: [
+                                countOption,
+                                {
+                                    syntax: '-distinct',
+                                    description: 'Remove duplicate entries.'
+                                }
+                            ]
                         }
                     ]
                 },

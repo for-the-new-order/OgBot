@@ -65,7 +65,8 @@ var GenerateCommand = /** @class */ (function (_super) {
                     var rawAdventureElement = commandArgs.findArgumentValue('element') || commandArgs.findArgumentValue('el');
                     var adventureElement = rawAdventureElement;
                     if (adventureElement) {
-                        json = JSON.stringify(this.starWarsAdventureGenerator.generateAdventureElement(adventureElement, count), null, indent);
+                        var distinct = commandArgs.argumentExists('distinct');
+                        json = JSON.stringify(this.starWarsAdventureGenerator.generateAdventureElement(adventureElement, count, distinct), null, indent);
                     }
                     else {
                         json = JSON.stringify({ error: rawAdventureElement + " is not a valid adventure element." }, null, indent);
@@ -314,7 +315,13 @@ var GenerateCommand = /** @class */ (function (_super) {
                             syntax: "-element ['contract' | 'theme' | 'location' | 'macguffin' | 'victimsAndNPCs' | 'antagonistOrTarget' | 'twistsOrComplications' | 'dramaticReveal']",
                             alias: '-el',
                             description: 'Generate only the specified adventure element (optionally: the specified the number of time).',
-                            options: [countOption]
+                            options: [
+                                countOption,
+                                {
+                                    syntax: '-distinct',
+                                    description: 'Remove duplicate entries.'
+                                }
+                            ]
                         }
                     ]
                 },

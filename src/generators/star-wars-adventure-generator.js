@@ -131,13 +131,14 @@ var StarWarsAdventureGenerator = /** @class */ (function () {
             dramaticReveal: this.dramaticRevealSelector.select()
         };
     };
-    StarWarsAdventureGenerator.prototype.generateAdventureElement = function (elementName, amount) {
+    StarWarsAdventureGenerator.prototype.generateAdventureElement = function (elementName, amount, distinct) {
         var property = elementName + 'Selector';
         if (this[property]) {
             var selectionService = this[property];
             if (selectionService) {
                 var value = {};
-                value[elementName] = selectionService.select(amount);
+                var randomItems = selectionService.select(amount);
+                value[elementName] = distinct ? Array.from(new Set(randomItems)) : randomItems;
                 return value;
             }
         }
