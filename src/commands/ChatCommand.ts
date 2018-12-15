@@ -6,5 +6,5 @@ import { CommandArgs } from './CommandArgs';
 export interface ChatCommand {
     handle(message: Message, commandArgs: CommandArgs);
     canHandle(commandArgs: CommandArgs): boolean;
-    help(): HelpText;
+    help(commandArgs: CommandArgs): HelpText;
 }

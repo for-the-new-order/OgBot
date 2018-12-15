@@ -49,9 +49,9 @@ var ChatCommandManager = /** @class */ (function () {
         this.commands = new Array(new generate_command_1.GenerateCommand(), new clean_channel_command_1.CleanChannelCommand(), new info_command_1.InfoCommand(), 
         //
         // Default (echo help)
-        new DefaultChatCommand(function (message) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+        new DefaultChatCommand(function (message, commandArgs) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, this.echoHelp(message)];
+                case 0: return [4 /*yield*/, this.echoHelp(message, commandArgs)];
                 case 1: return [2 /*return*/, _a.sent()];
             }
         }); }); }));
@@ -76,7 +76,7 @@ var ChatCommandManager = /** @class */ (function () {
                         }
                         if (!(args.length == 1)) return [3 /*break*/, 3];
                         if (!(args[0] === this.trigger)) return [3 /*break*/, 2];
-                        return [4 /*yield*/, this.echoHelp(message)];
+                        return [4 /*yield*/, this.echoHelp(message, new CommandArgs_1.CommandArgs(args[0], null, null))];
                     case 1:
                         _a.sent();
                         _a.label = 2;
@@ -84,7 +84,7 @@ var ChatCommandManager = /** @class */ (function () {
                     case 3:
                         commandArgs = new CommandArgs_1.CommandArgs(args[0].toLowerCase(), args[1].toLowerCase(), args.splice(2));
                         if (!(commandArgs.trigger !== this.trigger)) return [3 /*break*/, 5];
-                        return [4 /*yield*/, this.echoHelp(message)];
+                        return [4 /*yield*/, this.echoHelp(message, commandArgs)];
                     case 4:
                         _a.sent();
                         return [2 /*return*/];
@@ -97,7 +97,7 @@ var ChatCommandManager = /** @class */ (function () {
                         command = this.commands[i];
                         if (!command.canHandle(commandArgs)) return [3 /*break*/, 10];
                         if (!outputHelp) return [3 /*break*/, 8];
-                        help = command.help();
+                        help = command.help(commandArgs);
                         return [4 /*yield*/, this.echoHelpService.echo(help, false, message)];
                     case 7:
                         _a.sent();
@@ -114,7 +114,7 @@ var ChatCommandManager = /** @class */ (function () {
             });
         });
     };
-    ChatCommandManager.prototype.echoHelp = function (message) {
+    ChatCommandManager.prototype.echoHelp = function (message, commandArgs) {
         return __awaiter(this, void 0, void 0, function () {
             var i, command, help;
             return __generator(this, function (_a) {
@@ -126,7 +126,7 @@ var ChatCommandManager = /** @class */ (function () {
                     case 1:
                         if (!(i < this.commands.length)) return [3 /*break*/, 4];
                         command = this.commands[i];
-                        help = command.help();
+                        help = command.help(commandArgs);
                         return [4 /*yield*/, this.echoHelpService.echo(help, false, message)];
                     case 2:
                         _a.sent();
@@ -147,12 +147,12 @@ var DefaultChatCommand = /** @class */ (function () {
         this.callback = callback;
     }
     DefaultChatCommand.prototype.handle = function (message, commandArgs) {
-        this.callback(message);
+        this.callback(message, commandArgs);
     };
     DefaultChatCommand.prototype.canHandle = function (commandArgs) {
         return true;
     };
-    DefaultChatCommand.prototype.help = function () {
+    DefaultChatCommand.prototype.help = function (commandArgs) {
         return {
             command: '!og [command] -h',
             description: 'Shows the specified command help text ot the full help if no command is specified or if an invalid command is specified.'
