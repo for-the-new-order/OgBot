@@ -51,9 +51,8 @@ export class ChatCommandManager {
         // Transform the plain command arguments in a CommandArgs model
         const commandArgs = new CommandArgs(args[0].toLowerCase(), args[1].toLowerCase(), args.splice(2));
 
-        // Validate that the command is understood by the current bot (ex.: !og); in case there is more than one arguments.
+        // When the command (trigger) is not 2!og", exit.
         if (commandArgs.trigger !== this.trigger) {
-            await this.echoHelp(message, commandArgs);
             return;
         }
 

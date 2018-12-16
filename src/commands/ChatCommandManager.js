@@ -76,40 +76,38 @@ var ChatCommandManager = /** @class */ (function () {
                         }
                         if (!(args.length == 1)) return [3 /*break*/, 3];
                         if (!(args[0] === this.trigger)) return [3 /*break*/, 2];
-                        return [4 /*yield*/, this.echoHelp(message, new CommandArgs_1.CommandArgs(args[0], null, null))];
+                        return [4 /*yield*/, this.echoHelp(message, new CommandArgs_1.CommandArgs(args[0], null, []))];
                     case 1:
                         _a.sent();
                         _a.label = 2;
                     case 2: return [2 /*return*/];
                     case 3:
                         commandArgs = new CommandArgs_1.CommandArgs(args[0].toLowerCase(), args[1].toLowerCase(), args.splice(2));
-                        if (!(commandArgs.trigger !== this.trigger)) return [3 /*break*/, 5];
-                        return [4 /*yield*/, this.echoHelp(message, commandArgs)];
-                    case 4:
-                        _a.sent();
-                        return [2 /*return*/];
-                    case 5:
+                        // When the command (trigger) is not 2!og", exit.
+                        if (commandArgs.trigger !== this.trigger) {
+                            return [2 /*return*/];
+                        }
                         outputHelp = commandArgs.argumentExists(this.helpSwitch);
                         i = 0;
-                        _a.label = 6;
-                    case 6:
-                        if (!(i < this.commands.length)) return [3 /*break*/, 11];
+                        _a.label = 4;
+                    case 4:
+                        if (!(i < this.commands.length)) return [3 /*break*/, 9];
                         command = this.commands[i];
-                        if (!command.canHandle(commandArgs)) return [3 /*break*/, 10];
-                        if (!outputHelp) return [3 /*break*/, 8];
+                        if (!command.canHandle(commandArgs)) return [3 /*break*/, 8];
+                        if (!outputHelp) return [3 /*break*/, 6];
                         help = command.help(commandArgs);
                         return [4 /*yield*/, this.echoHelpService.echo(help, false, message)];
-                    case 7:
+                    case 5:
                         _a.sent();
-                        return [3 /*break*/, 9];
-                    case 8:
+                        return [3 /*break*/, 7];
+                    case 6:
                         command.handle(message, commandArgs);
-                        _a.label = 9;
-                    case 9: return [3 /*break*/, 11];
-                    case 10:
+                        _a.label = 7;
+                    case 7: return [3 /*break*/, 9];
+                    case 8:
                         i++;
-                        return [3 /*break*/, 6];
-                    case 11: return [2 /*return*/];
+                        return [3 /*break*/, 4];
+                    case 9: return [2 /*return*/];
                 }
             });
         });
