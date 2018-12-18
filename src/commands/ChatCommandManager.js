@@ -76,7 +76,7 @@ var ChatCommandManager = /** @class */ (function () {
                         }
                         if (!(args.length == 1)) return [3 /*break*/, 3];
                         if (!(args[0] === this.trigger)) return [3 /*break*/, 2];
-                        return [4 /*yield*/, this.echoHelp(message, new CommandArgs_1.CommandArgs(args[0], null, []))];
+                        return [4 /*yield*/, this.echoHelp(message, new CommandArgs_1.CommandArgs(args[0], null, null))];
                     case 1:
                         _a.sent();
                         _a.label = 2;

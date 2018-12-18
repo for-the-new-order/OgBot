@@ -36,10 +36,12 @@ var GenerateCommand = /** @class */ (function (_super) {
         return _this;
     }
     GenerateCommand.prototype.handle = function (message, commandArgs) {
-        var subCommand = null;
-        if (commandArgs.args.length > 0) {
-            subCommand = commandArgs.args[0];
-        }
+        //let subCommand: string = null;
+        // if (commandArgs.args.length > 0) {
+        //     subCommand = commandArgs.args[0];
+        // }
+        // Create sub-command object (this could become recursive to create a "command-tree" of sort)
+        var subCommand = new CommandArgs_1.CommandArgs(commandArgs.args.length > 0 ? commandArgs.args[0].toLowerCase() : null, commandArgs.args.length > 1 ? commandArgs.args[1].toLowerCase() : null, commandArgs.args.splice(2));
         if (commandArgs.argumentExists('seed')) {
             // Custom seed
             this.randomService.seed = parseInt(commandArgs.findArgumentValue('seed'));
@@ -59,18 +61,16 @@ var GenerateCommand = /** @class */ (function (_super) {
         var json = '';
         var indent = 2;
         var messageSent = false;
-        switch (subCommand) {
+        switch (subCommand.trigger) {
             case 'adventure':
-                // Create sub-command object (this could become recursive to create a "command-tree" of sort)
-                var adventureCommand = new CommandArgs_1.CommandArgs(commandArgs.args[0].toLowerCase(), commandArgs.args.length > 1 ? commandArgs.args[1].toLowerCase() : null, commandArgs.args.splice(2));
                 // Execute command
-                var adventureElement = adventureCommand.command;
+                var adventureElement = subCommand.command;
                 if (adventureElement) {
-                    var distinct = adventureCommand.argumentExists('distinct');
+                    var distinct = subCommand.argumentExists('distinct');
                     json = JSON.stringify(this.starWarsAdventureGenerator.generateAdventureElement(adventureElement, count, distinct), null, indent);
                 }
-                else if (adventureCommand.command != null && !adventureCommand.command.startsWith('-')) {
-                    json = JSON.stringify({ error: adventureCommand.command + " is not a valid adventure element." }, null, indent);
+                else if (subCommand.command != null && !subCommand.command.startsWith('-')) {
+                    json = JSON.stringify({ error: subCommand.command + " is not a valid adventure element." }, null, indent);
                 }
                 else {
                     json = JSON.stringify(this.starWarsAdventureGenerator.generateAdventure(), null, indent);
@@ -91,8 +91,12 @@ var GenerateCommand = /** @class */ (function (_super) {
                 }
                 json = JSON.stringify(aliennames, null, indent);
                 break;
-            case 'motivation':
-                var motivation = this.generateMotivations();
+            case 'motivations':
+                var motivationType = subCommand.command;
+                if (!motivationType) {
+                    motivationType = NpcType.Nemesis;
+                }
+                var motivation = this.generateMotivations(motivationType);
                 json = JSON.stringify(this.withSeed(initialSeed, motivation), null, indent);
                 break;
             case 'personality':
@@ -327,8 +331,14 @@ var GenerateCommand = /** @class */ (function (_super) {
                     ]
                 },
                 {
-                    command: 'motivation',
-                    description: 'Generate a character motivation.',
+                    command: 'motivations',
+                    description: "Generate a character's motivations.",
+                    subcommands: [
+                        {
+                            command: '[rival|nemesis]',
+                            description: "Indicate to generate a nemesis or a rival's motivations; default is nemesis."
+                        }
+                    ],
                     options: [seedOption]
                 },
                 {
@@ -395,8 +405,8 @@ var GenerateCommand = /** @class */ (function (_super) {
 exports.GenerateCommand = GenerateCommand;
 var NpcType;
 (function (NpcType) {
-    NpcType["Nemesis"] = "NEMESIS";
-    NpcType["Rival"] = "RIVAL";
-    NpcType["Minion"] = "MINION";
+    NpcType["Nemesis"] = "nemesis";
+    NpcType["Rival"] = "rival";
+    NpcType["Minion"] = "minion";
 })(NpcType || (NpcType = {}));
 //# sourceMappingURL=generate-command.js.map

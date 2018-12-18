@@ -28,10 +28,17 @@ export class GenerateCommand extends ChatCommandBase {
     }
 
     public handle(message: Message, commandArgs: CommandArgs) {
-        let subCommand: string = null;
-        if (commandArgs.args.length > 0) {
-            subCommand = commandArgs.args[0];
-        }
+        //let subCommand: string = null;
+        // if (commandArgs.args.length > 0) {
+        //     subCommand = commandArgs.args[0];
+        // }
+
+        // Create sub-command object (this could become recursive to create a "command-tree" of sort)
+        var subCommand = new CommandArgs(
+            commandArgs.args.length > 0 ? commandArgs.args[0].toLowerCase() : null,
+            commandArgs.args.length > 1 ? commandArgs.args[1].toLowerCase() : null,
+            commandArgs.args.splice(2)
+        );
 
         if (commandArgs.argumentExists('seed')) {
             // Custom seed
@@ -54,25 +61,19 @@ export class GenerateCommand extends ChatCommandBase {
         let json = '';
         const indent = 2;
         let messageSent = false;
-        switch (subCommand) {
+        switch (subCommand.trigger) {
             case 'adventure':
-                // Create sub-command object (this could become recursive to create a "command-tree" of sort)
-                var adventureCommand = new CommandArgs(
-                    commandArgs.args[0].toLowerCase(),
-                    commandArgs.args.length > 1 ? commandArgs.args[1].toLowerCase() : null,
-                    commandArgs.args.splice(2)
-                );
                 // Execute command
-                var adventureElement = adventureCommand.command as AdventureProperties;
+                var adventureElement = subCommand.command as AdventureProperties;
                 if (adventureElement) {
-                    var distinct = adventureCommand.argumentExists('distinct');
+                    var distinct = subCommand.argumentExists('distinct');
                     json = JSON.stringify(
                         this.starWarsAdventureGenerator.generateAdventureElement(adventureElement, count, distinct),
                         null,
                         indent
                     );
-                } else if (adventureCommand.command != null && !adventureCommand.command.startsWith('-')) {
-                    json = JSON.stringify({ error: `${adventureCommand.command} is not a valid adventure element.` }, null, indent);
+                } else if (subCommand.command != null && !subCommand.command.startsWith('-')) {
+                    json = JSON.stringify({ error: `${subCommand.command} is not a valid adventure element.` }, null, indent);
                 } else {
                     json = JSON.stringify(this.starWarsAdventureGenerator.generateAdventure(), null, indent);
                 }
@@ -93,7 +94,11 @@ export class GenerateCommand extends ChatCommandBase {
                 json = JSON.stringify(aliennames, null, indent);
                 break;
             case 'motivations':
-                var motivation = this.generateMotivations();
+                let motivationType = subCommand.command as NpcType;
+                if (!motivationType) {
+                    motivationType = NpcType.Nemesis;
+                }
+                const motivation = this.generateMotivations(motivationType);
                 json = JSON.stringify(this.withSeed(initialSeed, motivation), null, indent);
                 break;
             case 'personality':
@@ -354,8 +359,14 @@ export class GenerateCommand extends ChatCommandBase {
                     ]
                 },
                 {
-                    command: 'motivation',
-                    description: 'Generate a character motivation.',
+                    command: 'motivations',
+                    description: "Generate a character's motivations.",
+                    subcommands: [
+                        {
+                            command: '[rival|nemesis]',
+                            description: "Indicate to generate a nemesis or a rival's motivations; default is nemesis."
+                        }
+                    ],
                     options: [seedOption]
                 },
                 {
@@ -425,9 +436,9 @@ interface Species {
 }
 
 enum NpcType {
-    Nemesis = 'NEMESIS',
-    Rival = 'RIVAL',
-    Minion = 'MINION'
+    Nemesis = 'nemesis',
+    Rival = 'rival',
+    Minion = 'minion'
 }
 
 interface Motivations {
