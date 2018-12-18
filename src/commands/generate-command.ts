@@ -92,7 +92,7 @@ export class GenerateCommand extends ChatCommandBase {
                 }
                 json = JSON.stringify(aliennames, null, indent);
                 break;
-            case 'motivation':
+            case 'motivations':
                 var motivation = this.generateMotivations();
                 json = JSON.stringify(this.withSeed(initialSeed, motivation), null, indent);
                 break;
