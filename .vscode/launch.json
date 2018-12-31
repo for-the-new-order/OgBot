@@ -7,8 +7,14 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
+            "name": "Launch Bot",
             "program": "${workspaceFolder}/bot.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Web",
+            "program": "${workspaceFolder}/index.js"
         }
     ]
 }

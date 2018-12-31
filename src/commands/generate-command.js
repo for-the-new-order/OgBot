@@ -41,7 +41,8 @@ var GenerateCommand = /** @class */ (function (_super) {
         //     subCommand = commandArgs.args[0];
         // }
         // Create sub-command object (this could become recursive to create a "command-tree" of sort)
-        var subCommand = new CommandArgs_1.CommandArgs(commandArgs.args.length > 0 ? commandArgs.args[0].toLowerCase() : null, commandArgs.args.length > 1 ? commandArgs.args[1].toLowerCase() : null, commandArgs.args.splice(2));
+        var subCommand = new CommandArgs_1.CommandArgs(commandArgs.args.length > 0 ? commandArgs.args[0].toLowerCase() : null, commandArgs.args.length > 1 ? commandArgs.args[1].toLowerCase() : null, commandArgs.args.slice(2));
+        //commandArgs.args.slice
         if (commandArgs.argumentExists('seed')) {
             // Custom seed
             this.randomService.seed = parseInt(commandArgs.findArgumentValue('seed'));

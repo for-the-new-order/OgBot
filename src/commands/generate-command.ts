@@ -37,8 +37,9 @@ export class GenerateCommand extends ChatCommandBase {
         var subCommand = new CommandArgs(
             commandArgs.args.length > 0 ? commandArgs.args[0].toLowerCase() : null,
             commandArgs.args.length > 1 ? commandArgs.args[1].toLowerCase() : null,
-            commandArgs.args.splice(2)
+            commandArgs.args.slice(2)
         );
+        //commandArgs.args.slice
 
         if (commandArgs.argumentExists('seed')) {
             // Custom seed

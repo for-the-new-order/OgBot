@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Web Bot</title>
+        <!-- Required meta tags -->
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+        <!-- Bootstrap CSS -->
+        <link
+            rel="stylesheet"
+            href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+            integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+            crossorigin="anonymous"
+        />
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <form action="" method="post">
+                    <div class="form-group row">
+                        <label for="chatCommand" class="col-sm-12 col-form-label">Chat Command:</label>
+                        <div class="col-sm-12"><input type="text" class="form-control" name="chatCommand" id="chatCommand" /></div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="offset-sm-2 col-sm-10">
+                            <button type="submit" class="btn btn-primary" id="submitMessage">Send</button>
+                            <button type="button" class="btn btn-secondary" id="cleanMessages">Clear</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="row">
+                <div class="col-sm-1-12"><pre id="chat"></pre></div>
+            </div>
+        </div>
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous"
+        ></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+            integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+            crossorigin="anonymous"
+        ></script>
+        <script>
+            const chatCommand = $('#chatCommand');
+            const chat = $('#chat');
+            $('#submitMessage').on('click', e => {
+                e.preventDefault();
+                const command = chatCommand.val();
+                appendTextToChat(command, 'bg-secondary text-light');
+                //chatCommand.val('');
+                $.ajax({
+                    url: '/command',
+                    method: 'POST',
+                    data: { chatCommand: command }
+                }).done(msg => appendTextToChat(msg, 'bg-light'));
+            });
+            $('#cleanMessages').on('click', () => chat.empty());
+            function appendTextToChat(content, cssClass) {
+                $('<div>')
+                    .addClass(cssClass)
+                    .text(content)
+                    .appendTo(chat);
+            }
+        </script>
+    </body>
+</html>
