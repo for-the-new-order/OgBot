@@ -28,18 +28,14 @@ export class GenerateCommand extends ChatCommandBase {
     }
 
     public handle(message: Message, commandArgs: CommandArgs) {
-        //let subCommand: string = null;
-        // if (commandArgs.args.length > 0) {
-        //     subCommand = commandArgs.args[0];
-        // }
-
         // Create sub-command object (this could become recursive to create a "command-tree" of sort)
         var subCommand = new CommandArgs(
             commandArgs.args.length > 0 ? commandArgs.args[0].toLowerCase() : null,
             commandArgs.args.length > 1 ? commandArgs.args[1].toLowerCase() : null,
             commandArgs.args.slice(2)
         );
-        //commandArgs.args.slice
+        // This bugs a little (-count become the command and 5 an argument)
+        // Buggy command: !og g adventure -count 5
 
         if (commandArgs.argumentExists('seed')) {
             // Custom seed

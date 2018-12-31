@@ -31,7 +31,7 @@
                 </form>
             </div>
             <div class="row">
-                <div class="col-sm-1-12"><pre id="chat"></pre></div>
+                <div class="col-sm-12"><div id="chat"></div></div>
             </div>
         </div>
         <!-- Optional JavaScript -->
@@ -54,23 +54,43 @@
         <script>
             const chatCommand = $('#chatCommand');
             const chat = $('#chat');
+            let messageCount = 0;
             $('#submitMessage').on('click', e => {
                 e.preventDefault();
                 const command = chatCommand.val();
-                appendTextToChat(command, 'bg-secondary text-light');
-                //chatCommand.val('');
+                const card = $('<div class="card">');
+                const id = `card${messageCount++}`;
+                const button = appendHeaderToCard(card, command, id);
                 $.ajax({
                     url: '/command',
                     method: 'POST',
                     data: { chatCommand: command }
-                }).done(msg => appendTextToChat(msg, 'bg-light'));
+                }).done(msg => appendContentToCard(card, msg, id, button));
+                chat.prepend(card);
             });
             $('#cleanMessages').on('click', () => chat.empty());
-            function appendTextToChat(content, cssClass) {
-                $('<div>')
-                    .addClass(cssClass)
-                    .text(content)
-                    .appendTo(chat);
+            function appendHeaderToCard(card, content, id) {
+                const button = $('<button class="btn btn-link">')
+                    .attr('data-toggle', 'collapse')
+                    .attr('data-target', `#${id}`)
+                    .text(`"${content}" [${new Date()}]`);
+                const cardHeader = $('<div class="card-header">');
+                const h5 = $('<h5 class="mb-0">');
+                card.append(cardHeader);
+                cardHeader.append(h5);
+                h5.append(button);
+                return button;
+            }
+            function appendContentToCard(card, content, id, button) {
+                const cardBody = $('<pre class="card-body">').text(content);
+
+                const collapseWrapper = $('<div class="collapse">')
+                    .attr('id', id)
+                    .attr('data-parent', '#chat')
+                    .append(cardBody);
+
+                card.append(collapseWrapper);
+                button.get(0).click();
             }
         </script>
     </body>
