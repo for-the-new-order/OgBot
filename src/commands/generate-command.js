@@ -19,14 +19,12 @@ var alien_names_generator_1 = require("../generators/alien-names-generator");
 var name_generator_1 = require("../generators/name-generator");
 var format_utility_1 = require("../generators/format-utility");
 var data_1 = require("../../data");
-var EchoHelpService_1 = require("./EchoHelpService");
 var star_wars_adventure_generator_1 = require("../generators/star-wars-adventure-generator");
 var GenerateCommand = /** @class */ (function (_super) {
     __extends(GenerateCommand, _super);
     function GenerateCommand() {
         var _this = _super.call(this) || this;
         _this.supportedCommands = ['generate', 'gen', 'g'];
-        _this.echoHelpService = new EchoHelpService_1.EchoHelpService();
         _this.randomService = new random_service_1.RandomService();
         _this.nameGenerator = new name_generator_1.NameGenerator(_this.randomService);
         _this.formatUtility = new format_utility_1.FormatUtility();

@@ -7,7 +7,6 @@ import { AlienNamesGenerator } from '../generators/alien-names-generator';
 import { NameGenerator, Gender } from '../generators/name-generator';
 import { FormatUtility } from '../generators/format-utility';
 import { motivations, personalityTraits, ranks, species } from '../../data';
-import { EchoHelpService } from './EchoHelpService';
 import { StarWarsAdventureGenerator, AdventureProperties } from '../generators/star-wars-adventure-generator';
 import { Rank } from '../Models/Rank';
 
@@ -17,7 +16,6 @@ export class GenerateCommand extends ChatCommandBase {
     private formatUtility: FormatUtility;
     private alienNamesGenerator: AlienNamesGenerator; // = new AlienNamesGenerator(new FormatUtility());
     private nameGenerator: NameGenerator;
-    private echoHelpService = new EchoHelpService();
     private starWarsAdventureGenerator: StarWarsAdventureGenerator;
     constructor() {
         super();
