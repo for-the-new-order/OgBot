@@ -9,6 +9,7 @@ import { FormatUtility } from '../generators/format-utility';
 import { motivations, personalityTraits, ranks, species } from '../../data';
 import { EchoHelpService } from './EchoHelpService';
 import { StarWarsAdventureGenerator, AdventureProperties } from '../generators/star-wars-adventure-generator';
+import { Rank } from '../Models/Rank';
 
 export class GenerateCommand extends ChatCommandBase {
     protected supportedCommands = ['generate', 'gen', 'g'];
@@ -29,24 +30,17 @@ export class GenerateCommand extends ChatCommandBase {
 
     public handle(message: Message, commandArgs: CommandArgs) {
         // Create sub-command object (this could become recursive to create a "command-tree" of sort)
-        var subCommand = new CommandArgs(
-            commandArgs.args.length > 0 ? commandArgs.args[0].toLowerCase() : null,
-            commandArgs.args.length > 1 ? commandArgs.args[1].toLowerCase() : null,
-            commandArgs.args.slice(2)
-        );
-        // This bugs a little (-count become the command and 5 an argument)
-        // Buggy command: !og g adventure -count 5
+        var subCommand = commandArgs.convertToSubCommand();
 
+        // Set the random seed
         if (commandArgs.argumentExists('seed')) {
-            // Custom seed
             this.randomService.seed = parseInt(commandArgs.findArgumentValue('seed'));
         } else {
-            // Re-randomize the random seed
             this.randomService.reseed();
         }
         const initialSeed = this.randomService.seed;
 
-        // count
+        // Count
         let count = 1;
         if (commandArgs.argumentExists('count')) {
             count = parseInt(commandArgs.findArgumentValue('count'));
@@ -55,10 +49,44 @@ export class GenerateCommand extends ChatCommandBase {
         // Whisper
         const whisper = commandArgs.argumentExists('whisper') || commandArgs.argumentExists('w');
 
+        //
+        // Apply faction/corp/rank filters
+        //
+        let factionName: string;
+        if (commandArgs.argumentExists('faction')) {
+            factionName = commandArgs.findArgumentValue('faction');
+        }
+        let corpName: string;
+        if (commandArgs.argumentExists('corp')) {
+            corpName = commandArgs.findArgumentValue('corp');
+        }
+
+        // Find rank level
+        let factionRanks: Array<Rank>;
+        if (factionName && ranks.hasOwnProperty(factionName)) {
+            const faction = ranks[factionName];
+            if (corpName && faction.hasOwnProperty(corpName)) {
+                factionRanks = faction.all.filter(r => r.corp === corpName);
+            } else {
+                factionRanks = faction.all;
+            }
+        } else {
+            factionRanks = ranks.all;
+        }
+
+        // Gender
+        let gender: Gender;
+        if (commandArgs.argumentExists('gender')) {
+            const tmpGender = commandArgs.findArgumentValue('gender');
+            gender = tmpGender === 'f' ? Gender.Female : tmpGender === 'm' ? Gender.Male : Gender.Unknown;
+        }
+
+        // Evaluate the command
         let json = '';
         const indent = 2;
         let messageSent = false;
-        switch (subCommand.trigger) {
+        const switchCondition = subCommand ? subCommand.trigger : '';
+        switch (switchCondition) {
             case 'adventure':
                 // Execute command
                 var adventureElement = subCommand.command as AdventureProperties;
@@ -69,7 +97,7 @@ export class GenerateCommand extends ChatCommandBase {
                         null,
                         indent
                     );
-                } else if (subCommand.command != null && !subCommand.command.startsWith('-')) {
+                } else if (subCommand.command) {
                     json = JSON.stringify({ error: `${subCommand.command} is not a valid adventure element.` }, null, indent);
                 } else {
                     json = JSON.stringify(this.starWarsAdventureGenerator.generateAdventure(), null, indent);
@@ -110,24 +138,10 @@ export class GenerateCommand extends ChatCommandBase {
                 json = JSON.stringify(this.withSeed(initialSeed, places), null, indent);
                 break;
             case 'rank':
-                // corp
-                let corpName: string;
-                if (commandArgs.argumentExists('corp')) {
-                    corpName = commandArgs.findArgumentValue('corp');
-                }
-
-                // // Find rank level
-                // let corpRanks: Array<{ level: number; name: string }>;
-                // if (corpName && ranks.hasOwnProperty(corpName)) {
-                //     corpRanks = ranks[corpName];
-                // } else {
-                const corpRanks = ranks.all;
-                // }
-
                 // Generate rank(s)
-                var generatedRanks: Array<{ level: number; name: string }> = [];
+                var generatedRanks: Array<Rank> = [];
                 for (let i = 0; i < count; i++) {
-                    generatedRanks.push(this.generateRank(corpRanks));
+                    generatedRanks.push(this.generateRank(factionRanks));
                 }
                 json = JSON.stringify(this.withSeed(initialSeed, generatedRanks), null, indent);
                 break;
@@ -142,8 +156,8 @@ export class GenerateCommand extends ChatCommandBase {
                 json = JSON.stringify(species, null, indent);
                 break;
             default:
-                const name = this.generateAnyName();
-                const rank = this.generateRank(ranks.all);
+                const name = this.generateAnyName(gender);
+                const rank = this.generateRank(factionRanks);
                 const type = this.getTypeBasedOnRank(rank);
                 const obj: any = {};
                 const generatedValues = {
@@ -154,6 +168,7 @@ export class GenerateCommand extends ChatCommandBase {
                     rank: rank.name,
                     gender: name.gender,
                     clan: this.formatUtility.capitalize(rank.clan),
+                    corp: this.formatUtility.capitalize(rank.corp),
                     personality: this.generatePersonality(),
                     motivation: this.generateMotivations(type)
                 };
@@ -232,23 +247,30 @@ export class GenerateCommand extends ChatCommandBase {
         return this.alienNamesGenerator.generate();
     }
 
-    private generateAnyName(): {
+    private generateAnyName(
+        gender?: Gender
+    ): {
         name: string;
         isAlien: boolean;
         species: Species;
         gender: Gender;
     } {
-        const isAlien = this.randomService.getRandomInt(0, 20).value == 20;
+        let isAlien = this.randomService.getRandomInt(0, 20).value == 20;
+        if (!gender) {
+            gender = this.generateGender();
+        }
+        if (gender === Gender.Unknown) {
+            isAlien = true;
+        }
         if (isAlien) {
             const alienName = this.alienNamesGenerator.generate();
             return {
                 isAlien: isAlien,
                 name: alienName,
                 species: this.generateSpecies(),
-                gender: Gender.Unknown
+                gender: gender
             };
         }
-        const gender = this.generateGender();
         const humanName = this.generateName(gender);
         return {
             isAlien: isAlien,
@@ -259,7 +281,7 @@ export class GenerateCommand extends ChatCommandBase {
     }
 
     private generateGender() {
-        return this.randomService.pickOne([Gender.Male, Gender.Male, Gender.Female]).value;
+        return this.randomService.pickOne([Gender.Male, Gender.Female, Gender.Male]).value;
     }
 
     private generateSpecies(): Species {
@@ -291,12 +313,12 @@ export class GenerateCommand extends ChatCommandBase {
     }
 
     private generateRank(
-        corpRanks: Array<{ level: number; name: string; clan: string }>,
+        corpRanks: Array<Rank>,
         range?: {
             minLevel: number;
             maxLevel: number;
         }
-    ) {
+    ): Rank {
         let rndRanks = corpRanks;
         if (range !== undefined) {
             rndRanks = rndRanks.filter(x => x.level >= range.minLevel && x.level <= range.maxLevel);
@@ -308,7 +330,7 @@ export class GenerateCommand extends ChatCommandBase {
         return this.randomService.pickOne(rndRanks).value;
     }
 
-    private getTypeBasedOnRank(rank: { level: number; name: string; clan: string }): NpcType {
+    private getTypeBasedOnRank(rank: Rank): NpcType {
         var findSteps = ranks[rank.clan].steps;
         var mid = Math.ceil(findSteps.length / 2);
         var step = findSteps[mid];

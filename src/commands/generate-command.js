@@ -14,7 +14,6 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var ChatCommandBase_1 = require("./ChatCommandBase");
-var CommandArgs_1 = require("./CommandArgs");
 var random_service_1 = require("../generators/random-service");
 var alien_names_generator_1 = require("../generators/alien-names-generator");
 var name_generator_1 = require("../generators/name-generator");
@@ -36,34 +35,60 @@ var GenerateCommand = /** @class */ (function (_super) {
         return _this;
     }
     GenerateCommand.prototype.handle = function (message, commandArgs) {
-        //let subCommand: string = null;
-        // if (commandArgs.args.length > 0) {
-        //     subCommand = commandArgs.args[0];
-        // }
         // Create sub-command object (this could become recursive to create a "command-tree" of sort)
-        var subCommand = new CommandArgs_1.CommandArgs(commandArgs.args.length > 0 ? commandArgs.args[0].toLowerCase() : null, commandArgs.args.length > 1 ? commandArgs.args[1].toLowerCase() : null, commandArgs.args.slice(2));
-        // This bugs a little
-        // Buggy command: !og g adventure -count 5
+        var subCommand = commandArgs.convertToSubCommand();
+        // Set the random seed
         if (commandArgs.argumentExists('seed')) {
-            // Custom seed
             this.randomService.seed = parseInt(commandArgs.findArgumentValue('seed'));
         }
         else {
-            // Re-randomize the random seed
             this.randomService.reseed();
         }
         var initialSeed = this.randomService.seed;
-        // count
+        // Count
         var count = 1;
         if (commandArgs.argumentExists('count')) {
             count = parseInt(commandArgs.findArgumentValue('count'));
         }
         // Whisper
         var whisper = commandArgs.argumentExists('whisper') || commandArgs.argumentExists('w');
+        //
+        // Apply faction/corp/rank filters
+        //
+        var factionName;
+        if (commandArgs.argumentExists('faction')) {
+            factionName = commandArgs.findArgumentValue('faction');
+        }
+        var corpName;
+        if (commandArgs.argumentExists('corp')) {
+            corpName = commandArgs.findArgumentValue('corp');
+        }
+        // Find rank level
+        var factionRanks;
+        if (factionName && data_1.ranks.hasOwnProperty(factionName)) {
+            var faction = data_1.ranks[factionName];
+            if (corpName && faction.hasOwnProperty(corpName)) {
+                factionRanks = faction.all.filter(function (r) { return r.corp === corpName; });
+            }
+            else {
+                factionRanks = faction.all;
+            }
+        }
+        else {
+            factionRanks = data_1.ranks.all;
+        }
+        // Gender
+        var gender;
+        if (commandArgs.argumentExists('gender')) {
+            var tmpGender = commandArgs.findArgumentValue('gender');
+            gender = tmpGender === 'f' ? name_generator_1.Gender.Female : tmpGender === 'g' ? name_generator_1.Gender.Male : name_generator_1.Gender.Unknown;
+        }
+        // Evaluate the command
         var json = '';
         var indent = 2;
         var messageSent = false;
-        switch (subCommand.trigger) {
+        var switchCondition = subCommand ? subCommand.trigger : '';
+        switch (switchCondition) {
             case 'adventure':
                 // Execute command
                 var adventureElement = subCommand.command;
@@ -71,7 +96,7 @@ var GenerateCommand = /** @class */ (function (_super) {
                     var distinct = subCommand.argumentExists('distinct');
                     json = JSON.stringify(this.starWarsAdventureGenerator.generateAdventureElement(adventureElement, count, distinct), null, indent);
                 }
-                else if (subCommand.command != null && !subCommand.command.startsWith('-')) {
+                else if (subCommand.command) {
                     json = JSON.stringify({ error: subCommand.command + " is not a valid adventure element." }, null, indent);
                 }
                 else {
@@ -81,8 +106,8 @@ var GenerateCommand = /** @class */ (function (_super) {
             case 'name':
                 var names = [];
                 for (var i = 0; i < count; i++) {
-                    var gender = this.generateGender();
-                    names.push(this.generateName(gender));
+                    var gender_1 = this.generateGender();
+                    names.push(this.generateName(gender_1));
                 }
                 json = JSON.stringify(this.withSeed(initialSeed, names), null, indent);
                 break;
@@ -113,22 +138,10 @@ var GenerateCommand = /** @class */ (function (_super) {
                 json = JSON.stringify(this.withSeed(initialSeed, places), null, indent);
                 break;
             case 'rank':
-                // corp
-                var corpName = void 0;
-                if (commandArgs.argumentExists('corp')) {
-                    corpName = commandArgs.findArgumentValue('corp');
-                }
-                // // Find rank level
-                // let corpRanks: Array<{ level: number; name: string }>;
-                // if (corpName && ranks.hasOwnProperty(corpName)) {
-                //     corpRanks = ranks[corpName];
-                // } else {
-                var corpRanks = data_1.ranks.all;
-                // }
                 // Generate rank(s)
                 var generatedRanks = [];
                 for (var i = 0; i < count; i++) {
-                    generatedRanks.push(this.generateRank(corpRanks));
+                    generatedRanks.push(this.generateRank(factionRanks));
                 }
                 json = JSON.stringify(this.withSeed(initialSeed, generatedRanks), null, indent);
                 break;
@@ -143,8 +156,8 @@ var GenerateCommand = /** @class */ (function (_super) {
                 json = JSON.stringify(species_1, null, indent);
                 break;
             default:
-                var name_1 = this.generateAnyName();
-                var rank = this.generateRank(data_1.ranks.all);
+                var name_1 = this.generateAnyName(gender);
+                var rank = this.generateRank(factionRanks);
                 var type = this.getTypeBasedOnRank(rank);
                 var obj = {};
                 var generatedValues = {
@@ -155,6 +168,7 @@ var GenerateCommand = /** @class */ (function (_super) {
                     rank: rank.name,
                     gender: name_1.gender,
                     clan: this.formatUtility.capitalize(rank.clan),
+                    corp: this.formatUtility.capitalize(rank.corp),
                     personality: this.generatePersonality(),
                     motivation: this.generateMotivations(type)
                 };
@@ -230,18 +244,23 @@ var GenerateCommand = /** @class */ (function (_super) {
     GenerateCommand.prototype.generateAlienName = function () {
         return this.alienNamesGenerator.generate();
     };
-    GenerateCommand.prototype.generateAnyName = function () {
+    GenerateCommand.prototype.generateAnyName = function (gender) {
         var isAlien = this.randomService.getRandomInt(0, 20).value == 20;
+        if (!gender) {
+            gender = this.generateGender();
+        }
+        if (gender === name_generator_1.Gender.Unknown) {
+            isAlien = true;
+        }
         if (isAlien) {
             var alienName = this.alienNamesGenerator.generate();
             return {
                 isAlien: isAlien,
                 name: alienName,
                 species: this.generateSpecies(),
-                gender: name_generator_1.Gender.Unknown
+                gender: gender
             };
         }
-        var gender = this.generateGender();
         var humanName = this.generateName(gender);
         return {
             isAlien: isAlien,
@@ -251,7 +270,7 @@ var GenerateCommand = /** @class */ (function (_super) {
         };
     };
     GenerateCommand.prototype.generateGender = function () {
-        return this.randomService.pickOne([name_generator_1.Gender.Male, name_generator_1.Gender.Male, name_generator_1.Gender.Female]).value;
+        return this.randomService.pickOne([name_generator_1.Gender.Male, name_generator_1.Gender.Female, name_generator_1.Gender.Male]).value;
     };
     GenerateCommand.prototype.generateSpecies = function () {
         var specie = this.randomService.pickOne(data_1.species);

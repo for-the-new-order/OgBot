@@ -20,6 +20,24 @@ var CommandArgs = /** @class */ (function () {
         var seedArgIndex = this.args.indexOf('-' + name);
         return seedArgIndex;
     };
+    CommandArgs.prototype.convertToSubCommand = function () {
+        if (this.args.length === 0) {
+            return null;
+        }
+        var trigger = this.args[0].toLowerCase();
+        if (trigger.startsWith('-')) {
+            return null;
+        }
+        var command = this.args.length > 1 ? this.args[1].toLowerCase() : '';
+        var sliceIndex = 2;
+        // Avoid splitted options
+        if (command.startsWith('-')) {
+            sliceIndex = 1;
+            command = '';
+        }
+        var args = this.args.slice(sliceIndex);
+        return new CommandArgs(trigger, command, args);
+    };
     return CommandArgs;
 }());
 exports.CommandArgs = CommandArgs;

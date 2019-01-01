@@ -67,7 +67,7 @@ var tmp = {
             { level: 14, name: 'Deputy Director' },
             { level: 15, name: 'Director' }
         ],
-        COMPORN: [
+        COMPNOR: [
             { level: 3, name: 'Junior Inspector' },
             { level: 4, name: 'Inspector' },
             { level: 5, name: 'Inspector General' },
@@ -155,14 +155,25 @@ var tmp = {
     },
     rebels: {}
 };
+tmp.rebels = tmp.generic;
 var allEmpire = tmp.empire.navy
-    .concat(tmp.empire.army, tmp.empire.COMPORN, tmp.empire.appointments, tmp.empire.ancillary, tmp.empire.governance, tmp.empire.intelligence)
-    .map(function (x) {
-    return __assign({}, x, { clan: 'empire' });
-});
-var allGeneric = tmp.generic.army.concat(tmp.generic.navy).map(function (x) {
-    return __assign({}, x, { clan: 'generic' });
-});
-var all = allGeneric.concat(allEmpire);
-exports.ranks = __assign({}, tmp, { empire: __assign({}, tmp.empire, { all: allEmpire }), generic: __assign({}, tmp.generic, { all: allGeneric }), all: all });
+    .map(function (x) { return addCorp(x, 'navy'); })
+    .concat(tmp.empire.army.map(function (x) { return addCorp(x, 'army'); }), tmp.empire.COMPNOR.map(function (x) { return addCorp(x, 'compnor'); }), tmp.empire.appointments.map(function (x) { return addCorp(x, 'appointments'); }), tmp.empire.ancillary.map(function (x) { return addCorp(x, 'ancillary'); }), tmp.empire.governance.map(function (x) { return addCorp(x, 'governance'); }), tmp.empire.intelligence.map(function (x) { return addCorp(x, 'intelligence'); }))
+    .map(function (x) { return addClan(x, 'empire'); });
+var allGeneric = tmp.generic.army
+    .map(function (x) { return addCorp(x, 'army'); })
+    .concat(tmp.generic.navy.map(function (x) { return addCorp(x, 'navy'); }))
+    .map(function (x) { return addClan(x, 'generic'); });
+var allRebels = tmp.generic.army
+    .map(function (x) { return addCorp(x, 'army'); })
+    .concat(tmp.generic.navy.map(function (x) { return addCorp(x, 'navy'); }))
+    .map(function (x) { return addClan(x, 'rebels'); });
+var all = allGeneric.concat(allEmpire, allRebels);
+exports.ranks = __assign({}, tmp, { empire: __assign({}, tmp.empire, { all: allEmpire }), generic: __assign({}, tmp.generic, { all: allGeneric }), rebels: __assign({}, tmp.rebels, { all: allRebels }), all: all });
+function addClan(ranks, clanName) {
+    return __assign({}, ranks, { clan: clanName });
+}
+function addCorp(ranks, corpName) {
+    return __assign({}, ranks, { corp: corpName });
+}
 //# sourceMappingURL=ranks.js.map

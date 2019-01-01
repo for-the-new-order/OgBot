@@ -1,3 +1,5 @@
+import { Rank } from '../src/Models/Rank';
+
 let tmp = {
     empire: {
         steps: [[1, 5], [6, 6], [7, 9], [10, 14], [15, 16]],
@@ -54,7 +56,7 @@ let tmp = {
             { level: 14, name: 'Deputy Director' },
             { level: 15, name: 'Director' }
         ],
-        COMPORN: [
+        COMPNOR: [
             { level: 3, name: 'Junior Inspector' },
             { level: 4, name: 'Inspector' },
             { level: 5, name: 'Inspector General' },
@@ -142,23 +144,29 @@ let tmp = {
     },
     rebels: {}
 };
+tmp.rebels = tmp.generic;
 
 const allEmpire = tmp.empire.navy
+    .map(x => addCorp(x, 'navy'))
     .concat(
-        tmp.empire.army,
-        tmp.empire.COMPORN,
-        tmp.empire.appointments,
-        tmp.empire.ancillary,
-        tmp.empire.governance,
-        tmp.empire.intelligence
+        tmp.empire.army.map(x => addCorp(x, 'army')),
+        tmp.empire.COMPNOR.map(x => addCorp(x, 'compnor')),
+        tmp.empire.appointments.map(x => addCorp(x, 'appointments')),
+        tmp.empire.ancillary.map(x => addCorp(x, 'ancillary')),
+        tmp.empire.governance.map(x => addCorp(x, 'governance')),
+        tmp.empire.intelligence.map(x => addCorp(x, 'intelligence'))
     )
-    .map(x => {
-        return { ...x, clan: 'empire' };
-    });
-const allGeneric = tmp.generic.army.concat(tmp.generic.navy).map(x => {
-    return { ...x, clan: 'generic' };
-});
-const all = allGeneric.concat(allEmpire);
+    .map(x => addClan(x, 'empire'));
+const allGeneric = tmp.generic.army
+    .map(x => addCorp(x, 'army'))
+    .concat(tmp.generic.navy.map(x => addCorp(x, 'navy')))
+    .map(x => addClan(x, 'generic'));
+const allRebels = tmp.generic.army
+    .map(x => addCorp(x, 'army'))
+    .concat(tmp.generic.navy.map(x => addCorp(x, 'navy')))
+    .map(x => addClan(x, 'rebels'));
+
+const all = allGeneric.concat(allEmpire, allRebels);
 export const ranks = {
     ...tmp,
     empire: {
@@ -169,5 +177,17 @@ export const ranks = {
         ...tmp.generic,
         all: allGeneric
     },
+    rebels: {
+        ...tmp.rebels,
+        all: allRebels
+    },
     all: all
 };
+
+function addClan(ranks: Rank, clanName: string) {
+    return { ...ranks, clan: clanName };
+}
+
+function addCorp(ranks: Rank, corpName: string) {
+    return { ...ranks, corp: corpName };
+}
