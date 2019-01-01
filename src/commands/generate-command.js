@@ -63,6 +63,20 @@ var GenerateCommand = /** @class */ (function (_super) {
         if (commandArgs.argumentExists('corp')) {
             corpName = commandArgs.findArgumentValue('corp');
         }
+        var range = {
+            min: 0,
+            max: 0,
+            hasMin: false,
+            hasMax: false
+        };
+        if (commandArgs.argumentExists('min')) {
+            range.min = parseInt(commandArgs.findArgumentValue('min'));
+            range.hasMin = true;
+        }
+        if (commandArgs.argumentExists('max')) {
+            range.max = parseInt(commandArgs.findArgumentValue('max'));
+            range.hasMax = true;
+        }
         // Find rank level
         var factionRanks;
         if (factionName && data_1.ranks.hasOwnProperty(factionName)) {
@@ -76,6 +90,15 @@ var GenerateCommand = /** @class */ (function (_super) {
         }
         else {
             factionRanks = data_1.ranks.all;
+        }
+        if (range.hasMin && range.hasMax) {
+            factionRanks = factionRanks.filter(function (r) { return r.level >= range.min && r.level <= range.max; });
+        }
+        else if (range.hasMin) {
+            factionRanks = factionRanks.filter(function (r) { return r.level >= range.min; });
+        }
+        else if (range.hasMax) {
+            factionRanks = factionRanks.filter(function (r) { return r.level <= range.max; });
         }
         // Gender
         var gender;

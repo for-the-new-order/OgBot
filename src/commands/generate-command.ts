@@ -60,6 +60,20 @@ export class GenerateCommand extends ChatCommandBase {
         if (commandArgs.argumentExists('corp')) {
             corpName = commandArgs.findArgumentValue('corp');
         }
+        const range = {
+            min: 0,
+            max: 0,
+            hasMin: false,
+            hasMax: false
+        };
+        if (commandArgs.argumentExists('min')) {
+            range.min = parseInt(commandArgs.findArgumentValue('min'));
+            range.hasMin = true;
+        }
+        if (commandArgs.argumentExists('max')) {
+            range.max = parseInt(commandArgs.findArgumentValue('max'));
+            range.hasMax = true;
+        }
 
         // Find rank level
         let factionRanks: Array<Rank>;
@@ -72,6 +86,14 @@ export class GenerateCommand extends ChatCommandBase {
             }
         } else {
             factionRanks = ranks.all;
+        }
+
+        if (range.hasMin && range.hasMax) {
+            factionRanks = factionRanks.filter(r => r.level >= range.min && r.level <= range.max);
+        } else if (range.hasMin) {
+            factionRanks = factionRanks.filter(r => r.level >= range.min);
+        } else if (range.hasMax) {
+            factionRanks = factionRanks.filter(r => r.level <= range.max);
         }
 
         // Gender
@@ -368,6 +390,14 @@ export class GenerateCommand extends ChatCommandBase {
                 }
             ]
         };
+        const minOption = {
+            command: '-min [number]',
+            description: 'Select the minimum rank level (inclusive) for the generated NPC.'
+        };
+        const maxOption = {
+            command: '-max [number]',
+            description: 'Select the maximum rank level (inclusive) for the generated NPC.'
+        };
 
         const helpObject: CommandHelpDescriptor = {
             command: this.supportedCommands[0],
@@ -428,7 +458,7 @@ export class GenerateCommand extends ChatCommandBase {
                 {
                     command: 'rank',
                     description: 'Generate a rank.',
-                    options: [countOption, seedOption, clanOption]
+                    options: [countOption, seedOption, clanOption, minOption, maxOption]
                 },
                 {
                     command: 'species',
@@ -438,7 +468,7 @@ export class GenerateCommand extends ChatCommandBase {
                 {
                     command: 'default',
                     description: 'Generate a default Jekyll formatted default values for NPCs.',
-                    options: [seedOption, genderOption, clanOption]
+                    options: [seedOption, genderOption, clanOption, minOption, maxOption]
                 }
             ]
         };
