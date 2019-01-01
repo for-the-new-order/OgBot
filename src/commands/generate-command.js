@@ -320,6 +320,14 @@ var GenerateCommand = /** @class */ (function (_super) {
         return { value: value, initialSeed: initialSeed };
     };
     GenerateCommand.prototype.generateRank = function (corpRanks, range) {
+        if (corpRanks.length === 0) {
+            return {
+                level: 0,
+                name: 'N/D',
+                clan: 'N/D',
+                corp: 'N/D'
+            };
+        }
         var rndRanks = corpRanks;
         if (range !== undefined) {
             rndRanks = rndRanks.filter(function (x) { return x.level >= range.minLevel && x.level <= range.maxLevel; });
@@ -330,7 +338,11 @@ var GenerateCommand = /** @class */ (function (_super) {
         return this.randomService.pickOne(rndRanks).value;
     };
     GenerateCommand.prototype.getTypeBasedOnRank = function (rank) {
-        var findSteps = data_1.ranks[rank.clan].steps;
+        var allRanks = data_1.ranks[rank.clan];
+        if (!allRanks) {
+            return NpcType.Rival;
+        }
+        var findSteps = allRanks.steps;
         var mid = Math.ceil(findSteps.length / 2);
         var step = findSteps[mid];
         var threshold = step[0];

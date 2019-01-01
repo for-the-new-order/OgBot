@@ -341,6 +341,14 @@ export class GenerateCommand extends ChatCommandBase {
             maxLevel: number;
         }
     ): Rank {
+        if (corpRanks.length === 0) {
+            return {
+                level: 0,
+                name: 'N/D',
+                clan: 'N/D',
+                corp: 'N/D'
+            };
+        }
         let rndRanks = corpRanks;
         if (range !== undefined) {
             rndRanks = rndRanks.filter(x => x.level >= range.minLevel && x.level <= range.maxLevel);
@@ -353,7 +361,11 @@ export class GenerateCommand extends ChatCommandBase {
     }
 
     private getTypeBasedOnRank(rank: Rank): NpcType {
-        var findSteps = ranks[rank.clan].steps;
+        var allRanks = ranks[rank.clan];
+        if (!allRanks) {
+            return NpcType.Rival;
+        }
+        var findSteps = allRanks.steps;
         var mid = Math.ceil(findSteps.length / 2);
         var step = findSteps[mid];
         var threshold = step[0];
