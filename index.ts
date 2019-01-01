@@ -20,6 +20,10 @@ app.post('/command', async function(req, res) {
     let output = '';
     const messageMock = MakeMessage(chatCommand, chat => (output += chat));
     await chatCommandManager.Handle(messageMock.object);
+    const spacerString = '\n``````json\n';
+    do {
+        output = output.replace(spacerString, '');
+    } while (output.indexOf(spacerString) > -1);
     res.send(output);
 });
 

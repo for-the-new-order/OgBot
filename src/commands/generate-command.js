@@ -364,6 +364,14 @@ var GenerateCommand = /** @class */ (function (_super) {
                 }
             ]
         };
+        var minOption = {
+            command: '-min [number]',
+            description: 'Select the minimum rank level (inclusive) for the generated NPC.'
+        };
+        var maxOption = {
+            command: '-max [number]',
+            description: 'Select the maximum rank level (inclusive) for the generated NPC.'
+        };
         var helpObject = {
             command: this.supportedCommands[0],
             alias: this.supportedCommands.slice(1).join(', '),
@@ -422,7 +430,7 @@ var GenerateCommand = /** @class */ (function (_super) {
                 {
                     command: 'rank',
                     description: 'Generate a rank.',
-                    options: [countOption, seedOption, clanOption]
+                    options: [countOption, seedOption, clanOption, minOption, maxOption]
                 },
                 {
                     command: 'species',
@@ -432,7 +440,7 @@ var GenerateCommand = /** @class */ (function (_super) {
                 {
                     command: 'default',
                     description: 'Generate a default Jekyll formatted default values for NPCs.',
-                    options: [seedOption, genderOption, clanOption]
+                    options: [seedOption, genderOption, clanOption, minOption, maxOption]
                 }
             ]
         };
