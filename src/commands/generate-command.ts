@@ -14,7 +14,7 @@ export class GenerateCommand extends ChatCommandBase {
     protected supportedCommands = ['generate', 'gen', 'g'];
     private randomService: RandomService;
     private formatUtility: FormatUtility;
-    private alienNamesGenerator: AlienNamesGenerator; // = new AlienNamesGenerator(new FormatUtility());
+    private alienNamesGenerator: AlienNamesGenerator;
     private nameGenerator: NameGenerator;
     private starWarsAdventureGenerator: StarWarsAdventureGenerator;
     constructor() {
