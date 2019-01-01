@@ -56,8 +56,8 @@ var GenerateCommand = /** @class */ (function (_super) {
         // Apply faction/corp/rank filters
         //
         var factionName;
-        if (commandArgs.argumentExists('faction')) {
-            factionName = commandArgs.findArgumentValue('faction');
+        if (commandArgs.argumentExists('clan')) {
+            factionName = commandArgs.findArgumentValue('clan');
         }
         var corpName;
         if (commandArgs.argumentExists('corp')) {
@@ -81,7 +81,7 @@ var GenerateCommand = /** @class */ (function (_super) {
         var gender;
         if (commandArgs.argumentExists('gender')) {
             var tmpGender = commandArgs.findArgumentValue('gender');
-            gender = tmpGender === 'f' ? name_generator_1.Gender.Female : tmpGender === 'g' ? name_generator_1.Gender.Male : name_generator_1.Gender.Unknown;
+            gender = tmpGender === 'f' ? name_generator_1.Gender.Female : tmpGender === 'm' ? name_generator_1.Gender.Male : name_generator_1.Gender.Unknown;
         }
         // Evaluate the command
         var json = '';
@@ -327,6 +327,20 @@ var GenerateCommand = /** @class */ (function (_super) {
             alias: '-w',
             description: 'The bot will whisper you the results instead of relying in the current channel.'
         };
+        var genderOption = {
+            command: '-gender [f|m|...]',
+            description: 'Generate a name based on the specified gender. Anything else than m or f will generate an alien with an unknown gender.'
+        };
+        var clanOption = {
+            command: '-clan [empire|generic|rebels]',
+            description: 'Generate the NPC based on the specified clan.',
+            options: [
+                {
+                    command: '-corp [empire: {navy|army|compnor|appointments|ancillary|governance|intelligence}, generic: {army|navy}, rebels: {army|navy}]',
+                    description: 'Generate the NPC based on the specified corp. This setting depends on the selected clan'
+                }
+            ]
+        };
         var helpObject = {
             command: this.supportedCommands[0],
             alias: this.supportedCommands.slice(1).join(', '),
@@ -385,16 +399,7 @@ var GenerateCommand = /** @class */ (function (_super) {
                 {
                     command: 'rank',
                     description: 'Generate a rank.',
-                    options: [
-                        countOption,
-                        // {
-                        //     command:
-                        //         '-corp [navy|army|intelligence|COMPORN|governance|ancillary|appointments]',
-                        //     description:
-                        //         'Use a particular rank collectino to generate the rank in.'
-                        // },
-                        seedOption
-                    ]
+                    options: [countOption, seedOption, clanOption]
                 },
                 {
                     command: 'species',
@@ -404,7 +409,7 @@ var GenerateCommand = /** @class */ (function (_super) {
                 {
                     command: 'default',
                     description: 'Generate a default Jekyll formatted default values for NPCs.',
-                    options: [seedOption]
+                    options: [seedOption, genderOption, clanOption]
                 }
             ]
         };

@@ -53,8 +53,8 @@ export class GenerateCommand extends ChatCommandBase {
         // Apply faction/corp/rank filters
         //
         let factionName: string;
-        if (commandArgs.argumentExists('faction')) {
-            factionName = commandArgs.findArgumentValue('faction');
+        if (commandArgs.argumentExists('clan')) {
+            factionName = commandArgs.findArgumentValue('clan');
         }
         let corpName: string;
         if (commandArgs.argumentExists('corp')) {
@@ -352,6 +352,23 @@ export class GenerateCommand extends ChatCommandBase {
             alias: '-w',
             description: 'The bot will whisper you the results instead of relying in the current channel.'
         };
+        const genderOption = {
+            command: '-gender [f|m|...]',
+            description:
+                'Generate a name based on the specified gender. Anything else than m or f will generate an alien with an unknown gender.'
+        };
+        const clanOption = {
+            command: '-clan [empire|generic|rebels]',
+            description: 'Generate the NPC based on the specified clan.',
+            options: [
+                {
+                    command:
+                        '-corp [empire: {navy|army|compnor|appointments|ancillary|governance|intelligence}, generic: {army|navy}, rebels: {army|navy}]',
+                    description: 'Generate the NPC based on the specified corp. This setting depends on the selected clan'
+                }
+            ]
+        };
+
         const helpObject: CommandHelpDescriptor = {
             command: this.supportedCommands[0],
             alias: this.supportedCommands.slice(1).join(', '),
@@ -411,16 +428,7 @@ export class GenerateCommand extends ChatCommandBase {
                 {
                     command: 'rank',
                     description: 'Generate a rank.',
-                    options: [
-                        countOption,
-                        // {
-                        //     command:
-                        //         '-corp [navy|army|intelligence|COMPORN|governance|ancillary|appointments]',
-                        //     description:
-                        //         'Use a particular rank collectino to generate the rank in.'
-                        // },
-                        seedOption
-                    ]
+                    options: [countOption, seedOption, clanOption]
                 },
                 {
                     command: 'species',
@@ -430,7 +438,7 @@ export class GenerateCommand extends ChatCommandBase {
                 {
                     command: 'default',
                     description: 'Generate a default Jekyll formatted default values for NPCs.',
-                    options: [seedOption]
+                    options: [seedOption, genderOption, clanOption]
                 }
             ]
         };
