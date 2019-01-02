@@ -21,6 +21,7 @@ Bot to play YouTube music.
 !stop
 !clean
 !clear
+!disconnect
 ```
 
 ### YouTube music
