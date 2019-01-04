@@ -148,8 +148,11 @@ var GenerateCommand = /** @class */ (function (_super) {
                 json = JSON.stringify(this.withSeed(initialSeed, motivation), null, indent);
                 break;
             case 'personality':
-                var personality = this.generatePersonality();
-                json = JSON.stringify(this.withSeed(initialSeed, personality), null, indent);
+                var personalities = [];
+                for (var i = 0; i < count; i++) {
+                    personalities.push(this.generatePersonality());
+                }
+                json = JSON.stringify(this.withSeed(initialSeed, personalities), null, indent);
                 break;
             case 'place':
                 var places = [];
@@ -291,7 +294,7 @@ var GenerateCommand = /** @class */ (function (_super) {
         };
     };
     GenerateCommand.prototype.generateGender = function () {
-        return this.randomService.pickOne([name_generator_1.Gender.Male, name_generator_1.Gender.Female, name_generator_1.Gender.Male]).value;
+        return this.randomService.pickOne([name_generator_1.Gender.Male, name_generator_1.Gender.Male, name_generator_1.Gender.Female, name_generator_1.Gender.Male]).value;
     };
     GenerateCommand.prototype.generateSpecies = function () {
         var specie = this.randomService.pickOne(data_1.species);

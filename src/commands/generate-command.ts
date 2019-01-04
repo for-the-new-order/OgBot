@@ -147,8 +147,11 @@ export class GenerateCommand extends ChatCommandBase {
                 json = JSON.stringify(this.withSeed(initialSeed, motivation), null, indent);
                 break;
             case 'personality':
-                var personality = this.generatePersonality();
-                json = JSON.stringify(this.withSeed(initialSeed, personality), null, indent);
+                var personalities: Array<string> = [];
+                for (let i = 0; i < count; i++) {
+                    personalities.push(this.generatePersonality());
+                }
+                json = JSON.stringify(this.withSeed(initialSeed, personalities), null, indent);
                 break;
             case 'place':
                 var places: Array<string> = [];
@@ -301,7 +304,7 @@ export class GenerateCommand extends ChatCommandBase {
     }
 
     private generateGender() {
-        return this.randomService.pickOne([Gender.Male, Gender.Female, Gender.Male]).value;
+        return this.randomService.pickOne([Gender.Male, Gender.Male, Gender.Female, Gender.Male]).value;
     }
 
     private generateSpecies(): Species {
