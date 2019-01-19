@@ -4,6 +4,8 @@ This is some unstructured Discord bot experiments.
 
 # Notes to myself
 
+-   [TECHNOBABBLE GENERATOR](http://www.scifiideas.com/technobabble-generator/)
+
 ## Rythm
 
 Bot to play YouTube music.
