@@ -125,8 +125,11 @@ export class GenerateCommand extends ChatCommandBase {
                 break;
             case 'name':
                 const names: Array<{ name: string; gender: Gender }> = [];
+                const genderParam = gender;
                 for (let i = 0; i < count; i++) {
-                    const gender = this.generateGender();
+                    if (!genderParam) {
+                        gender = this.generateGender();
+                    }
                     names.push(this.generateName(gender));
                 }
                 json = JSON.stringify(this.withSeed(initialSeed, names), null, indent);
@@ -487,7 +490,7 @@ export class GenerateCommand extends ChatCommandBase {
         };
 
         // Some sub-command filter; this should be extracted in some sort of sub-command (along with the sub-command themselves).
-        if (commandArgs.args.length > 0) {
+        if (commandArgs.args && commandArgs.args.length > 0) {
             const firsArg = commandArgs.args[0];
             for (let i = 0; i < helpObject.subcommands.length; i++) {
                 const element = helpObject.subcommands[i];

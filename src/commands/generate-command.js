@@ -126,9 +126,12 @@ var GenerateCommand = /** @class */ (function (_super) {
                 break;
             case 'name':
                 var names = [];
+                var genderParam = gender;
                 for (var i = 0; i < count; i++) {
-                    var gender_1 = this.generateGender();
-                    names.push(this.generateName(gender_1));
+                    if (!genderParam) {
+                        gender = this.generateGender();
+                    }
+                    names.push(this.generateName(gender));
                 }
                 json = JSON.stringify(this.withSeed(initialSeed, names), null, indent);
                 break;
@@ -458,7 +461,7 @@ var GenerateCommand = /** @class */ (function (_super) {
             ]
         };
         // Some sub-command filter; this should be extracted in some sort of sub-command (along with the sub-command themselves).
-        if (commandArgs.args.length > 0) {
+        if (commandArgs.args && commandArgs.args.length > 0) {
             var firsArg = commandArgs.args[0];
             for (var i = 0; i < helpObject.subcommands.length; i++) {
                 var element = helpObject.subcommands[i];

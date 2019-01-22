@@ -67,7 +67,7 @@ var tmp = {
             { level: 14, name: 'Deputy Director' },
             { level: 15, name: 'Director' }
         ],
-        COMPNOR: [
+        compnor: [
             { level: 3, name: 'Junior Inspector' },
             { level: 4, name: 'Inspector' },
             { level: 5, name: 'Inspector General' },
@@ -158,7 +158,7 @@ var tmp = {
 tmp.rebels = tmp.generic;
 var allEmpire = tmp.empire.navy
     .map(function (x) { return addCorp(x, 'navy'); })
-    .concat(tmp.empire.army.map(function (x) { return addCorp(x, 'army'); }), tmp.empire.COMPNOR.map(function (x) { return addCorp(x, 'compnor'); }), tmp.empire.appointments.map(function (x) { return addCorp(x, 'appointments'); }), tmp.empire.ancillary.map(function (x) { return addCorp(x, 'ancillary'); }), tmp.empire.governance.map(function (x) { return addCorp(x, 'governance'); }), tmp.empire.intelligence.map(function (x) { return addCorp(x, 'intelligence'); }))
+    .concat(tmp.empire.army.map(function (x) { return addCorp(x, 'army'); }), tmp.empire.compnor.map(function (x) { return addCorp(x, 'compnor'); }), tmp.empire.appointments.map(function (x) { return addCorp(x, 'appointments'); }), tmp.empire.ancillary.map(function (x) { return addCorp(x, 'ancillary'); }), tmp.empire.governance.map(function (x) { return addCorp(x, 'governance'); }), tmp.empire.intelligence.map(function (x) { return addCorp(x, 'intelligence'); }))
     .map(function (x) { return addClan(x, 'empire'); });
 var allGeneric = tmp.generic.army
     .map(function (x) { return addCorp(x, 'army'); })

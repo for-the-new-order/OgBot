@@ -56,7 +56,7 @@ let tmp = {
             { level: 14, name: 'Deputy Director' },
             { level: 15, name: 'Director' }
         ],
-        COMPNOR: [
+        compnor: [
             { level: 3, name: 'Junior Inspector' },
             { level: 4, name: 'Inspector' },
             { level: 5, name: 'Inspector General' },
@@ -99,7 +99,6 @@ let tmp = {
             { level: 6, name: 'Chief of Department' },
             { level: 6, name: 'Lieutenant' },
             { level: 9, name: 'Captain' },
-            { level: 9, name: 'Commandant' },
             { level: 9, name: 'Taskmaster' },
             { level: 9, name: 'Commander' },
             { level: 11, name: 'Commander of a Task Squadron' },
@@ -150,7 +149,7 @@ const allEmpire = tmp.empire.navy
     .map(x => addCorp(x, 'navy'))
     .concat(
         tmp.empire.army.map(x => addCorp(x, 'army')),
-        tmp.empire.COMPNOR.map(x => addCorp(x, 'compnor')),
+        tmp.empire.compnor.map(x => addCorp(x, 'compnor')),
         tmp.empire.appointments.map(x => addCorp(x, 'appointments')),
         tmp.empire.ancillary.map(x => addCorp(x, 'ancillary')),
         tmp.empire.governance.map(x => addCorp(x, 'governance')),
