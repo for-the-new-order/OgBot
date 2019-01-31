@@ -82,6 +82,9 @@ Bot to play YouTube music.
 
 # Sci-Fi Ambience: Hyperion Cryogenic Chambers (ASMR, White Noise, Relaxation)
 !playskip https://www.youtube.com/watch?v=8I5HCN4BS8I
+
+# The Imperial March
+https://www.youtube.com/watch?v=-bzWSJG93P8
 ```
 
 **Combat sounds**
