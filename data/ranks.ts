@@ -141,9 +141,26 @@ let tmp = {
             { level: 14, name: 'Admiral' }
         ]
     },
-    rebels: {}
+    rebels: {
+        steps: [[1, 2], [3, 4], [5, 6]],
+        army: [
+            { level: 1, name: 'Lieutenant' },
+            { level: 2, name: 'Captain' },
+            { level: 3, name: 'Major' },
+            { level: 4, name: 'Commander' },
+            { level: 5, name: 'Colonel' },
+            { level: 6, name: 'General' }
+        ],
+        navy: [
+            { level: 1, name: 'Lieutenant' },
+            { level: 2, name: 'Captain' },
+            { level: 3, name: 'Major' },
+            { level: 4, name: 'Commander' },
+            { level: 5, name: 'Colonel' },
+            { level: 6, name: 'Admiral' }
+        ]
+    }
 };
-tmp.rebels = tmp.generic;
 
 const allEmpire = tmp.empire.navy
     .map(x => addCorp(x, 'navy'))
@@ -160,9 +177,9 @@ const allGeneric = tmp.generic.army
     .map(x => addCorp(x, 'army'))
     .concat(tmp.generic.navy.map(x => addCorp(x, 'navy')))
     .map(x => addClan(x, 'generic'));
-const allRebels = tmp.generic.army
+const allRebels = tmp.rebels.army
     .map(x => addCorp(x, 'army'))
-    .concat(tmp.generic.navy.map(x => addCorp(x, 'navy')))
+    .concat(tmp.rebels.navy.map(x => addCorp(x, 'navy')))
     .map(x => addClan(x, 'rebels'));
 
 const all = allGeneric.concat(allEmpire, allRebels);
