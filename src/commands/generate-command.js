@@ -350,7 +350,7 @@ var GenerateCommand = /** @class */ (function (_super) {
         var mid = Math.ceil(findSteps.length / 2);
         var step = findSteps[mid];
         var threshold = step[0];
-        return rank.level > threshold ? NpcType.Nemesis : NpcType.Rival;
+        return rank.level >= threshold ? NpcType.Nemesis : NpcType.Rival;
     };
     GenerateCommand.prototype.help = function (commandArgs) {
         var countOption = {
