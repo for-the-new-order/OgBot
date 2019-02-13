@@ -84,7 +84,10 @@ Bot to play YouTube music.
 !playskip https://www.youtube.com/watch?v=8I5HCN4BS8I
 
 # The Imperial March
-https://www.youtube.com/watch?v=-bzWSJG93P8
+!playskip https://www.youtube.com/watch?v=-bzWSJG93P8
+
+# Imperial Alert / Siren Sound
+!playskip https://www.youtube.com/watch?v=AfuQd_xZlKw
 ```
 
 **Combat sounds**
