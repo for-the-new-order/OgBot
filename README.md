@@ -118,3 +118,16 @@ Bot to play YouTube music.
 >playskip https://www.youtube.com/watch?v=yKwzYDyx2ro
 >loop
 ```
+
+**Init**
+
+https://github.com/SkyJedi/FFGNDS-Discord-Dice-Roller
+
+```
+!Init Set nppnn
+!Init
+!Init Reset
+!Init Next
+!Init Previous
+!Init Modify npnpn
+```
