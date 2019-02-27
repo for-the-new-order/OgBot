@@ -6,7 +6,7 @@ var botName = require('./../../package.json').name;
 var botVersion = require('./../../package.json').version;
 
 export class VersionCommand extends ChatCommandBase {
-    protected supportedCommands: string[] = ['info'];
+    protected supportedCommands: string[] = ['version'];
     public async handle(message: Message, commandArgs: CommandArgs) {
         await message.channel.send(`${botName}: ${botVersion}`);
     }
