@@ -6,6 +6,7 @@ import { CommandHelpDescriptor } from './HelpText';
 import { EchoHelpService } from './EchoHelpService';
 import { CleanChannelCommand } from './clean-channel-command';
 import { InfoCommand } from './info-command';
+import { VersionCommand } from './version-command';
 
 export class ChatCommandManager {
     private trigger = 'og';
@@ -17,6 +18,7 @@ export class ChatCommandManager {
             new GenerateCommand(),
             new CleanChannelCommand(),
             new InfoCommand(),
+            new VersionCommand(),
             //
             // Default (echo help)
             new DefaultChatCommand(async (message, commandArgs) => await this.echoHelp(message, commandArgs))

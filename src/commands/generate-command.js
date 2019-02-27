@@ -110,6 +110,12 @@ var GenerateCommand = /** @class */ (function (_super) {
         var messageSent = false;
         var switchCondition = subCommand ? subCommand.trigger : '';
         switch (switchCondition) {
+            case 'docker':
+                json = JSON.stringify({ dockerified: true }, null, indent);
+                break;
+            case 'docker2':
+                json = JSON.stringify({ dockerified: true }, null, indent);
+                break;
             case 'adventure':
                 // Execute command
                 var adventureElement = subCommand.command;

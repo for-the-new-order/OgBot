@@ -107,6 +107,9 @@ export class GenerateCommand extends ChatCommandBase {
         let messageSent = false;
         const switchCondition = subCommand ? subCommand.trigger : '';
         switch (switchCondition) {
+            case 'docker':
+                json = JSON.stringify({ dockerified: true }, null, indent);
+                break;
             case 'adventure':
                 // Execute command
                 var adventureElement = subCommand.command as AdventureProperties;

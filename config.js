@@ -1,7 +1,9 @@
-var Configuration = require('merge-config');
+var allConfigs = require('./config.secrets.json');
 
-const config = new Configuration();
-config.file('config.json');
-config.file('config.secrets.json');
+//var Configuration = require('merge-config');
 
-exports.configuration = config.get();
+// const config = new Configuration();
+// config.file('config.json');
+// config.file('config.secrets.json');
+
+exports.configuration = allConfigs;
