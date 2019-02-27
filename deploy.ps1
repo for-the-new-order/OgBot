@@ -1,14 +1,12 @@
 [CmdletBinding()]
 param (
-    # [Parameter(Mandatory = $true)][string]$tag
-    [string]$tag = "latest"
-    # [Parameter(Mandatory = $true)][string]$containerRegistryName,
-    # [Parameter(Mandatory = $true)][string]$containerDnsName,
-    # [string]$resourceGroupName = "GAB2019Group",
-    # [string]$location = "canadacentral",
-    # [string]$imageName = "gabdemo",
-    # [string]$containerName = "gab2019container"
+    [string]$tag = "auto"
 )
+
+if ($tag -eq "auto"){
+    $tag = (Get-Content package.json) -join "`n" | ConvertFrom-Json | Select -ExpandProperty "version"
+}
+echo "tag: $tag"
 
 az acr login --name fortheneworder
 
