@@ -21,7 +21,7 @@ export class ImperialMissionGenerator {
             'Coercive Diplomacy'
         ]);
         this.locationSelector = new RandomAdventureElementSelectionService<AdventureLocation>(randomService, [
-            new BaseGenerator('Rebel Base', randomService),
+            new BaseGenerator(() => 'Rebel Base', randomService),
             'Hutt Space',
             'Backwater Outer Rim world',
             'An Imperial Core World',
@@ -30,7 +30,7 @@ export class ImperialMissionGenerator {
             'Factory',
             'Shipyard',
             'Imperial High Society',
-            new BaseGenerator('Imperial Base', randomService)
+            new BaseGenerator(() => 'Imperial Base', randomService)
         ]);
         this.oppositionSelector = new RandomAdventureElementSelectionService<AdventureOpposition>(randomService, [
             'Rebel Alliance Soldiers',
@@ -130,10 +130,12 @@ export class BaseGenerator implements ElementGenerator<AdventureLocation> {
     private purposeSelector: RandomAdventureElementSelectionService<BasePurpose>;
     private locationSelector: RandomAdventureElementSelectionService<BaseLocation>;
     private statusSelector: RandomAdventureElementSelectionService<BaseStatus>;
-    // Purpose
-    // "Exotic" Location
-    // Status
-    constructor(public name: string, private randomService: RandomService) {
+
+    public get name() {
+        return this.nameGetter();
+    }
+
+    constructor(private nameGetter: NameGetter, private randomService: RandomService) {
         this.purposeSelector = new RandomAdventureElementSelectionService<BasePurpose>(randomService, [
             'Data Vault',
             'Propaganda Broadcast Facility',
@@ -179,4 +181,8 @@ export class BaseGenerator implements ElementGenerator<AdventureLocation> {
             status: this.statusSelector.select()
         };
     }
+}
+
+interface NameGetter {
+    (): string;
 }

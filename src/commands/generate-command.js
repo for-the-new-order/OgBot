@@ -26,12 +26,15 @@ var GenerateCommand = /** @class */ (function (_super) {
     function GenerateCommand() {
         var _this = _super.call(this) || this;
         _this.supportedCommands = ['generate', 'gen', 'g'];
+        _this.baseName = '';
+        _this.baseNameAction = function () { return _this.baseName; };
         _this.randomService = new random_service_1.RandomService();
         _this.nameGenerator = new name_generator_1.NameGenerator(_this.randomService);
         _this.formatUtility = new format_utility_1.FormatUtility();
         _this.alienNamesGenerator = new alien_names_generator_1.AlienNamesGenerator(_this.formatUtility);
         _this.starWarsAdventureGenerator = new star_wars_adventure_generator_1.StarWarsAdventureGenerator(_this.randomService);
         _this.imperialMissionGenerator = new imperial_mission_generator_1.ImperialMissionGenerator(_this.randomService);
+        _this.baseGenerator = new imperial_mission_generator_1.BaseGenerator(_this.baseNameAction, _this.randomService);
         return _this;
     }
     GenerateCommand.prototype.handle = function (message, commandArgs) {
@@ -111,10 +114,28 @@ var GenerateCommand = /** @class */ (function (_super) {
         var indent = 2;
         var messageSent = false;
         var switchCondition = subCommand ? subCommand.trigger : '';
+        this.baseName = 'Base';
         switch (switchCondition) {
             case 'imperialmission':
                 var mission = this.imperialMissionGenerator.generate();
                 json = JSON.stringify(mission, null, indent);
+                break;
+            case 'imperialbase':
+                this.baseName = 'Imperial Base';
+                var imperialbase = this.baseGenerator.generate();
+                json = JSON.stringify(imperialbase, null, indent);
+                break;
+            case 'rebelbase':
+                this.baseName = 'Rebel Base';
+                var rebelbase = this.baseGenerator.generate();
+                json = JSON.stringify(rebelbase, null, indent);
+                break;
+            case 'base':
+                if (commandArgs.argumentExists('name')) {
+                    this.baseName = commandArgs.findArgumentValue('name');
+                }
+                var base = this.baseGenerator.generate();
+                json = JSON.stringify(base, null, indent);
                 break;
             case 'docker':
                 json = JSON.stringify({ dockerified: true }, null, indent);

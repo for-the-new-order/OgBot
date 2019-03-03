@@ -17,7 +17,7 @@ var ImperialMissionGenerator = /** @class */ (function () {
             'Coercive Diplomacy'
         ]);
         this.locationSelector = new RandomAdventureElementSelectionService(randomService, [
-            new BaseGenerator('Rebel Base', randomService),
+            new BaseGenerator(function () { return 'Rebel Base'; }, randomService),
             'Hutt Space',
             'Backwater Outer Rim world',
             'An Imperial Core World',
@@ -26,7 +26,7 @@ var ImperialMissionGenerator = /** @class */ (function () {
             'Factory',
             'Shipyard',
             'Imperial High Society',
-            new BaseGenerator('Imperial Base', randomService)
+            new BaseGenerator(function () { return 'Imperial Base'; }, randomService)
         ]);
         this.oppositionSelector = new RandomAdventureElementSelectionService(randomService, [
             'Rebel Alliance Soldiers',
@@ -94,11 +94,8 @@ var RandomAdventureElementSelectionService = /** @class */ (function () {
 }());
 exports.RandomAdventureElementSelectionService = RandomAdventureElementSelectionService;
 var BaseGenerator = /** @class */ (function () {
-    // Purpose
-    // "Exotic" Location
-    // Status
-    function BaseGenerator(name, randomService) {
-        this.name = name;
+    function BaseGenerator(nameGetter, randomService) {
+        this.nameGetter = nameGetter;
         this.randomService = randomService;
         this.purposeSelector = new RandomAdventureElementSelectionService(randomService, [
             'Data Vault',
@@ -137,6 +134,13 @@ var BaseGenerator = /** @class */ (function () {
             'Commander is corrupt'
         ]);
     }
+    Object.defineProperty(BaseGenerator.prototype, "name", {
+        get: function () {
+            return this.nameGetter();
+        },
+        enumerable: true,
+        configurable: true
+    });
     BaseGenerator.prototype.generate = function () {
         return {
             name: this.name,
