@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var RandomSelectionService_1 = require("./RandomSelectionService");
 var StarWarsAdventureGenerator = /** @class */ (function () {
     function StarWarsAdventureGenerator(randomService) {
         this.randomService = randomService;
-        this.contractSelector = new randomSelectionService(randomService, [
+        this.contractSelector = new RandomSelectionService_1.RandomStringSelectionService(randomService, [
             'The Force (If a character is Force Sensitive they receive contact from either a force ghost or visions)',
             'Trade Guild (One of the many guilds of the Trade Federation has a job for you)',
             'Tech (Someone is looking to build or repair something)',
@@ -18,7 +19,7 @@ var StarWarsAdventureGenerator = /** @class */ (function () {
             '/reroll 2',
             '/reroll 3'
         ]);
-        this.themeSelector = new randomSelectionService(randomService, [
+        this.themeSelector = new RandomSelectionService_1.RandomStringSelectionService(randomService, [
             'Escape/Survival (The adventure starts after things have already gone sour.)',
             'Hunt (You are searching for something… or someone)',
             'Violence (You are hired to harm or possibly kill someone)',
@@ -32,7 +33,7 @@ var StarWarsAdventureGenerator = /** @class */ (function () {
             'Escort (All you have to do is get it there on time.)',
             'Discovery (Something new or long forgotten has surfaced and you are hired to check it out.)'
         ]);
-        this.locationSelector = new randomSelectionService(randomService, [
+        this.locationSelector = new RandomSelectionService_1.RandomStringSelectionService(randomService, [
             'Hutt Space or Crime Planet',
             'Wealthy Core World or Busy Trading Station',
             'Swamp Planet',
@@ -48,7 +49,7 @@ var StarWarsAdventureGenerator = /** @class */ (function () {
             '/reroll 2',
             '/reroll 3'
         ]);
-        this.macguffinSelector = new randomSelectionService(randomService, [
+        this.macguffinSelector = new RandomSelectionService_1.RandomStringSelectionService(randomService, [
             "Credits (Sometimes it's cold hard cash.)",
             'Information (The right info can be priceless)',
             'Rare / Dangerous Creature (Sometimes even your cargo wants you dead.)',
@@ -62,7 +63,7 @@ var StarWarsAdventureGenerator = /** @class */ (function () {
             'Tech (Cutting edge or experimental tech can always fetch a fair price.)',
             'Treasure (Something os valuable to even finding a buyer might be a job in itself, but always worth a heavy price.)'
         ]);
-        this.victimsAndNPCsSelector = new randomSelectionService(randomService, [
+        this.victimsAndNPCsSelector = new RandomSelectionService_1.RandomStringSelectionService(randomService, [
             'Nobility (Someone of considerable wealth possibly dating back to pre-Imperial ties.)',
             'Child (Sometimes a kid gets sucked into the mix.)',
             "Family or Friend (Someone personal to a character's background.)",
@@ -76,7 +77,7 @@ var StarWarsAdventureGenerator = /** @class */ (function () {
             'The Force or Prerecording (For a force sensitive a force ghost or vision could be of aid, then again a simple holo recording could be found too.)',
             'Sith (They still lurk in the shadows and are likely never to reveal their true intensions, reroll for their cover identity.)'
         ]);
-        this.antagonistOrTargetSelector = new randomSelectionService(randomService, [
+        this.antagonistOrTargetSelector = new RandomSelectionService_1.RandomStringSelectionService(randomService, [
             'Bounty Hunter (A common threat when working freelance.)',
             'Con Artist (Sometimes an enemy pretends to be a friend roll on the victim table for a cover identity.)',
             'Guild or Company (Even reputable businesses sometimes have darker sides.)',
@@ -90,7 +91,7 @@ var StarWarsAdventureGenerator = /** @class */ (function () {
             "Dangerous Beast (Sometimes it's just about the hunt.)",
             "Assassins (Even worse than mercenaries these characters have one task and that's to kill.)"
         ]);
-        this.twistsOrComplicationsSelector = new randomSelectionService(randomService, [
+        this.twistsOrComplicationsSelector = new RandomSelectionService_1.RandomStringSelectionService(randomService, [
             "Ally with the Enemy (Sometimes it turns out the target isn't the real threat.)",
             "Betrayed by Contract (Sometimes it's a set up.)",
             'Disaster (Sometimes things just go wrong.)',
@@ -104,7 +105,7 @@ var StarWarsAdventureGenerator = /** @class */ (function () {
             'Time Limit (Sometimes a simple clock makes everything more difficult.)',
             'Trap (The entire job is a big complicated trap.)'
         ]);
-        this.dramaticRevealSelector = new randomSelectionService(randomService, [
+        this.dramaticRevealSelector = new RandomSelectionService_1.RandomStringSelectionService(randomService, [
             'Destruction (Something about the final conflict will cause massive destruction.)',
             'Economic Disaster (Something about the outcome of this will most likely leave a lot of innocent people poor.)',
             'Environmental Damage (Something about the final conflict will cause massive damage to the surrounding environment.)',
@@ -147,39 +148,6 @@ var StarWarsAdventureGenerator = /** @class */ (function () {
     return StarWarsAdventureGenerator;
 }());
 exports.StarWarsAdventureGenerator = StarWarsAdventureGenerator;
-var randomSelectionService = /** @class */ (function () {
-    function randomSelectionService(randomService, choices) {
-        this.randomService = randomService;
-        this.choices = choices;
-    }
-    randomSelectionService.prototype.select = function (amount) {
-        if (amount === void 0) { amount = 1; }
-        var results = new Array();
-        for (var i = 0; i < amount; i++) {
-            var randomChoice = this.randomService.pickOne(this.choices).value;
-            if (this.isReroll(randomChoice)) {
-                var rerollAmount = this.parseReroll(randomChoice);
-                var combinedSelection = this.select(rerollAmount);
-                results = results.concat(combinedSelection);
-                continue;
-            }
-            results.push(randomChoice);
-        }
-        return results;
-    };
-    randomSelectionService.prototype.isReroll = function (value) {
-        return value.startsWith('/reroll');
-    };
-    randomSelectionService.prototype.parseReroll = function (value) {
-        try {
-            return parseInt(value.replace('/reroll ', ''));
-        }
-        catch (error) {
-            return 1;
-        }
-    };
-    return randomSelectionService;
-}());
 exports.AdventureLabels = {
     contract: 'Contract',
     theme: 'Theme',

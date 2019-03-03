@@ -20,6 +20,7 @@ var name_generator_1 = require("../generators/name-generator");
 var format_utility_1 = require("../generators/format-utility");
 var data_1 = require("../../data");
 var star_wars_adventure_generator_1 = require("../generators/star-wars-adventure-generator");
+var imperial_mission_generator_1 = require("../generators/imperial-mission-generator");
 var GenerateCommand = /** @class */ (function (_super) {
     __extends(GenerateCommand, _super);
     function GenerateCommand() {
@@ -30,6 +31,7 @@ var GenerateCommand = /** @class */ (function (_super) {
         _this.formatUtility = new format_utility_1.FormatUtility();
         _this.alienNamesGenerator = new alien_names_generator_1.AlienNamesGenerator(_this.formatUtility);
         _this.starWarsAdventureGenerator = new star_wars_adventure_generator_1.StarWarsAdventureGenerator(_this.randomService);
+        _this.imperialMissionGenerator = new imperial_mission_generator_1.ImperialMissionGenerator(_this.randomService);
         return _this;
     }
     GenerateCommand.prototype.handle = function (message, commandArgs) {
@@ -110,6 +112,10 @@ var GenerateCommand = /** @class */ (function (_super) {
         var messageSent = false;
         var switchCondition = subCommand ? subCommand.trigger : '';
         switch (switchCondition) {
+            case 'imperialmission':
+                var mission = this.imperialMissionGenerator.generate();
+                json = JSON.stringify(mission, null, indent);
+                break;
             case 'docker':
                 json = JSON.stringify({ dockerified: true }, null, indent);
                 break;

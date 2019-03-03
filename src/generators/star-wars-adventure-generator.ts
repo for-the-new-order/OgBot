@@ -1,18 +1,18 @@
-import { Adventure } from './star-wars-adventure-generator';
 import { RandomService } from './random-service';
+import { RandomStringSelectionService } from './RandomSelectionService';
 
 export class StarWarsAdventureGenerator {
-    private contractSelector: randomSelectionService;
-    private themeSelector: randomSelectionService;
-    private locationSelector: randomSelectionService;
-    private macguffinSelector: randomSelectionService;
-    private victimsAndNPCsSelector: randomSelectionService;
-    private antagonistOrTargetSelector: randomSelectionService;
-    private twistsOrComplicationsSelector: randomSelectionService;
-    private dramaticRevealSelector: randomSelectionService;
+    private contractSelector: RandomStringSelectionService;
+    private themeSelector: RandomStringSelectionService;
+    private locationSelector: RandomStringSelectionService;
+    private macguffinSelector: RandomStringSelectionService;
+    private victimsAndNPCsSelector: RandomStringSelectionService;
+    private antagonistOrTargetSelector: RandomStringSelectionService;
+    private twistsOrComplicationsSelector: RandomStringSelectionService;
+    private dramaticRevealSelector: RandomStringSelectionService;
 
     constructor(private randomService: RandomService) {
-        this.contractSelector = new randomSelectionService(randomService, [
+        this.contractSelector = new RandomStringSelectionService(randomService, [
             'The Force (If a character is Force Sensitive they receive contact from either a force ghost or visions)',
             'Trade Guild (One of the many guilds of the Trade Federation has a job for you)',
             'Tech (Someone is looking to build or repair something)',
@@ -27,7 +27,7 @@ export class StarWarsAdventureGenerator {
             '/reroll 2',
             '/reroll 3'
         ]);
-        this.themeSelector = new randomSelectionService(randomService, [
+        this.themeSelector = new RandomStringSelectionService(randomService, [
             'Escape/Survival (The adventure starts after things have already gone sour.)',
             'Hunt (You are searching for something… or someone)',
             'Violence (You are hired to harm or possibly kill someone)',
@@ -41,7 +41,7 @@ export class StarWarsAdventureGenerator {
             'Escort (All you have to do is get it there on time.)',
             'Discovery (Something new or long forgotten has surfaced and you are hired to check it out.)'
         ]);
-        this.locationSelector = new randomSelectionService(randomService, [
+        this.locationSelector = new RandomStringSelectionService(randomService, [
             'Hutt Space or Crime Planet',
             'Wealthy Core World or Busy Trading Station',
             'Swamp Planet',
@@ -57,7 +57,7 @@ export class StarWarsAdventureGenerator {
             '/reroll 2',
             '/reroll 3'
         ]);
-        this.macguffinSelector = new randomSelectionService(randomService, [
+        this.macguffinSelector = new RandomStringSelectionService(randomService, [
             "Credits (Sometimes it's cold hard cash.)",
             'Information (The right info can be priceless)',
             'Rare / Dangerous Creature (Sometimes even your cargo wants you dead.)',
@@ -71,7 +71,7 @@ export class StarWarsAdventureGenerator {
             'Tech (Cutting edge or experimental tech can always fetch a fair price.)',
             'Treasure (Something os valuable to even finding a buyer might be a job in itself, but always worth a heavy price.)'
         ]);
-        this.victimsAndNPCsSelector = new randomSelectionService(randomService, [
+        this.victimsAndNPCsSelector = new RandomStringSelectionService(randomService, [
             'Nobility (Someone of considerable wealth possibly dating back to pre-Imperial ties.)',
             'Child (Sometimes a kid gets sucked into the mix.)',
             "Family or Friend (Someone personal to a character's background.)",
@@ -85,7 +85,7 @@ export class StarWarsAdventureGenerator {
             'The Force or Prerecording (For a force sensitive a force ghost or vision could be of aid, then again a simple holo recording could be found too.)',
             'Sith (They still lurk in the shadows and are likely never to reveal their true intensions, reroll for their cover identity.)'
         ]);
-        this.antagonistOrTargetSelector = new randomSelectionService(randomService, [
+        this.antagonistOrTargetSelector = new RandomStringSelectionService(randomService, [
             'Bounty Hunter (A common threat when working freelance.)',
             'Con Artist (Sometimes an enemy pretends to be a friend roll on the victim table for a cover identity.)',
             'Guild or Company (Even reputable businesses sometimes have darker sides.)',
@@ -99,7 +99,7 @@ export class StarWarsAdventureGenerator {
             "Dangerous Beast (Sometimes it's just about the hunt.)",
             "Assassins (Even worse than mercenaries these characters have one task and that's to kill.)"
         ]);
-        this.twistsOrComplicationsSelector = new randomSelectionService(randomService, [
+        this.twistsOrComplicationsSelector = new RandomStringSelectionService(randomService, [
             "Ally with the Enemy (Sometimes it turns out the target isn't the real threat.)",
             "Betrayed by Contract (Sometimes it's a set up.)",
             'Disaster (Sometimes things just go wrong.)',
@@ -113,7 +113,7 @@ export class StarWarsAdventureGenerator {
             'Time Limit (Sometimes a simple clock makes everything more difficult.)',
             'Trap (The entire job is a big complicated trap.)'
         ]);
-        this.dramaticRevealSelector = new randomSelectionService(randomService, [
+        this.dramaticRevealSelector = new RandomStringSelectionService(randomService, [
             'Destruction (Something about the final conflict will cause massive destruction.)',
             'Economic Disaster (Something about the outcome of this will most likely leave a lot of innocent people poor.)',
             'Environmental Damage (Something about the final conflict will cause massive damage to the surrounding environment.)',
@@ -145,7 +145,7 @@ export class StarWarsAdventureGenerator {
     public generateAdventureElement(elementName: AdventureProperties, amount: number, distinct: boolean): AdventureElement {
         const property = elementName + 'Selector';
         if ((this as any)[property]) {
-            const selectionService = (this as any)[property] as randomSelectionService;
+            const selectionService = (this as any)[property] as RandomStringSelectionService;
             if (selectionService) {
                 const value: AdventureElement = {};
                 const randomItems = selectionService.select(amount);
@@ -154,36 +154,6 @@ export class StarWarsAdventureGenerator {
             }
         }
         throw new Error(`StarWarsAdventureGenerator has no "${property}" or "${property}" is undefined.`);
-    }
-}
-
-class randomSelectionService {
-    constructor(private randomService: RandomService, private choices: string[]) {}
-    public select(amount: number = 1): string[] {
-        let results = new Array<string>();
-        for (let i = 0; i < amount; i++) {
-            const randomChoice = this.randomService.pickOne(this.choices).value;
-            if (this.isReroll(randomChoice)) {
-                const rerollAmount = this.parseReroll(randomChoice);
-                const combinedSelection = this.select(rerollAmount);
-                results = results.concat(combinedSelection);
-                continue;
-            }
-            results.push(randomChoice);
-        }
-        return results;
-    }
-
-    public isReroll(value: string): boolean {
-        return value.startsWith('/reroll');
-    }
-
-    public parseReroll(value: string): number {
-        try {
-            return parseInt(value.replace('/reroll ', ''));
-        } catch (error) {
-            return 1;
-        }
     }
 }
 

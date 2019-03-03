@@ -9,6 +9,7 @@ import { FormatUtility } from '../generators/format-utility';
 import { motivations, personalityTraits, ranks, species } from '../../data';
 import { StarWarsAdventureGenerator, AdventureProperties } from '../generators/star-wars-adventure-generator';
 import { Rank } from '../Models/Rank';
+import { ImperialMissionGenerator } from '../generators/imperial-mission-generator';
 
 export class GenerateCommand extends ChatCommandBase {
     protected supportedCommands = ['generate', 'gen', 'g'];
@@ -17,6 +18,7 @@ export class GenerateCommand extends ChatCommandBase {
     private alienNamesGenerator: AlienNamesGenerator;
     private nameGenerator: NameGenerator;
     private starWarsAdventureGenerator: StarWarsAdventureGenerator;
+    private imperialMissionGenerator: ImperialMissionGenerator;
     constructor() {
         super();
         this.randomService = new RandomService();
@@ -24,6 +26,7 @@ export class GenerateCommand extends ChatCommandBase {
         this.formatUtility = new FormatUtility();
         this.alienNamesGenerator = new AlienNamesGenerator(this.formatUtility);
         this.starWarsAdventureGenerator = new StarWarsAdventureGenerator(this.randomService);
+        this.imperialMissionGenerator = new ImperialMissionGenerator(this.randomService);
     }
 
     public handle(message: Message, commandArgs: CommandArgs) {
@@ -107,6 +110,10 @@ export class GenerateCommand extends ChatCommandBase {
         let messageSent = false;
         const switchCondition = subCommand ? subCommand.trigger : '';
         switch (switchCondition) {
+            case 'imperialmission':
+                const mission = this.imperialMissionGenerator.generate();
+                json = JSON.stringify(mission, null, indent);
+                break;
             case 'docker':
                 json = JSON.stringify({ dockerified: true }, null, indent);
                 break;
