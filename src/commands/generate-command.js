@@ -33,7 +33,7 @@ var GenerateCommand = /** @class */ (function (_super) {
         _this.formatUtility = new format_utility_1.FormatUtility();
         _this.alienNamesGenerator = new alien_names_generator_1.AlienNamesGenerator(_this.formatUtility);
         _this.starWarsAdventureGenerator = new star_wars_adventure_generator_1.StarWarsAdventureGenerator(_this.randomService);
-        _this.imperialMissionGenerator = new imperial_mission_generator_1.ImperialMissionGenerator(_this.randomService);
+        _this.imperialMissionGenerator = new imperial_mission_generator_1.ImperialMissionGenerator(_this.randomService, _this.starWarsAdventureGenerator);
         _this.baseGenerator = new imperial_mission_generator_1.BaseGenerator(_this.baseNameAction, _this.randomService);
         return _this;
     }

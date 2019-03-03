@@ -29,7 +29,7 @@ export class GenerateCommand extends ChatCommandBase {
         this.formatUtility = new FormatUtility();
         this.alienNamesGenerator = new AlienNamesGenerator(this.formatUtility);
         this.starWarsAdventureGenerator = new StarWarsAdventureGenerator(this.randomService);
-        this.imperialMissionGenerator = new ImperialMissionGenerator(this.randomService);
+        this.imperialMissionGenerator = new ImperialMissionGenerator(this.randomService, this.starWarsAdventureGenerator);
         this.baseGenerator = new BaseGenerator(this.baseNameAction, this.randomService);
     }
 
