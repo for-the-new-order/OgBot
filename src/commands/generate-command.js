@@ -137,9 +137,6 @@ var GenerateCommand = /** @class */ (function (_super) {
                 var base = this.baseGenerator.generate();
                 json = JSON.stringify(base, null, indent);
                 break;
-            case 'docker':
-                json = JSON.stringify({ dockerified: true }, null, indent);
-                break;
             case 'adventure':
                 // Execute command
                 var adventureElement = subCommand.command;
@@ -439,6 +436,28 @@ var GenerateCommand = /** @class */ (function (_super) {
                                     description: 'Remove duplicate entries.'
                                 }
                             ]
+                        }
+                    ]
+                },
+                {
+                    command: 'imperialmission',
+                    description: 'Generate a Star Wars Imperial adventure.'
+                },
+                {
+                    command: 'imperialbase',
+                    description: 'Generate a Star Wars Imperial base.'
+                },
+                {
+                    command: 'rebelbase',
+                    description: 'Generate a Star Wars Rebel Alliance base.'
+                },
+                {
+                    command: 'base',
+                    description: 'Generate a generic Star Wars base.',
+                    options: [
+                        {
+                            command: '-name [name of the base without space]',
+                            description: 'The name of the generated base.'
                         }
                     ]
                 },
