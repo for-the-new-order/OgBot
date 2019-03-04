@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+// Initial Data source: https://gmtable.blogspot.com/2015/09/universal-adventure-generator-for-your.html
 var StarWarsAdventureGenerator = /** @class */ (function () {
     function StarWarsAdventureGenerator(randomService) {
         this.randomService = randomService;

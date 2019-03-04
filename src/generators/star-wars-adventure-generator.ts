@@ -1,5 +1,6 @@
 import { RandomService } from './random-service';
 
+// Initial Data source: https://gmtable.blogspot.com/2015/09/universal-adventure-generator-for-your.html
 export class StarWarsAdventureGenerator {
     private contractSelector: RandomStringsSelectionService;
     private themeSelector: RandomStringsSelectionService;
