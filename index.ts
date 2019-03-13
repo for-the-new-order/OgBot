@@ -5,8 +5,11 @@ import * as path from 'path';
 import { Message, TextChannel, User } from 'discord.js';
 import * as TypeMoq from 'typemoq';
 import { IActionN } from 'typemoq/_all';
+import { ChatterService, defaultChatterOptions } from './src/commands/ChatterService';
 
-const chatCommandManager = new ChatCommandManager();
+const chatterOptions = defaultChatterOptions.mergeWith({ splitMessages: false });
+const chatterService = new ChatterService(chatterOptions);
+const chatCommandManager = new ChatCommandManager(chatterService);
 const app = express();
 app.use(express.urlencoded());
 const listener = app.listen(8888, function() {

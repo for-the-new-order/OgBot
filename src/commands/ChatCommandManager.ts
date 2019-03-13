@@ -7,15 +7,16 @@ import { EchoHelpService } from './EchoHelpService';
 import { CleanChannelCommand } from './clean-channel-command';
 import { InfoCommand } from './info-command';
 import { VersionCommand } from './version-command';
+import { ChatterService } from './ChatterService';
 
 export class ChatCommandManager {
     private trigger = 'og';
     private helpSwitch = 'h';
     private commands: Array<ChatCommand>;
-    private echoHelpService = new EchoHelpService();
-    constructor() {
+    private echoHelpService: EchoHelpService;
+    constructor(private chatterService: ChatterService) {
         this.commands = new Array<ChatCommand>(
-            new GenerateCommand(),
+            new GenerateCommand(this.chatterService),
             new CleanChannelCommand(),
             new InfoCommand(),
             new VersionCommand(),
@@ -23,6 +24,7 @@ export class ChatCommandManager {
             // Default (echo help)
             new DefaultChatCommand(async (message, commandArgs) => await this.echoHelp(message, commandArgs))
         );
+        this.echoHelpService = new EchoHelpService(this.chatterService);
     }
 
     public async Handle(message: Message): Promise<void> {

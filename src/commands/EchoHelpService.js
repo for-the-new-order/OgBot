@@ -36,56 +36,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var EchoHelpService = /** @class */ (function () {
-    function EchoHelpService(indent) {
-        if (indent === void 0) { indent = 2; }
-        this.indent = indent;
+    function EchoHelpService(sendChatService) {
+        this.sendChatService = sendChatService;
     }
     EchoHelpService.prototype.echo = function (help, whisper, message) {
         return __awaiter(this, void 0, void 0, function () {
-            var json, threshold, blockCount, i, block;
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        json = JSON.stringify(help, null, this.indent);
-                        threshold = 1900;
-                        blockCount = Math.ceil(json.length / threshold);
-                        i = 0;
-                        _a.label = 1;
-                    case 1:
-                        if (!(i < blockCount)) return [3 /*break*/, 4];
-                        block = json.substring(i * threshold, (i + 1) * threshold);
-                        return [4 /*yield*/, this.send(block, whisper, message)];
-                    case 2:
-                        _a.sent();
-                        _a.label = 3;
-                    case 3:
-                        i++;
-                        return [3 /*break*/, 1];
-                    case 4: return [2 /*return*/];
-                }
-            });
-        });
-    };
-    EchoHelpService.prototype.send = function (json, whisper, message) {
-        return __awaiter(this, void 0, void 0, function () {
-            var chatToSend;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        chatToSend = "```json\n" + json + "\n```";
-                        if (!whisper) return [3 /*break*/, 2];
-                        return [4 /*yield*/, message.author.createDM().then(function (c) {
-                                c.send(chatToSend);
-                            })];
-                    case 1:
-                        _a.sent();
-                        return [3 /*break*/, 4];
-                    case 2: return [4 /*yield*/, message.reply(chatToSend)];
-                    case 3:
-                        _a.sent();
-                        _a.label = 4;
-                    case 4: return [2 /*return*/];
-                }
+                this.sendChatService.send(help, whisper, message);
+                return [2 /*return*/];
             });
         });
     };

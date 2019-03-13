@@ -11,6 +11,7 @@ import { StarWarsAdventureGenerator, AdventureProperties } from '../generators/s
 import { Rank } from '../Models/Rank';
 import { ImperialMissionGenerator, BaseGenerator } from '../generators/imperial-mission-generator';
 import { SpaceTrafficGenerator } from '../generators/space-traffic-generator';
+import { ChatterService } from './ChatterService';
 
 export class GenerateCommand extends ChatCommandBase {
     protected supportedCommands = ['generate', 'gen', 'g'];
@@ -24,7 +25,7 @@ export class GenerateCommand extends ChatCommandBase {
     private baseGenerator: BaseGenerator;
     private baseName = '';
     private baseNameAction = () => this.baseName;
-    constructor() {
+    constructor(private chatterService: ChatterService) {
         super();
         this.randomService = new RandomService();
         this.nameGenerator = new NameGenerator(this.randomService);
@@ -112,51 +113,47 @@ export class GenerateCommand extends ChatCommandBase {
         }
 
         // Evaluate the command
-        let json = '';
         const indent = 2;
-        let messageSent = false;
         const switchCondition = subCommand ? subCommand.trigger : '';
         this.baseName = 'Base';
         switch (switchCondition) {
             case 'spacetraffic':
                 const traffic = this.spaceTrafficGenerator.generate({ amount: count });
-                json = JSON.stringify(traffic, null, indent);
+                this.chatterService.send(traffic, whisper, message);
                 break;
             case 'imperialmission':
                 const mission = this.imperialMissionGenerator.generate();
-                json = JSON.stringify(mission, null, indent);
+                this.chatterService.send(mission, whisper, message);
                 break;
             case 'imperialbase':
                 this.baseName = 'Imperial Base';
                 const imperialbase = this.baseGenerator.generate();
-                json = JSON.stringify(imperialbase, null, indent);
+                this.chatterService.send(imperialbase, whisper, message);
                 break;
             case 'rebelbase':
                 this.baseName = 'Rebel Base';
                 const rebelbase = this.baseGenerator.generate();
-                json = JSON.stringify(rebelbase, null, indent);
+                this.chatterService.send(rebelbase, whisper, message);
                 break;
             case 'base':
                 if (commandArgs.argumentExists('name')) {
                     this.baseName = commandArgs.findArgumentValue('name');
                 }
                 const base = this.baseGenerator.generate();
-                json = JSON.stringify(base, null, indent);
+                this.chatterService.send(base, whisper, message);
                 break;
             case 'adventure':
                 // Execute command
                 var adventureElement = subCommand.command as AdventureProperties;
                 if (adventureElement) {
                     var distinct = subCommand.argumentExists('distinct');
-                    json = JSON.stringify(
-                        this.starWarsAdventureGenerator.generateAdventureElement(adventureElement, count, distinct),
-                        null,
-                        indent
-                    );
+                    const result = this.starWarsAdventureGenerator.generateAdventureElement(adventureElement, count, distinct);
+                    this.chatterService.send(result, whisper, message);
                 } else if (subCommand.command) {
-                    json = JSON.stringify({ error: `${subCommand.command} is not a valid adventure element.` }, null, indent);
+                    this.chatterService.send({ error: `${subCommand.command} is not a valid adventure element.` }, whisper, message);
                 } else {
-                    json = JSON.stringify(this.starWarsAdventureGenerator.generateAdventure(), null, indent);
+                    const result = this.starWarsAdventureGenerator.generateAdventure();
+                    this.chatterService.send(result, whisper, message);
                 }
                 break;
             case 'name':
@@ -168,14 +165,15 @@ export class GenerateCommand extends ChatCommandBase {
                     }
                     names.push(this.generateName(gender));
                 }
-                json = JSON.stringify(this.withSeed(initialSeed, names), null, indent);
+                const nameResult = this.withSeed(initialSeed, names);
+                this.chatterService.send(nameResult, whisper, message);
                 break;
             case 'alienname':
                 var aliennames: Array<string> = [];
                 for (let i = 0; i < count; i++) {
                     aliennames.push(this.generateAlienName());
                 }
-                json = JSON.stringify(aliennames, null, indent);
+                this.chatterService.send(aliennames, whisper, message);
                 break;
             case 'motivations':
                 let motivationType = subCommand.command as NpcType;
@@ -183,21 +181,24 @@ export class GenerateCommand extends ChatCommandBase {
                     motivationType = NpcType.Nemesis;
                 }
                 const motivation = this.generateMotivations(motivationType);
-                json = JSON.stringify(this.withSeed(initialSeed, motivation), null, indent);
+                const motivationWithSeed = this.withSeed(initialSeed, motivation);
+                this.chatterService.send(motivationWithSeed, whisper, message);
                 break;
             case 'personality':
                 var personalities: Array<string> = [];
                 for (let i = 0; i < count; i++) {
                     personalities.push(this.generatePersonality());
                 }
-                json = JSON.stringify(this.withSeed(initialSeed, personalities), null, indent);
+                const personalityWithSeed = this.withSeed(initialSeed, personalities);
+                this.chatterService.send(personalityWithSeed, whisper, message);
                 break;
             case 'place':
                 var places: Array<string> = [];
                 for (let i = 0; i < count; i++) {
                     places.push(this.generatePlace());
                 }
-                json = JSON.stringify(this.withSeed(initialSeed, places), null, indent);
+                const placeWithSeed = this.withSeed(initialSeed, places);
+                this.chatterService.send(placeWithSeed, whisper, message);
                 break;
             case 'rank':
                 // Generate rank(s)
@@ -205,23 +206,34 @@ export class GenerateCommand extends ChatCommandBase {
                 for (let i = 0; i < count; i++) {
                     generatedRanks.push(this.generateRank(factionRanks));
                 }
-                json = JSON.stringify(this.withSeed(initialSeed, generatedRanks), null, indent);
+                const ranksWithSeed = this.withSeed(initialSeed, generatedRanks);
+                this.chatterService.send(ranksWithSeed, whisper, message);
                 break;
             case 'default':
-                json = JSON.stringify(this.defaultValues, null, indent);
+                this.chatterService.send(this.defaultValues, whisper, message);
                 break;
             case 'species':
                 const species: Array<Species> = [];
                 for (let i = 0; i < count; i++) {
                     species.push(this.generateSpecies());
                 }
-                json = JSON.stringify(species, null, indent);
+                this.chatterService.send(species, whisper, message);
                 break;
             default:
                 const name = this.generateAnyName(gender);
                 const rank = this.generateRank(factionRanks);
                 const type = this.getTypeBasedOnRank(rank);
                 const obj: any = {};
+
+                if (commandArgs.argumentExists('defaults')) {
+                    // const defaultsObj: any = {};
+                    // defaultsObj[name.name] = this.defaultValues;
+                    // const defaultsJson = JSON.stringify(defaultsObj, null, indent);
+                    // this.send(json, whisper, message);
+                    // this.send(defaultsJson, whisper, message);
+                    Object.assign(obj, this.defaultValues);
+                }
+
                 const generatedValues = {
                     initialSeed,
                     image_path: `/assets/images/npcs/250x250-${rank.clan}.png`,
@@ -235,22 +247,11 @@ export class GenerateCommand extends ChatCommandBase {
                     motivation: this.generateMotivations(type)
                 };
                 obj[name.name] = generatedValues;
-                json = JSON.stringify(obj, null, indent);
 
-                if (commandArgs.argumentExists('defaults')) {
-                    const defaultsObj: any = {};
-                    defaultsObj[name.name] = this.defaultValues;
-                    const defaultsJson = JSON.stringify(defaultsObj, null, indent);
-                    this.send(json, whisper, message);
-                    this.send(defaultsJson, whisper, message);
-                    messageSent = true;
-                }
+                this.chatterService.send(obj, whisper, message);
                 break;
         }
 
-        if (!messageSent) {
-            this.send(json, whisper, message);
-        }
         if (message.deletable) {
             message.delete();
         }

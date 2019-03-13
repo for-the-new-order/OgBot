@@ -42,12 +42,12 @@ var clean_channel_command_1 = require("./clean-channel-command");
 var info_command_1 = require("./info-command");
 var version_command_1 = require("./version-command");
 var ChatCommandManager = /** @class */ (function () {
-    function ChatCommandManager() {
+    function ChatCommandManager(chatterService) {
         var _this = this;
+        this.chatterService = chatterService;
         this.trigger = 'og';
         this.helpSwitch = 'h';
-        this.echoHelpService = new EchoHelpService_1.EchoHelpService();
-        this.commands = new Array(new generate_command_1.GenerateCommand(), new clean_channel_command_1.CleanChannelCommand(), new info_command_1.InfoCommand(), new version_command_1.VersionCommand(), 
+        this.commands = new Array(new generate_command_1.GenerateCommand(this.chatterService), new clean_channel_command_1.CleanChannelCommand(), new info_command_1.InfoCommand(), new version_command_1.VersionCommand(), 
         //
         // Default (echo help)
         new DefaultChatCommand(function (message, commandArgs) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
@@ -56,6 +56,7 @@ var ChatCommandManager = /** @class */ (function () {
                 case 1: return [2 /*return*/, _a.sent()];
             }
         }); }); }));
+        this.echoHelpService = new EchoHelpService_1.EchoHelpService(this.chatterService);
     }
     ChatCommandManager.prototype.Handle = function (message) {
         return __awaiter(this, void 0, void 0, function () {

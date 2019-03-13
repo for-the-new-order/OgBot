@@ -40,7 +40,10 @@ var express = require("express");
 var path = require("path");
 var discord_js_1 = require("discord.js");
 var TypeMoq = require("typemoq");
-var chatCommandManager = new ChatCommandManager_1.ChatCommandManager();
+var ChatterService_1 = require("./src/commands/ChatterService");
+var chatterOptions = ChatterService_1.defaultChatterOptions.mergeWith({ splitMessages: false });
+var chatterService = new ChatterService_1.ChatterService(chatterOptions);
+var chatCommandManager = new ChatCommandManager_1.ChatCommandManager(chatterService);
 var app = express();
 app.use(express.urlencoded());
 var listener = app.listen(8888, function () {

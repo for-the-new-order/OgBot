@@ -6,11 +6,14 @@ var bot = new Discord.Client();
 // var characterGenerator = new characterGen.CharacterGenerator();
 
 var x = require('./src/commands/ChatCommandManager');
-var chatCommandManager = new x.ChatCommandManager();
+var y = require('./src/commands/ChatterService');
+
+var chatterService = new y.ChatterService();
+var chatCommandManager = new x.ChatCommandManager(chatterService);
 
 bot.login(config.auth.token);
 
-bot.on('ready', function (evt) {
+bot.on('ready', function(evt) {
     console.info('Connected');
     console.info('Logged in as: ');
     console.info(bot.user.username + ' - (' + bot.user.id + ')');

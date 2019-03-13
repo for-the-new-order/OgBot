@@ -24,8 +24,9 @@ var imperial_mission_generator_1 = require("../generators/imperial-mission-gener
 var space_traffic_generator_1 = require("../generators/space-traffic-generator");
 var GenerateCommand = /** @class */ (function (_super) {
     __extends(GenerateCommand, _super);
-    function GenerateCommand() {
+    function GenerateCommand(chatterService) {
         var _this = _super.call(this) || this;
+        _this.chatterService = chatterService;
         _this.supportedCommands = ['generate', 'gen', 'g'];
         _this.baseName = '';
         _this.baseNameAction = function () { return _this.baseName; };
@@ -112,49 +113,49 @@ var GenerateCommand = /** @class */ (function (_super) {
             gender = tmpGender === 'f' ? name_generator_1.Gender.Female : tmpGender === 'm' ? name_generator_1.Gender.Male : name_generator_1.Gender.Unknown;
         }
         // Evaluate the command
-        var json = '';
         var indent = 2;
-        var messageSent = false;
         var switchCondition = subCommand ? subCommand.trigger : '';
         this.baseName = 'Base';
         switch (switchCondition) {
             case 'spacetraffic':
                 var traffic = this.spaceTrafficGenerator.generate({ amount: count });
-                json = JSON.stringify(traffic, null, indent);
+                this.chatterService.send(traffic, whisper, message);
                 break;
             case 'imperialmission':
                 var mission = this.imperialMissionGenerator.generate();
-                json = JSON.stringify(mission, null, indent);
+                this.chatterService.send(mission, whisper, message);
                 break;
             case 'imperialbase':
                 this.baseName = 'Imperial Base';
                 var imperialbase = this.baseGenerator.generate();
-                json = JSON.stringify(imperialbase, null, indent);
+                this.chatterService.send(imperialbase, whisper, message);
                 break;
             case 'rebelbase':
                 this.baseName = 'Rebel Base';
                 var rebelbase = this.baseGenerator.generate();
-                json = JSON.stringify(rebelbase, null, indent);
+                this.chatterService.send(rebelbase, whisper, message);
                 break;
             case 'base':
                 if (commandArgs.argumentExists('name')) {
                     this.baseName = commandArgs.findArgumentValue('name');
                 }
                 var base = this.baseGenerator.generate();
-                json = JSON.stringify(base, null, indent);
+                this.chatterService.send(base, whisper, message);
                 break;
             case 'adventure':
                 // Execute command
                 var adventureElement = subCommand.command;
                 if (adventureElement) {
                     var distinct = subCommand.argumentExists('distinct');
-                    json = JSON.stringify(this.starWarsAdventureGenerator.generateAdventureElement(adventureElement, count, distinct), null, indent);
+                    var result = this.starWarsAdventureGenerator.generateAdventureElement(adventureElement, count, distinct);
+                    this.chatterService.send(result, whisper, message);
                 }
                 else if (subCommand.command) {
-                    json = JSON.stringify({ error: subCommand.command + " is not a valid adventure element." }, null, indent);
+                    this.chatterService.send({ error: subCommand.command + " is not a valid adventure element." }, whisper, message);
                 }
                 else {
-                    json = JSON.stringify(this.starWarsAdventureGenerator.generateAdventure(), null, indent);
+                    var result = this.starWarsAdventureGenerator.generateAdventure();
+                    this.chatterService.send(result, whisper, message);
                 }
                 break;
             case 'name':
@@ -166,14 +167,15 @@ var GenerateCommand = /** @class */ (function (_super) {
                     }
                     names.push(this.generateName(gender));
                 }
-                json = JSON.stringify(this.withSeed(initialSeed, names), null, indent);
+                var nameResult = this.withSeed(initialSeed, names);
+                this.chatterService.send(nameResult, whisper, message);
                 break;
             case 'alienname':
                 var aliennames = [];
                 for (var i = 0; i < count; i++) {
                     aliennames.push(this.generateAlienName());
                 }
-                json = JSON.stringify(aliennames, null, indent);
+                this.chatterService.send(aliennames, whisper, message);
                 break;
             case 'motivations':
                 var motivationType = subCommand.command;
@@ -181,21 +183,24 @@ var GenerateCommand = /** @class */ (function (_super) {
                     motivationType = NpcType.Nemesis;
                 }
                 var motivation = this.generateMotivations(motivationType);
-                json = JSON.stringify(this.withSeed(initialSeed, motivation), null, indent);
+                var motivationWithSeed = this.withSeed(initialSeed, motivation);
+                this.chatterService.send(motivationWithSeed, whisper, message);
                 break;
             case 'personality':
                 var personalities = [];
                 for (var i = 0; i < count; i++) {
                     personalities.push(this.generatePersonality());
                 }
-                json = JSON.stringify(this.withSeed(initialSeed, personalities), null, indent);
+                var personalityWithSeed = this.withSeed(initialSeed, personalities);
+                this.chatterService.send(personalityWithSeed, whisper, message);
                 break;
             case 'place':
                 var places = [];
                 for (var i = 0; i < count; i++) {
                     places.push(this.generatePlace());
                 }
-                json = JSON.stringify(this.withSeed(initialSeed, places), null, indent);
+                var placeWithSeed = this.withSeed(initialSeed, places);
+                this.chatterService.send(placeWithSeed, whisper, message);
                 break;
             case 'rank':
                 // Generate rank(s)
@@ -203,23 +208,32 @@ var GenerateCommand = /** @class */ (function (_super) {
                 for (var i = 0; i < count; i++) {
                     generatedRanks.push(this.generateRank(factionRanks));
                 }
-                json = JSON.stringify(this.withSeed(initialSeed, generatedRanks), null, indent);
+                var ranksWithSeed = this.withSeed(initialSeed, generatedRanks);
+                this.chatterService.send(ranksWithSeed, whisper, message);
                 break;
             case 'default':
-                json = JSON.stringify(this.defaultValues, null, indent);
+                this.chatterService.send(this.defaultValues, whisper, message);
                 break;
             case 'species':
                 var species_1 = [];
                 for (var i = 0; i < count; i++) {
                     species_1.push(this.generateSpecies());
                 }
-                json = JSON.stringify(species_1, null, indent);
+                this.chatterService.send(species_1, whisper, message);
                 break;
             default:
                 var name_1 = this.generateAnyName(gender);
                 var rank = this.generateRank(factionRanks);
                 var type = this.getTypeBasedOnRank(rank);
                 var obj = {};
+                if (commandArgs.argumentExists('defaults')) {
+                    // const defaultsObj: any = {};
+                    // defaultsObj[name.name] = this.defaultValues;
+                    // const defaultsJson = JSON.stringify(defaultsObj, null, indent);
+                    // this.send(json, whisper, message);
+                    // this.send(defaultsJson, whisper, message);
+                    Object.assign(obj, this.defaultValues);
+                }
                 var generatedValues = {
                     initialSeed: initialSeed,
                     image_path: "/assets/images/npcs/250x250-" + rank.clan + ".png",
@@ -233,19 +247,8 @@ var GenerateCommand = /** @class */ (function (_super) {
                     motivation: this.generateMotivations(type)
                 };
                 obj[name_1.name] = generatedValues;
-                json = JSON.stringify(obj, null, indent);
-                if (commandArgs.argumentExists('defaults')) {
-                    var defaultsObj = {};
-                    defaultsObj[name_1.name] = this.defaultValues;
-                    var defaultsJson = JSON.stringify(defaultsObj, null, indent);
-                    this.send(json, whisper, message);
-                    this.send(defaultsJson, whisper, message);
-                    messageSent = true;
-                }
+                this.chatterService.send(obj, whisper, message);
                 break;
-        }
-        if (!messageSent) {
-            this.send(json, whisper, message);
         }
         if (message.deletable) {
             message.delete();
