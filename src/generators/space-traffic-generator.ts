@@ -6,7 +6,7 @@ export class SpaceTrafficGenerator {
         this.spaceshipGenerator = new SpaceshipGenerator(randomService);
     }
     public generate(options: SpaceTrafficOptions): SpaceTraffic {
-        if (options.amount == null) {
+        if (options.amount == 0) {
             options.amount = this.randomService.getRandomInt(1, 10).value;
         }
         const density = this.randomService.pickOne(new Array<Dencity>('Light', 'Normal', 'Normal', 'Normal', 'Dense')).value;
