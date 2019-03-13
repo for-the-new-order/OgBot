@@ -6,12 +6,13 @@ export class SpaceTrafficGenerator {
         this.spaceshipGenerator = new SpaceshipGenerator(randomService);
     }
     public generate(options: SpaceTrafficOptions): SpaceTraffic {
-        if (options.amount == 0) {
-            options.amount = this.randomService.getRandomInt(1, 10).value;
+        let amount = options.amount;
+        if (amount == 0) {
+            amount = this.randomService.getRandomInt(1, 10).value;
         }
         const density = this.randomService.pickOne(new Array<Dencity>('Light', 'Normal', 'Normal', 'Normal', 'Dense')).value;
         var result = { density: density, ships: new Array<Spaceship>() };
-        for (let i = 0; i < options.amount; i++) {
+        for (let i = 0; i < amount; i++) {
             const ship = this.spaceshipGenerator.generate();
             result.ships.push(ship);
         }
