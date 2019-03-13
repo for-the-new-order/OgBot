@@ -10,6 +10,7 @@ import { motivations, personalityTraits, ranks, species } from '../../data';
 import { StarWarsAdventureGenerator, AdventureProperties } from '../generators/star-wars-adventure-generator';
 import { Rank } from '../Models/Rank';
 import { ImperialMissionGenerator, BaseGenerator } from '../generators/imperial-mission-generator';
+import { SpaceTrafficGenerator } from '../generators/space-traffic-generator';
 
 export class GenerateCommand extends ChatCommandBase {
     protected supportedCommands = ['generate', 'gen', 'g'];
@@ -19,6 +20,7 @@ export class GenerateCommand extends ChatCommandBase {
     private nameGenerator: NameGenerator;
     private starWarsAdventureGenerator: StarWarsAdventureGenerator;
     private imperialMissionGenerator: ImperialMissionGenerator;
+    private spaceTrafficGenerator: SpaceTrafficGenerator;
     private baseGenerator: BaseGenerator;
     private baseName = '';
     private baseNameAction = () => this.baseName;
@@ -31,6 +33,7 @@ export class GenerateCommand extends ChatCommandBase {
         this.starWarsAdventureGenerator = new StarWarsAdventureGenerator(this.randomService);
         this.imperialMissionGenerator = new ImperialMissionGenerator(this.randomService, this.starWarsAdventureGenerator);
         this.baseGenerator = new BaseGenerator(this.baseNameAction, this.randomService);
+        this.spaceTrafficGenerator = new SpaceTrafficGenerator(this.randomService);
     }
 
     public handle(message: Message, commandArgs: CommandArgs) {
@@ -115,6 +118,10 @@ export class GenerateCommand extends ChatCommandBase {
         const switchCondition = subCommand ? subCommand.trigger : '';
         this.baseName = 'Base';
         switch (switchCondition) {
+            case 'spacetraffic':
+                const traffic = this.spaceTrafficGenerator.generate({ amount: count });
+                json = JSON.stringify(traffic, null, indent);
+                break;
             case 'imperialmission':
                 const mission = this.imperialMissionGenerator.generate();
                 json = JSON.stringify(mission, null, indent);

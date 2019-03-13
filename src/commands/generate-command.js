@@ -21,6 +21,7 @@ var format_utility_1 = require("../generators/format-utility");
 var data_1 = require("../../data");
 var star_wars_adventure_generator_1 = require("../generators/star-wars-adventure-generator");
 var imperial_mission_generator_1 = require("../generators/imperial-mission-generator");
+var space_traffic_generator_1 = require("../generators/space-traffic-generator");
 var GenerateCommand = /** @class */ (function (_super) {
     __extends(GenerateCommand, _super);
     function GenerateCommand() {
@@ -35,6 +36,7 @@ var GenerateCommand = /** @class */ (function (_super) {
         _this.starWarsAdventureGenerator = new star_wars_adventure_generator_1.StarWarsAdventureGenerator(_this.randomService);
         _this.imperialMissionGenerator = new imperial_mission_generator_1.ImperialMissionGenerator(_this.randomService, _this.starWarsAdventureGenerator);
         _this.baseGenerator = new imperial_mission_generator_1.BaseGenerator(_this.baseNameAction, _this.randomService);
+        _this.spaceTrafficGenerator = new space_traffic_generator_1.SpaceTrafficGenerator(_this.randomService);
         return _this;
     }
     GenerateCommand.prototype.handle = function (message, commandArgs) {
@@ -116,6 +118,10 @@ var GenerateCommand = /** @class */ (function (_super) {
         var switchCondition = subCommand ? subCommand.trigger : '';
         this.baseName = 'Base';
         switch (switchCondition) {
+            case 'spacetraffic':
+                var traffic = this.spaceTrafficGenerator.generate({ amount: count });
+                json = JSON.stringify(traffic, null, indent);
+                break;
             case 'imperialmission':
                 var mission = this.imperialMissionGenerator.generate();
                 json = JSON.stringify(mission, null, indent);
