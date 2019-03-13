@@ -224,15 +224,7 @@ export class GenerateCommand extends ChatCommandBase {
                 const rank = this.generateRank(factionRanks);
                 const type = this.getTypeBasedOnRank(rank);
                 const obj: any = {};
-
-                if (commandArgs.argumentExists('defaults')) {
-                    // const defaultsObj: any = {};
-                    // defaultsObj[name.name] = this.defaultValues;
-                    // const defaultsJson = JSON.stringify(defaultsObj, null, indent);
-                    // this.send(json, whisper, message);
-                    // this.send(defaultsJson, whisper, message);
-                    Object.assign(obj, this.defaultValues);
-                }
+                let character = (obj[name.name] = {});
 
                 const generatedValues = {
                     initialSeed,
@@ -246,7 +238,11 @@ export class GenerateCommand extends ChatCommandBase {
                     personality: this.generatePersonality(),
                     motivation: this.generateMotivations(type)
                 };
-                obj[name.name] = generatedValues;
+                Object.assign(character, generatedValues);
+
+                if (commandArgs.argumentExists('defaults')) {
+                    Object.assign(character, this.defaultValues);
+                }
 
                 this.chatterService.send(obj, whisper, message);
                 break;

@@ -226,14 +226,7 @@ var GenerateCommand = /** @class */ (function (_super) {
                 var rank = this.generateRank(factionRanks);
                 var type = this.getTypeBasedOnRank(rank);
                 var obj = {};
-                if (commandArgs.argumentExists('defaults')) {
-                    // const defaultsObj: any = {};
-                    // defaultsObj[name.name] = this.defaultValues;
-                    // const defaultsJson = JSON.stringify(defaultsObj, null, indent);
-                    // this.send(json, whisper, message);
-                    // this.send(defaultsJson, whisper, message);
-                    Object.assign(obj, this.defaultValues);
-                }
+                var character = (obj[name_1.name] = {});
                 var generatedValues = {
                     initialSeed: initialSeed,
                     image_path: "/assets/images/npcs/250x250-" + rank.clan + ".png",
@@ -246,7 +239,10 @@ var GenerateCommand = /** @class */ (function (_super) {
                     personality: this.generatePersonality(),
                     motivation: this.generateMotivations(type)
                 };
-                obj[name_1.name] = generatedValues;
+                Object.assign(character, generatedValues);
+                if (commandArgs.argumentExists('defaults')) {
+                    Object.assign(character, this.defaultValues);
+                }
                 this.chatterService.send(obj, whisper, message);
                 break;
         }

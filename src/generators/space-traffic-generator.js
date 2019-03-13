@@ -8,10 +8,10 @@ var SpaceTrafficGenerator = /** @class */ (function () {
     SpaceTrafficGenerator.prototype.generate = function (options) {
         var amount = options.amount;
         if (amount == 0) {
-            amount = this.randomService.getRandomInt(1, 10).value;
+            amount = this.randomService.getRandomInt(1, 5).value;
         }
         var density = this.randomService.pickOne(new Array('Light', 'Normal', 'Normal', 'Normal', 'Dense')).value;
-        var result = { options: { amount: amount, options: options }, density: density, ships: new Array() };
+        var result = { options: { amount: amount }, density: density, ships: new Array() };
         for (var i = 0; i < amount; i++) {
             var ship = this.spaceshipGenerator.generate();
             result.ships.push(ship);

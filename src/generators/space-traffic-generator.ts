@@ -8,10 +8,10 @@ export class SpaceTrafficGenerator {
     public generate(options: SpaceTrafficOptions): SpaceTraffic {
         let amount = options.amount;
         if (amount == 0) {
-            amount = this.randomService.getRandomInt(1, 10).value;
+            amount = this.randomService.getRandomInt(1, 5).value;
         }
         const density = this.randomService.pickOne(new Array<Dencity>('Light', 'Normal', 'Normal', 'Normal', 'Dense')).value;
-        var result = { options: { amount, options }, density: density, ships: new Array<Spaceship>() };
+        var result = { options: { amount }, density: density, ships: new Array<Spaceship>() };
         for (let i = 0; i < amount; i++) {
             const ship = this.spaceshipGenerator.generate();
             result.ships.push(ship);
