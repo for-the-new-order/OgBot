@@ -6,12 +6,13 @@ var SpaceTrafficGenerator = /** @class */ (function () {
         this.spaceshipGenerator = new SpaceshipGenerator(randomService);
     }
     SpaceTrafficGenerator.prototype.generate = function (options) {
-        if (options.amount == null) {
-            options.amount = this.randomService.getRandomInt(1, 10).value;
+        var amount = options.amount;
+        if (amount == 0) {
+            amount = this.randomService.getRandomInt(1, 10).value;
         }
         var density = this.randomService.pickOne(new Array('Light', 'Normal', 'Normal', 'Normal', 'Dense')).value;
-        var result = { density: density, ships: new Array() };
-        for (var i = 0; i < options.amount; i++) {
+        var result = { options: { amount: amount, options: options }, density: density, ships: new Array() };
+        for (var i = 0; i < amount; i++) {
             var ship = this.spaceshipGenerator.generate();
             result.ships.push(ship);
         }
@@ -20,6 +21,7 @@ var SpaceTrafficGenerator = /** @class */ (function () {
     return SpaceTrafficGenerator;
 }());
 exports.SpaceTrafficGenerator = SpaceTrafficGenerator;
+// 866: Spacecraft
 var SpaceshipGenerator = /** @class */ (function () {
     function SpaceshipGenerator(randomService) {
         var _this = this;
@@ -89,7 +91,7 @@ var SpaceshipGenerator = /** @class */ (function () {
             { weight: 3, generate: function () { return ({ name: 'None', description: 'Everything is fine.' }); } },
             { weight: 3, generate: function () { return ({ name: 'Alien manufacture', description: "Ship is not built to character's racial standards. Seats are wrong, controls labels are illegible and so on." }); } },
             { weight: 1, generate: function () { return ({ name: 'Clunky hyperspace', description: 'Drive may not always function when engaged. 75% chance of working.' }); } },
-            { weight: 1, generate: function () { return ({ name: 'Small cargo area', description: 'Has haif the normal cargo space' }); } },
+            { weight: 1, generate: function () { return ({ name: 'Small cargo area', description: 'Has half the normal cargo space' }); } },
             { weight: 1, generate: function () { return ({ name: 'Interior unfinished', description: 'Walls lack paneling, floorsare raw metal, loose wiring hangs everywhere.' }); } },
             { weight: 1, generate: function () {
                     var extraConsumption = _this.randomService.getRandomInt(1, 100).value;
@@ -97,7 +99,7 @@ var SpaceshipGenerator = /** @class */ (function () {
                 } },
             { weight: 1, generate: function () {
                     // TODO: GM Only: See entry #866 on Table 967: GM's Specials
-                    return ({ name: '', description: '' });
+                    return ({ name: 'TODO', description: '...' });
                 } },
             { weight: 1, generate: function () {
                     var amountOfShips = _this.randomService.getRandomInt(1, 6).value;

@@ -11,7 +11,7 @@ export class SpaceTrafficGenerator {
             amount = this.randomService.getRandomInt(1, 10).value;
         }
         const density = this.randomService.pickOne(new Array<Dencity>('Light', 'Normal', 'Normal', 'Normal', 'Dense')).value;
-        var result = { density: density, ships: new Array<Spaceship>() };
+        var result = { options: { amount, options }, density: density, ships: new Array<Spaceship>() };
         for (let i = 0; i < amount; i++) {
             const ship = this.spaceshipGenerator.generate();
             result.ships.push(ship);
