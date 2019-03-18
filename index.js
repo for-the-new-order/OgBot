@@ -75,8 +75,7 @@ app.post('/command', function (req, res) {
     });
 });
 function cleanMarkdownCodeBreak(output, type) {
-    var lineFeed = '\n';
-    var spacerString = lineFeed + '``````' + type.toLowerCase() + lineFeed;
+    var spacerString = '\n``````' + type.toLowerCase() + '\n';
     do {
         output = output.replace(spacerString, '');
     } while (output.indexOf(spacerString) > -1);
