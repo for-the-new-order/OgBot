@@ -1,4 +1,5 @@
 import { RandomService } from '../generators/random-service';
+import { CentralCastingHeroesForTomorrowHub } from './CentralCastingHeroesForTomorrowHub';
 
 // 866: Spacecraft
 export class SpaceshipGenerator {
@@ -171,33 +172,5 @@ export class RerollGenerator {
             result.push(element);
         }
         return result;
-    }
-}
-
-class AlignmentAndAttitude {}
-
-export class CentralCastingHeroesForTomorrowHub {
-    /**
-     * Create a Central Casting Heroes For Tomorrow Service Hub
-     */
-    constructor(private _spaceship: SpaceshipGenerator) {}
-
-    /**
-     * Gets the 866 Spacecraft generator.
-     *
-     * @readonly
-     * @type {SpaceshipGenerator}
-     * @memberof CentralCastingHeroesForTomorrowHub
-     */
-    public get spaceship(): SpaceshipGenerator {
-        return this._spaceship;
-    }
-}
-
-export class CentralCastingFactory {
-    constructor(private randomService: RandomService = new RandomService()) {}
-
-    public createHeroesForTomorrow(): CentralCastingHeroesForTomorrowHub {
-        return new CentralCastingHeroesForTomorrowHub(new SpaceshipGenerator(this.randomService));
     }
 }

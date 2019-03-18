@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var random_service_1 = require("../generators/random-service");
 // 866: Spacecraft
 var SpaceshipGenerator = /** @class */ (function () {
     function SpaceshipGenerator(randomService) {
@@ -156,44 +155,4 @@ var RerollGenerator = /** @class */ (function () {
     return RerollGenerator;
 }());
 exports.RerollGenerator = RerollGenerator;
-var AlignmentAndAttitude = /** @class */ (function () {
-    function AlignmentAndAttitude() {
-    }
-    return AlignmentAndAttitude;
-}());
-var CentralCastingHeroesForTomorrowHub = /** @class */ (function () {
-    /**
-     * Create a Central Casting Heroes For Tomorrow Service Hub
-     */
-    function CentralCastingHeroesForTomorrowHub(_spaceship) {
-        this._spaceship = _spaceship;
-    }
-    Object.defineProperty(CentralCastingHeroesForTomorrowHub.prototype, "spaceship", {
-        /**
-         * Gets the 866 Spacecraft generator.
-         *
-         * @readonly
-         * @type {SpaceshipGenerator}
-         * @memberof CentralCastingHeroesForTomorrowHub
-         */
-        get: function () {
-            return this._spaceship;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    return CentralCastingHeroesForTomorrowHub;
-}());
-exports.CentralCastingHeroesForTomorrowHub = CentralCastingHeroesForTomorrowHub;
-var CentralCastingFactory = /** @class */ (function () {
-    function CentralCastingFactory(randomService) {
-        if (randomService === void 0) { randomService = new random_service_1.RandomService(); }
-        this.randomService = randomService;
-    }
-    CentralCastingFactory.prototype.createHeroesForTomorrow = function () {
-        return new CentralCastingHeroesForTomorrowHub(new SpaceshipGenerator(this.randomService));
-    };
-    return CentralCastingFactory;
-}());
-exports.CentralCastingFactory = CentralCastingFactory;
 //# sourceMappingURL=SpaceshipGenerator.js.map
