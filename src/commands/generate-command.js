@@ -465,6 +465,28 @@ var GenerateCommand = /** @class */ (function (_super) {
                     ]
                 },
                 {
+                    command: 'alignmentandattitude',
+                    alias: '312, personality2',
+                    description: 'Generate a character personality, alignment and attitude. The number of random traits are defined by the count option (default: 1).',
+                    options: [
+                        countOption,
+                        {
+                            command: '-alignmentThreshold [some number]',
+                            description: 'Change the alignment threshold needed to tell if a character is good, neutral or evil (default: 2).'
+                        }
+                    ]
+                },
+                {
+                    command: 'spacecraft',
+                    alias: '866, spaceship',
+                    description: 'Generate a spacecraft.'
+                },
+                {
+                    command: 'spacetraffic',
+                    description: 'Generate space traffic; the amount of ship generated is defined by the count option (default: 1).',
+                    options: [countOption]
+                },
+                {
                     command: 'imperialmission',
                     description: 'Generate a Star Wars Imperial adventure.'
                 },

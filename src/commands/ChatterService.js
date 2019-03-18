@@ -35,14 +35,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.defaultChatterOptions = {
-    indent: 2,
-    threshold: 1900,
-    splitMessages: true,
-    mergeWith: function (obj) {
-        return Object.assign({}, this, obj);
-    }
-};
+var strEnum_1 = require("../utilities/strEnum");
+var yaml = require("js-yaml");
 var ChatterService = /** @class */ (function () {
     function ChatterService(options) {
         if (options === void 0) { options = exports.defaultChatterOptions; }
@@ -50,18 +44,20 @@ var ChatterService = /** @class */ (function () {
     }
     ChatterService.prototype.send = function (objectToSend, whisper, message) {
         return __awaiter(this, void 0, void 0, function () {
-            var json, blockCount, i, block;
+            var outputText, blockCount, i, block;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        json = JSON.stringify(objectToSend, null, this.options.indent);
+                        outputText = this.options.outputType == exports.OutputType.JSON
+                            ? JSON.stringify(objectToSend, null, this.options.indent)
+                            : yaml.safeDump(objectToSend, { noRefs: true, noCompatMode: true });
                         if (!this.options.splitMessages) return [3 /*break*/, 5];
-                        blockCount = Math.ceil(json.length / this.options.threshold);
+                        blockCount = Math.ceil(outputText.length / this.options.threshold);
                         i = 0;
                         _a.label = 1;
                     case 1:
                         if (!(i < blockCount)) return [3 /*break*/, 4];
-                        block = json.substring(i * this.options.threshold, (i + 1) * this.options.threshold);
+                        block = outputText.substring(i * this.options.threshold, (i + 1) * this.options.threshold);
                         return [4 /*yield*/, this.sendToDiscord(block, whisper, message)];
                     case 2:
                         _a.sent();
@@ -72,7 +68,7 @@ var ChatterService = /** @class */ (function () {
                     case 4: return [3 /*break*/, 7];
                     case 5: 
                     // Just send the message (probably from the web UI)
-                    return [4 /*yield*/, this.sendToDiscord(json, whisper, message)];
+                    return [4 /*yield*/, this.sendToDiscord(outputText, whisper, message)];
                     case 6:
                         // Just send the message (probably from the web UI)
                         _a.sent();
@@ -82,13 +78,13 @@ var ChatterService = /** @class */ (function () {
             });
         });
     };
-    ChatterService.prototype.sendToDiscord = function (json, whisper, message) {
+    ChatterService.prototype.sendToDiscord = function (outputText, whisper, message) {
         return __awaiter(this, void 0, void 0, function () {
             var chatToSend;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        chatToSend = "```json\n" + json + "\n```";
+                        chatToSend = "```" + this.options.outputType.toLowerCase() + "\n" + outputText + "\n```";
                         if (!whisper) return [3 /*break*/, 2];
                         return [4 /*yield*/, message.author.createDM().then(function (c) {
                                 c.send(chatToSend);
@@ -108,4 +104,14 @@ var ChatterService = /** @class */ (function () {
     return ChatterService;
 }());
 exports.ChatterService = ChatterService;
+exports.OutputType = strEnum_1.strEnum(['JSON', 'YAML']);
+exports.defaultChatterOptions = {
+    indent: 2,
+    threshold: 1900,
+    splitMessages: true,
+    outputType: exports.OutputType.JSON,
+    mergeWith: function (obj) {
+        return Object.assign({}, this, obj);
+    }
+};
 //# sourceMappingURL=ChatterService.js.map

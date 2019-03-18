@@ -13,8 +13,7 @@ export class ChatCommandManager {
     private trigger = 'og';
     private helpSwitch = 'h';
     private commands: Array<ChatCommand>;
-    private echoHelpService: EchoHelpService;
-    constructor(private chatterService: ChatterService) {
+    constructor(private chatterService: ChatterService, private echoHelpService: EchoHelpService) {
         this.commands = new Array<ChatCommand>(
             new GenerateCommand(this.chatterService),
             new CleanChannelCommand(),
@@ -24,7 +23,6 @@ export class ChatCommandManager {
             // Default (echo help)
             new DefaultChatCommand(async (message, commandArgs) => await this.echoHelp(message, commandArgs))
         );
-        this.echoHelpService = new EchoHelpService(this.chatterService);
     }
 
     public async Handle(message: Message): Promise<void> {
@@ -78,7 +76,6 @@ export class ChatCommandManager {
     }
 
     private async echoHelp(message: Message, commandArgs: CommandArgs) {
-        message.reply('Something went wrong; I may add some more help some day... Stay tuned and do with the following until then!');
         for (let i = 0; i < this.commands.length; i++) {
             const command = this.commands[i];
             const help = command.help(commandArgs);

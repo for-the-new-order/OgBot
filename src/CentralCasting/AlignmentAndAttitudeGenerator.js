@@ -13,6 +13,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+var strEnum_1 = require("../utilities/strEnum");
 // 312: Alignment & Attitude
 var AlignmentAndAttitudeGenerator = /** @class */ (function () {
     function AlignmentAndAttitudeGenerator(randomService) {
@@ -79,6 +80,14 @@ var AlignmentAndAttitudeGenerator = /** @class */ (function () {
         var couldBeGood = (personality.alignment.metrics.couldBeGood =
             lightSided - alignmentThreshold > darksided || lightSided - alignmentThreshold > neutralSided);
         personality.alignment.metrics.exotic = personality.traits.filter(function (trait) { return trait.isExotic; }).length;
+        //
+        // TODO: take the strength of traits into account to compute the character's alignment
+        // Maybe as simple as:
+        // - 'Trivial' = -1
+        // - 'Weak', 'Average', 'Strong' = 0
+        // - 'Driving' = +1
+        // - 'Obsessive' = +2
+        //
         // Sets the character's alignment
         if (couldBeEvil && !couldBeGood) {
             personality.alignment.value = 'Darkside';
@@ -146,13 +155,13 @@ var PersonalityTrait = /** @class */ (function () {
     return PersonalityTrait;
 }());
 exports.PersonalityTrait = PersonalityTrait;
-var PersonalityStrength = strEnum(['Trivial', 'Weak', 'Average', 'Strong', 'Driving', 'Obsessive']);
+var PersonalityStrength = strEnum_1.strEnum(['Trivial', 'Weak', 'Average', 'Strong', 'Driving', 'Obsessive']);
 //
 // Generation models
 //
-var PersonalityAlignmentType = strEnum(['Lightside', 'Neutral', 'Darkside']);
-var PersonalityTraitTypes = strEnum(['None', 'Lightside', 'Neutral', 'Darkside', 'Exotic']);
-var TraitStrength = strEnum(['Trivial', 'Weak', 'Average', 'Strong', 'Driving', 'Obsessive', 'Random']);
+var PersonalityAlignmentType = strEnum_1.strEnum(['Lightside', 'Neutral', 'Darkside']);
+var PersonalityTraitTypes = strEnum_1.strEnum(['None', 'Lightside', 'Neutral', 'Darkside', 'Exotic']);
+var TraitStrength = strEnum_1.strEnum(['Trivial', 'Weak', 'Average', 'Strong', 'Driving', 'Obsessive', 'Random']);
 var RandomGenerator = /** @class */ (function () {
     function RandomGenerator(randomService, elements) {
         this.randomService = randomService;
@@ -472,12 +481,4 @@ var ExoticFeature = /** @class */ (function () {
     }
     return ExoticFeature;
 }());
-/** Utility function to create a K:V from a list of strings */
-// Source: https://basarat.gitbooks.io/typescript/docs/types/literal-types.html
-function strEnum(o) {
-    return o.reduce(function (res, key) {
-        res[key] = key;
-        return res;
-    }, Object.create(null));
-}
 //# sourceMappingURL=AlignmentAndAttitudeGenerator.js.map

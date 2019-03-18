@@ -5,11 +5,16 @@ import * as path from 'path';
 import { Message, TextChannel, User } from 'discord.js';
 import * as TypeMoq from 'typemoq';
 import { IActionN } from 'typemoq/_all';
-import { ChatterService, defaultChatterOptions } from './src/commands/ChatterService';
+import { ChatterService, defaultChatterOptions, OutputType } from './src/commands/ChatterService';
+import { EchoHelpService } from './src/commands/EchoHelpService';
 
 const chatterOptions = defaultChatterOptions.mergeWith({ splitMessages: false });
 const chatterService = new ChatterService(chatterOptions);
-const chatCommandManager = new ChatCommandManager(chatterService);
+const echoHelpService = new EchoHelpService(
+    new ChatterService(defaultChatterOptions.mergeWith({ splitMessages: false, outputType: OutputType.YAML }))
+);
+const chatCommandManager = new ChatCommandManager(chatterService, echoHelpService);
+
 const app = express();
 app.use(express.urlencoded());
 const listener = app.listen(8888, function() {
@@ -23,12 +28,18 @@ app.post('/command', async function(req, res) {
     let output = '';
     const messageMock = MakeMessage(chatCommand, chat => (output += chat));
     await chatCommandManager.Handle(messageMock.object);
-    const spacerString = '\n``````json\n';
+    output = cleanMarkdownCodeBreak(output, OutputType.JSON);
+    output = cleanMarkdownCodeBreak(output, OutputType.YAML);
+    res.send(output);
+});
+
+function cleanMarkdownCodeBreak(output: string, type: OutputType) {
+    const spacerString = '\n``````' + type.toLowerCase() + '\n';
     do {
         output = output.replace(spacerString, '');
     } while (output.indexOf(spacerString) > -1);
-    res.send(output);
-});
+    return output;
+}
 
 function MakeMessage(chatCommand: string, callback: IActionN<string>): TypeMoq.IMock<Message> {
     const messageMock: TypeMoq.IMock<Message> = TypeMoq.Mock.ofType(Message);

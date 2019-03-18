@@ -37,14 +37,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var generate_command_1 = require("./generate-command");
 var CommandArgs_1 = require("./CommandArgs");
-var EchoHelpService_1 = require("./EchoHelpService");
 var clean_channel_command_1 = require("./clean-channel-command");
 var info_command_1 = require("./info-command");
 var version_command_1 = require("./version-command");
 var ChatCommandManager = /** @class */ (function () {
-    function ChatCommandManager(chatterService) {
+    function ChatCommandManager(chatterService, echoHelpService) {
         var _this = this;
         this.chatterService = chatterService;
+        this.echoHelpService = echoHelpService;
         this.trigger = 'og';
         this.helpSwitch = 'h';
         this.commands = new Array(new generate_command_1.GenerateCommand(this.chatterService), new clean_channel_command_1.CleanChannelCommand(), new info_command_1.InfoCommand(), new version_command_1.VersionCommand(), 
@@ -56,7 +56,6 @@ var ChatCommandManager = /** @class */ (function () {
                 case 1: return [2 /*return*/, _a.sent()];
             }
         }); }); }));
-        this.echoHelpService = new EchoHelpService_1.EchoHelpService(this.chatterService);
     }
     ChatCommandManager.prototype.Handle = function (message) {
         return __awaiter(this, void 0, void 0, function () {
@@ -120,7 +119,6 @@ var ChatCommandManager = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        message.reply('Something went wrong; I may add some more help some day... Stay tuned and do with the following until then!');
                         i = 0;
                         _a.label = 1;
                     case 1:

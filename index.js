@@ -41,9 +41,11 @@ var path = require("path");
 var discord_js_1 = require("discord.js");
 var TypeMoq = require("typemoq");
 var ChatterService_1 = require("./src/commands/ChatterService");
+var EchoHelpService_1 = require("./src/commands/EchoHelpService");
 var chatterOptions = ChatterService_1.defaultChatterOptions.mergeWith({ splitMessages: false });
 var chatterService = new ChatterService_1.ChatterService(chatterOptions);
-var chatCommandManager = new ChatCommandManager_1.ChatCommandManager(chatterService);
+var echoHelpService = new EchoHelpService_1.EchoHelpService(new ChatterService_1.ChatterService(ChatterService_1.defaultChatterOptions.mergeWith({ splitMessages: false, outputType: ChatterService_1.OutputType.YAML })));
+var chatCommandManager = new ChatCommandManager_1.ChatCommandManager(chatterService, echoHelpService);
 var app = express();
 app.use(express.urlencoded());
 var listener = app.listen(8888, function () {
@@ -54,7 +56,7 @@ app.get('/', function (req, res) {
 });
 app.post('/command', function (req, res) {
     return __awaiter(this, void 0, void 0, function () {
-        var chatCommand, output, messageMock, spacerString;
+        var chatCommand, output, messageMock;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -64,16 +66,22 @@ app.post('/command', function (req, res) {
                     return [4 /*yield*/, chatCommandManager.Handle(messageMock.object)];
                 case 1:
                     _a.sent();
-                    spacerString = '\n``````json\n';
-                    do {
-                        output = output.replace(spacerString, '');
-                    } while (output.indexOf(spacerString) > -1);
+                    output = cleanMarkdownCodeBreak(output, ChatterService_1.OutputType.JSON);
+                    output = cleanMarkdownCodeBreak(output, ChatterService_1.OutputType.YAML);
                     res.send(output);
                     return [2 /*return*/];
             }
         });
     });
 });
+function cleanMarkdownCodeBreak(output, type) {
+    var lineFeed = '\n';
+    var spacerString = lineFeed + '``````' + type.toLowerCase() + lineFeed;
+    do {
+        output = output.replace(spacerString, '');
+    } while (output.indexOf(spacerString) > -1);
+    return output;
+}
 function MakeMessage(chatCommand, callback) {
     var messageMock = TypeMoq.Mock.ofType(discord_js_1.Message);
     var userMock = TypeMoq.Mock.ofType(discord_js_1.User);
