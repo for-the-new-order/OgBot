@@ -87,6 +87,15 @@ export class AlignmentAndAttitudeGenerator implements Generator<PersonalityOptio
             lightSided - alignmentThreshold > darksided || lightSided - alignmentThreshold > neutralSided);
         personality.alignment.metrics.exotic = personality.traits.filter(trait => trait.isExotic).length;
 
+        //
+        // TODO: take the strength of traits into account to compute the character's alignment
+        // Maybe as simple as:
+        // - 'Trivial' = -1
+        // - 'Weak', 'Average', 'Strong' = 0
+        // - 'Driving' = +1
+        // - 'Obsessive' = +2
+        //
+
         // Sets the character's alignment
         if (couldBeEvil && !couldBeGood) {
             personality.alignment.value = 'Darkside';
