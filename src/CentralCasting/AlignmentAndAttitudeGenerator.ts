@@ -1,5 +1,4 @@
 import { RandomService } from '../generators/random-service';
-import { basename } from 'path';
 
 // 312: Alignment & Attitude
 export class AlignmentAndAttitudeGenerator implements Generator<AlignmentAndAttitudeGeneratorOptions, Personality> {
