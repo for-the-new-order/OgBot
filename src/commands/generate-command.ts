@@ -12,6 +12,8 @@ import { Rank } from '../Models/Rank';
 import { ImperialMissionGenerator, BaseGenerator } from '../generators/imperial-mission-generator';
 import { SpaceTrafficGenerator } from '../generators/space-traffic-generator';
 import { ChatterService } from './ChatterService';
+import { AlignmentAndAttitudeGenerator, PersonalityOptions } from '../CentralCasting/AlignmentAndAttitudeGenerator';
+import { CentralCastingHeroesForTomorrowHub, CentralCastingFactory } from '../CentralCasting/CentralCastingHeroesForTomorrowHub';
 
 export class GenerateCommand extends ChatCommandBase {
     protected supportedCommands = ['generate', 'gen', 'g'];
@@ -22,6 +24,8 @@ export class GenerateCommand extends ChatCommandBase {
     private starWarsAdventureGenerator: StarWarsAdventureGenerator;
     private imperialMissionGenerator: ImperialMissionGenerator;
     private spaceTrafficGenerator: SpaceTrafficGenerator;
+    private centralCastingHub: CentralCastingHeroesForTomorrowHub;
+
     private baseGenerator: BaseGenerator;
     private baseName = '';
     private baseNameAction = () => this.baseName;
@@ -35,6 +39,7 @@ export class GenerateCommand extends ChatCommandBase {
         this.imperialMissionGenerator = new ImperialMissionGenerator(this.randomService, this.starWarsAdventureGenerator);
         this.baseGenerator = new BaseGenerator(this.baseNameAction, this.randomService);
         this.spaceTrafficGenerator = new SpaceTrafficGenerator(this.randomService);
+        this.centralCastingHub = CentralCastingFactory.createHub(this.randomService);
     }
 
     public handle(message: Message, commandArgs: CommandArgs) {
@@ -113,10 +118,27 @@ export class GenerateCommand extends ChatCommandBase {
         }
 
         // Evaluate the command
-        const indent = 2;
         const switchCondition = subCommand ? subCommand.trigger : '';
         this.baseName = 'Base';
         switch (switchCondition) {
+            case 'alignmentandattitude':
+            case 'personality2':
+            case '312':
+                const personalityOptions = Object.assign(new PersonalityOptions(), {
+                    randomPersonalityTrait: count
+                });
+                if (subCommand.argumentExists('alignmentThreshold')) {
+                    personalityOptions.alignmentThreshold = parseInt(subCommand.findArgumentValue('alignmentThreshold'));
+                }
+                const personality = this.centralCastingHub.alignmentAndAttitude.generate(personalityOptions);
+                this.chatterService.send(personality, whisper, message);
+                break;
+            case 'spacecraft':
+            case '866':
+            case 'spaceship':
+                const ship = this.centralCastingHub.spaceship.generate();
+                this.chatterService.send(ship, whisper, message);
+                break;
             case 'spacetraffic':
                 const traffic = this.spaceTrafficGenerator.generate({ amount: count });
                 this.chatterService.send(traffic, whisper, message);

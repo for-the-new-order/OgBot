@@ -22,6 +22,8 @@ var data_1 = require("../../data");
 var star_wars_adventure_generator_1 = require("../generators/star-wars-adventure-generator");
 var imperial_mission_generator_1 = require("../generators/imperial-mission-generator");
 var space_traffic_generator_1 = require("../generators/space-traffic-generator");
+var AlignmentAndAttitudeGenerator_1 = require("../CentralCasting/AlignmentAndAttitudeGenerator");
+var CentralCastingHeroesForTomorrowHub_1 = require("../CentralCasting/CentralCastingHeroesForTomorrowHub");
 var GenerateCommand = /** @class */ (function (_super) {
     __extends(GenerateCommand, _super);
     function GenerateCommand(chatterService) {
@@ -38,6 +40,7 @@ var GenerateCommand = /** @class */ (function (_super) {
         _this.imperialMissionGenerator = new imperial_mission_generator_1.ImperialMissionGenerator(_this.randomService, _this.starWarsAdventureGenerator);
         _this.baseGenerator = new imperial_mission_generator_1.BaseGenerator(_this.baseNameAction, _this.randomService);
         _this.spaceTrafficGenerator = new space_traffic_generator_1.SpaceTrafficGenerator(_this.randomService);
+        _this.centralCastingHub = CentralCastingHeroesForTomorrowHub_1.CentralCastingFactory.createHub(_this.randomService);
         return _this;
     }
     GenerateCommand.prototype.handle = function (message, commandArgs) {
@@ -113,10 +116,27 @@ var GenerateCommand = /** @class */ (function (_super) {
             gender = tmpGender === 'f' ? name_generator_1.Gender.Female : tmpGender === 'm' ? name_generator_1.Gender.Male : name_generator_1.Gender.Unknown;
         }
         // Evaluate the command
-        var indent = 2;
         var switchCondition = subCommand ? subCommand.trigger : '';
         this.baseName = 'Base';
         switch (switchCondition) {
+            case 'alignmentandattitude':
+            case 'personality2':
+            case '312':
+                var personalityOptions = Object.assign(new AlignmentAndAttitudeGenerator_1.PersonalityOptions(), {
+                    randomPersonalityTrait: count
+                });
+                if (subCommand.argumentExists('alignmentThreshold')) {
+                    personalityOptions.alignmentThreshold = parseInt(subCommand.findArgumentValue('alignmentThreshold'));
+                }
+                var personality = this.centralCastingHub.alignmentAndAttitude.generate(personalityOptions);
+                this.chatterService.send(personality, whisper, message);
+                break;
+            case 'spacecraft':
+            case '866':
+            case 'spaceship':
+                var ship = this.centralCastingHub.spaceship.generate();
+                this.chatterService.send(ship, whisper, message);
+                break;
             case 'spacetraffic':
                 var traffic = this.spaceTrafficGenerator.generate({ amount: count });
                 this.chatterService.send(traffic, whisper, message);
