@@ -1,51 +1,43 @@
 import { RandomService } from '../generators/random-service';
 
 // 312: Alignment & Attitude
-export class AlignmentAndAttitudeGenerator implements Generator<AlignmentAndAttitudeGeneratorOptions, Personality> {
+export class AlignmentAndAttitudeGenerator implements Generator<PersonalityOptions, Personality> {
     private traitStrengthGenerator: WeightenGenerator<
         { personality: Personality; event: TraitDevelopedFromEvent },
-        TraitStrength,
-        WeightenElement<{ personality: Personality; event: TraitDevelopedFromEvent }, TraitStrength>
-    >;
-    private traitAlignmentGenerator: WeightenGenerator<
-        { personality: Personality; event: TraitDevelopedFromEvent },
-        PersonalityAlignment,
-        WeightenElement<{ personality: Personality; event: TraitDevelopedFromEvent }, PersonalityAlignment>
+        PersonalityStrength,
+        WeightenElement<{ personality: Personality; event: TraitDevelopedFromEvent }, PersonalityStrength>
     >;
     private personalityTraitTypesGenerator: WeightenGenerator<
         Personality,
         PersonalityTraitTypes,
         WeightenElement<Personality, PersonalityTraitTypes>
     >;
+    private traitAlignmentGenerator: TraitAlignmentGenerator;
     private attitudeGenerator: AttitudeGenerator;
     private personalityTraitGenerator: PersonalityTraitGenerator;
 
     constructor(private randomService: RandomService) {
         this.traitStrengthGenerator = new WeightenGenerator(randomService, [
-            { weight: 2, generate: () => TraitStrength.Trivial },
-            { weight: 4, generate: () => TraitStrength.Weak },
-            { weight: 9, generate: () => TraitStrength.Average },
-            { weight: 4, generate: () => TraitStrength.Strong },
-            { weight: 3, generate: () => TraitStrength.Driving },
-            { weight: 1, generate: () => TraitStrength.Obsessive }
-        ]);
-        this.traitAlignmentGenerator = new WeightenGenerator(randomService, [
-            { weight: 3, generate: () => 'Lightside' as 'Lightside' },
-            { weight: 6, generate: () => 'Neutral' as 'Neutral' },
-            { weight: 3, generate: () => 'Darkside' as 'Darkside' }
+            { weight: 2, generate: () => PersonalityStrength.Trivial },
+            { weight: 4, generate: () => PersonalityStrength.Weak },
+            { weight: 10, generate: () => PersonalityStrength.Average },
+            { weight: 4, generate: () => PersonalityStrength.Strong },
+            { weight: 3, generate: () => PersonalityStrength.Driving },
+            { weight: 1, generate: () => PersonalityStrength.Obsessive }
         ]);
         this.personalityTraitTypesGenerator = new WeightenGenerator(randomService, [
-            { weight: 10, generate: () => 'None' as 'None' },
-            { weight: 3, generate: () => 'Lightside' as 'Lightside' },
-            { weight: 3, generate: () => 'Neutral' as 'Neutral' },
-            { weight: 3, generate: () => 'Darkside' as 'Darkside' },
-            { weight: 1, generate: () => 'Exotic' as 'Exotic' }
+            { weight: 10, generate: () => PersonalityTraitTypes.None },
+            { weight: 3, generate: () => PersonalityTraitTypes.Lightside },
+            { weight: 3, generate: () => PersonalityTraitTypes.Neutral },
+            { weight: 3, generate: () => PersonalityTraitTypes.Darkside },
+            { weight: 1, generate: () => PersonalityTraitTypes.Exotic }
         ]);
+        this.traitAlignmentGenerator = new TraitAlignmentGenerator(randomService);
         this.attitudeGenerator = new AttitudeGenerator(randomService);
         this.personalityTraitGenerator = new PersonalityTraitGenerator(randomService);
     }
 
-    generate(input: AlignmentAndAttitudeGeneratorOptions): Personality {
+    generate(input: PersonalityOptions): Personality {
         const personality = new Personality();
 
         // Generate random event
@@ -61,11 +53,7 @@ export class AlignmentAndAttitudeGenerator implements Generator<AlignmentAndAtti
             });
         }
 
-        // Generate the PersonalityTrait based on past events
-        // TODO: first generate Exotic one then non-exotic one
-        // so if an exotic trait, like multiple personality, can
-        // flip Personality.hasSplitPersonality to true, then it
-        // needs to be applied first.
+        // Generate the random PersonalityTrait strength and alignment based on past events
         input.events.forEach(event => {
             if (event.strength == TraitStrength.Random) {
                 event.strength = this.traitStrengthGenerator.generate({ personality, event });
@@ -73,24 +61,50 @@ export class AlignmentAndAttitudeGenerator implements Generator<AlignmentAndAtti
             if (event.alignment == 'Random') {
                 event.alignment = this.traitAlignmentGenerator.generate({ personality, event });
             }
-            var generated = this.personalityTraitGenerator.generate({ personality, event });
-            personality.traits.push(...generated);
         });
 
-        // Compute the character alignment
-        const alignmentThreshold = 2;
-        const neutralSided = personality.traits.filter(trait => trait.alignment == 'Neutral').length;
-        const lightSided = personality.traits.filter(trait => trait.alignment == 'Lightside').length;
-        const darksided = personality.traits.filter(trait => trait.alignment == 'Darkside').length;
-        const couldBeEvil = darksided + alignmentThreshold > lightSided || darksided + alignmentThreshold > neutralSided;
-        const couldBeGood = lightSided + alignmentThreshold > darksided || lightSided + alignmentThreshold > neutralSided;
-        personality.alignment = 'Neutral';
+        // Start by generating Exotic PersonalityTrait so one could flip Personality.hasSplitPersonality to true,
+        // before generating the normal ones.
+        input.events
+            .sort(event => (event.alignment == 'Exotic' ? -1 : 0))
+            .forEach(event => {
+                var generated = this.personalityTraitGenerator.generate({ personality, event });
+                personality.traits.push(...generated);
+            });
+
+        // Crunch the character's alignment numbers
+        const alignmentThreshold = (personality.alignment.metrics.threshold = input.alignmentThreshold);
+        const neutralSided = (personality.alignment.metrics.neutral = personality.traits.filter(
+            trait => trait.alignment == 'Neutral'
+        ).length);
+        const lightSided = (personality.alignment.metrics.light = personality.traits.filter(
+            trait => trait.alignment == 'Lightside'
+        ).length);
+        const darksided = (personality.alignment.metrics.dark = personality.traits.filter(trait => trait.alignment == 'Darkside').length);
+        const couldBeEvil = (personality.alignment.metrics.couldBeEvil =
+            darksided - alignmentThreshold > lightSided || darksided - alignmentThreshold > neutralSided);
+        const couldBeGood = (personality.alignment.metrics.couldBeGood =
+            lightSided - alignmentThreshold > darksided || lightSided - alignmentThreshold > neutralSided);
+        personality.alignment.metrics.exotic = personality.traits.filter(trait => trait.isExotic).length;
+
+        // Sets the character's alignment
         if (couldBeEvil && !couldBeGood) {
-            personality.alignment = 'Lightside';
+            personality.alignment.value = 'Darkside';
         } else if (!couldBeEvil && couldBeGood) {
-            personality.alignment = 'Darkside';
+            personality.alignment.value = 'Lightside';
         } else if (couldBeEvil && couldBeGood && lightSided != darksided) {
-            personality.alignment = lightSided > darksided ? 'Lightside' : 'Darkside';
+            personality.alignment.value = lightSided > darksided ? 'Lightside' : 'Darkside';
+        }
+
+        // Sets the character's alignment "tend toward" value
+        if (darksided > lightSided && darksided > neutralSided && personality.alignment.value != 'Darkside') {
+            personality.alignment.tendToward = 'Darkside';
+        }
+        if (lightSided > darksided && lightSided > neutralSided && personality.alignment.value != 'Lightside') {
+            personality.alignment.tendToward = 'Lightside';
+        }
+        if (neutralSided > darksided && neutralSided > lightSided && personality.alignment.value != 'Neutral') {
+            personality.alignment.tendToward = 'Neutral';
         }
 
         // Compute attitude
@@ -101,57 +115,64 @@ export class AlignmentAndAttitudeGenerator implements Generator<AlignmentAndAtti
     }
 }
 
-export interface AlignmentAndAttitudeGeneratorOptions {
-    events: TraitDevelopedFromEvent[];
-    randomPersonalityTrait: number;
+// Input
+export class PersonalityOptions {
+    events: TraitDevelopedFromEvent[] = new Array<TraitDevelopedFromEvent>();
+    randomPersonalityTrait: number = 0;
+    alignmentThreshold: number = 2;
 }
 
+// Output
 export class Personality {
-    traits: PersonalityTrait[];
-    alignment: PersonalityAlignment;
+    traits: PersonalityTrait[] = new Array<PersonalityTrait>();
+    alignment: PersonalityAlignment = new PersonalityAlignment();
     attitude: Descriptible;
     hasSplitPersonality: boolean;
 }
 
-/** Utility function to create a K:V from a list of strings */
-// FROM: https://basarat.gitbooks.io/typescript/docs/types/literal-types.html
-function strEnum<T extends string>(o: Array<T>): { [K in T]: K } {
-    return o.reduce((res, key) => {
-        res[key] = key;
-        return res;
-    }, Object.create(null));
+export class PersonalityAlignment {
+    value: PersonalityAlignmentType = 'Neutral';
+    tendToward?: PersonalityAlignmentType;
+    metrics: PersonalityAlignmentMetrics = new PersonalityAlignmentMetrics();
 }
 
-const PersonalityAlignment = strEnum(['Lightside', 'Neutral', 'Darkside']);
-type PersonalityAlignment = keyof typeof PersonalityAlignment;
-
-const PersonalityTraitTypes = strEnum(['None', 'Lightside', 'Neutral', 'Darkside', 'Exotic']);
-declare type PersonalityTraitTypes = keyof typeof PersonalityTraitTypes;
-
-// const PersonalityTraitAlignment = strEnum(['None', 'Lightside', 'Neutral', 'Darkside']);
-// declare type PersonalityTraitAlignment = keyof typeof PersonalityTraitAlignment;
+export class PersonalityAlignmentMetrics {
+    light: number;
+    neutral: number;
+    dark: number;
+    exotic: number;
+    threshold: number;
+    couldBeEvil: boolean;
+    couldBeGood: boolean;
+}
 
 export class PersonalityTrait implements Descriptible {
     description: string;
     name: string;
-    alignment: PersonalityAlignment | 'None';
-    strength: TraitStrength;
+    alignment: PersonalityAlignmentType | 'None';
+    strength: PersonalityStrength;
     stronglyAligned: boolean;
     isExotic: boolean;
+    source?: Descriptible;
 }
 
-export enum TraitStrength {
-    Trivial,
-    Weak,
-    Average,
-    Strong,
-    Driving,
-    Obsessive,
-    Random
-}
+const PersonalityStrength = strEnum(['Trivial', 'Weak', 'Average', 'Strong', 'Driving', 'Obsessive']);
+declare type PersonalityStrength = keyof typeof PersonalityStrength;
+
+//
+// Generation models
+//
+const PersonalityAlignmentType = strEnum(['Lightside', 'Neutral', 'Darkside']);
+type PersonalityAlignmentType = keyof typeof PersonalityAlignmentType;
+
+const PersonalityTraitTypes = strEnum(['None', 'Lightside', 'Neutral', 'Darkside', 'Exotic']);
+declare type PersonalityTraitTypes = keyof typeof PersonalityTraitTypes;
+
+const TraitStrength = strEnum(['Trivial', 'Weak', 'Average', 'Strong', 'Driving', 'Obsessive', 'Random']);
+declare type TraitStrength = keyof typeof TraitStrength;
 
 export interface TraitDevelopedFromEvent extends Nameable {
-    alignment: PersonalityAlignment | 'Exotic' | 'Random';
+    alignment: PersonalityAlignmentType | 'Exotic' | 'Random';
     strength: TraitStrength;
 }
 
@@ -238,6 +259,20 @@ class RerollDecorator<TModel, TOuput extends Nameable> implements Generator<TMod
 // Specific generators
 //
 
+export class TraitAlignmentGenerator extends WeightenGenerator<
+    { personality: Personality; event: TraitDevelopedFromEvent },
+    PersonalityAlignmentType,
+    WeightenElement<{ personality: Personality; event: TraitDevelopedFromEvent }, PersonalityAlignmentType>
+> {
+    constructor(randomService: RandomService) {
+        super(randomService, [
+            { weight: 3, generate: () => PersonalityAlignmentType.Lightside },
+            { weight: 6, generate: () => PersonalityAlignmentType.Neutral },
+            { weight: 3, generate: () => PersonalityAlignmentType.Darkside }
+        ]);
+    }
+}
+
 export class AttitudeGenerator implements Generator<Personality, Descriptible> {
     private goodGenerator: RandomGenerator<Personality, Descriptible, Generator<Personality, Descriptible>>;
     private neutralGenerator: RandomGenerator<Personality, Descriptible, Generator<Personality, Descriptible>>;
@@ -247,7 +282,7 @@ export class AttitudeGenerator implements Generator<Personality, Descriptible> {
         // prettier-ignore
         this.goodGenerator = new RandomGenerator(randomService, [
             { generate: () => ({ name: 'Ethical', description: '"What is true for one is true for all." is his watchword. He lives according to a strict, universal moral code of ethics. Values fair play and respects authority; does no evil to self or others; and works for the good of all.' }) },
-            { generate: () => ({ name: 'Conscientious', description: '"Each man knows his own \'good\' and de- fends it." sums up the conscientious character\'s beliefs. He lives according to a strict personalcode of ethics. He is often an indi- vidualist who works for the law and the good of the greatest num- ber of people, but who may distrust higher authority, living and working "outside the law." Includes vigilantes and "Robin Hood" type characters.' }) },
+            { generate: () => ({ name: 'Conscientious', description: '"Each man knows his own \'good\' and defends it." sums up the conscientious character\'s beliefs. He lives according to a strict personalcode of ethics. He is often an indi- vidualist who works for the law and the good of the greatest num- ber of people, but who may distrust higher authority, living and working "outside the law." Includes vigilantes and "Robin Hood" type characters.' }) },
             { generate: () => ({ name: 'Chivalrous', description: '"The strong are morally responsible to be the sheperds of the weak." is the chivalrous character\'s rule for life. Lives by the belief that the strong must protect the weak. This is often found among characters of Noble Social Status and knights.' }) }
         ]);
         // prettier-ignore
@@ -256,7 +291,7 @@ export class AttitudeGenerator implements Generator<Personality, Descriptible> {
             { generate: () => ({ name: 'Apathetic', description: '"What does it matter and who cares?" are his mottos. Such a character believes that nothing really matters in the end. He lives his life as if there were nothing to be accountable for often choosing to side with good or evil because he doesn\'t care which wins.' }) },
             { generate: () => ({ name: 'Materialistic', description: '"He whodies with the most toys, wins!" Is this character\'s battle-cry. This greedy character puts great emphasis on material things, particularly ones he can own. He strives to own the best of everything and may compromlse other principles for self gain. Like the self-centered character, he takes the course of action that will best suit his desires for material gain.' }) },
             { generate: () => ({ name: 'Anarchic', description: '"It\'s my life, I\'ll do as I please." Lives according to a loose personalcode of ethics, though he does not feel bound to tell the truth, keep his word or help others if there is nothing In it for him. An individualist who disrespects higher authority. Does what he pleases, when it pleases him.' }) },
-            { generate: () => ({ name: 'Egalitarian', description: '"Both sides have a right to their own views." He championsthe underdog, regardlessof whetherthatcause isgood or evil. He believes in fairness and equality for all. He is like the chivalrous knight, in that he is dedicated to his code of honor. Un- fortunately, the causes that he champions may not be the best for society.' }) },
+            { generate: () => ({ name: 'Egalitarian', description: '"Both sides have a right to their own views." He champions the underdog, regardless of whether that cause is good or evil. He believes in fairness and equality for all. He is like the chivalrous knight, in that he is dedicated to his code of honor. Un- fortunately, the causes that he champions may not be the best for society.' }) },
             { generate: () => ({ name: 'Conformist', description: '"Don\'t make waves," "Don\'t stick your neckout" and "It\'s none of my business" are his quotable quotes. He\'s Joe-average and likes it that way. He goes with the flow. His values are the popular ones for his times and make no effort to side with or against good or evil.' }) }
         ]);
         // prettier-ignore
@@ -268,12 +303,12 @@ export class AttitudeGenerator implements Generator<Personality, Descriptible> {
     }
 
     generate(personality: Personality): Descriptible {
-        switch (personality.alignment) {
-            case PersonalityAlignment.Lightside:
+        switch (personality.alignment.value) {
+            case PersonalityAlignmentType.Lightside:
                 return this.goodGenerator.generate(personality);
-            case PersonalityAlignment.Neutral:
+            case PersonalityAlignmentType.Neutral:
                 return this.neutralGenerator.generate(personality);
-            case PersonalityAlignment.Darkside:
+            case PersonalityAlignmentType.Darkside:
                 return this.evilGenerator.generate(personality);
         }
     }
@@ -334,7 +369,7 @@ class PersonalityTraitGenerator implements Generator<{ personality: Personality;
                 { stronglyAligned: false, name: 'Generous', description: 'willing to give more than fairly. ' },
                 { stronglyAligned: false, name: 'Imaginative', description: 'a clever, resourceful mind. ' },
                 { stronglyAligned: true, name: 'Forgiving', description: 'able to pardon faults in others. ' },
-                { stronglyAligned: true, name: 'Vlrtuous', description: 'chaste. pure, of excellent morals. ' },
+                { stronglyAligned: true, name: 'Virtuous', description: 'chaste. pure, of excellent morals. ' },
                 { stronglyAligned: false, name: 'Dependable', description: 'does duties reliably, responsibly. ' },
                 { stronglyAligned: false, name: 'Well-mannered', description: 'polite, courteous. ' },
                 { stronglyAligned: true, name: 'Benign', description: 'gentle, inoffensive. ' },
@@ -470,19 +505,27 @@ class PersonalityTraitGenerator implements Generator<{ personality: Personality;
     }
 
     private createTraitFrom(event: TraitDevelopedFromEvent, description: DescriptibleAndAlignable): PersonalityTrait {
-        return Object.assign(new PersonalityTrait(), event, description);
+        return Object.assign(new PersonalityTrait(), event, description, { source: { name: event.name } });
     }
 }
 
 class ExoticPersonalityTraitGenerator
     implements Generator<{ personality: Personality; event: TraitDevelopedFromEvent }, ExoticPersonalityTrait[]> {
-    constructor(private randomService: RandomService) {}
+    private traitAlignmentGenerator: TraitAlignmentGenerator;
+    constructor(randomService: RandomService) {
+        this.traitAlignmentGenerator = new TraitAlignmentGenerator(randomService);
+    }
 
     generate(input: { personality: Personality; event: TraitDevelopedFromEvent }): ExoticPersonalityTrait[] {
         const result = new Array<ExoticPersonalityTrait>();
         // TODO: implement this
         result.push(
-            Object.assign(new ExoticPersonalityTrait(), event, { name: 'ExoticPersonalityTrait', description: 'TODO: implement this' })
+            Object.assign(new ExoticPersonalityTrait(), input.event, {
+                name: 'ExoticPersonalityTrait',
+                description: 'TODO: implement this',
+                alignment: this.traitAlignmentGenerator.generate(input),
+                isExotic: true
+            })
         );
         return result;
     }
@@ -493,4 +536,13 @@ class ExoticPersonalityTrait extends PersonalityTrait {
 }
 class ExoticFeature {
     // TODO: design this
+}
+
+/** Utility function to create a K:V from a list of strings */
+// Source: https://basarat.gitbooks.io/typescript/docs/types/literal-types.html
+function strEnum<T extends string>(o: Array<T>): { [K in T]: K } {
+    return o.reduce((res, key) => {
+        res[key] = key;
+        return res;
+    }, Object.create(null));
 }

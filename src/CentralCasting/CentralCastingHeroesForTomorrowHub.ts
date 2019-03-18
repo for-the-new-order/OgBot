@@ -31,12 +31,10 @@ export class CentralCastingHeroesForTomorrowHub {
 }
 
 export class CentralCastingFactory {
-    constructor(private randomService: RandomService = new RandomService()) {}
-
-    public createHeroesForTomorrow(): CentralCastingHeroesForTomorrowHub {
+    public static createHub(randomService: RandomService = new RandomService()): CentralCastingHeroesForTomorrowHub {
         return new CentralCastingHeroesForTomorrowHub(
-            new SpaceshipGenerator(this.randomService),
-            new AlignmentAndAttitudeGenerator(this.randomService)
+            new SpaceshipGenerator(randomService),
+            new AlignmentAndAttitudeGenerator(randomService)
         );
     }
 }

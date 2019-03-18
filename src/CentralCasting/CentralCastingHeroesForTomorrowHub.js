@@ -43,12 +43,11 @@ var CentralCastingHeroesForTomorrowHub = /** @class */ (function () {
 }());
 exports.CentralCastingHeroesForTomorrowHub = CentralCastingHeroesForTomorrowHub;
 var CentralCastingFactory = /** @class */ (function () {
-    function CentralCastingFactory(randomService) {
-        if (randomService === void 0) { randomService = new random_service_1.RandomService(); }
-        this.randomService = randomService;
+    function CentralCastingFactory() {
     }
-    CentralCastingFactory.prototype.createHeroesForTomorrow = function () {
-        return new CentralCastingHeroesForTomorrowHub(new SpaceshipGenerator_1.SpaceshipGenerator(this.randomService), new AlignmentAndAttitudeGenerator_1.AlignmentAndAttitudeGenerator(this.randomService));
+    CentralCastingFactory.createHub = function (randomService) {
+        if (randomService === void 0) { randomService = new random_service_1.RandomService(); }
+        return new CentralCastingHeroesForTomorrowHub(new SpaceshipGenerator_1.SpaceshipGenerator(randomService), new AlignmentAndAttitudeGenerator_1.AlignmentAndAttitudeGenerator(randomService));
     };
     return CentralCastingFactory;
 }());
