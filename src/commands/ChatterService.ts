@@ -1,29 +1,34 @@
 import { Message } from 'discord.js';
-import { strEnum } from '../utilities/strEnum';
 import * as yaml from 'js-yaml';
 
 export class ChatterService {
-    constructor(private options: ChatterServiceOptions = defaultChatterOptions) {}
+    public get options(): ChatterServiceOptions {
+        return this.defaultOptions.clone();
+    }
 
-    public async send(objectToSend: any, whisper: boolean, message: Message) {
+    constructor(private defaultOptions: ChatterServiceOptions = new ChatterServiceOptions()) {}
+
+    public async send(objectToSend: any, whisper: boolean, message: Message, sendOptions: ChatterServiceOptions = null) {
+        const options = Object.assign({}, this.defaultOptions, sendOptions);
         const outputText =
-            this.options.outputType == OutputType.JSON
-                ? JSON.stringify(objectToSend, null, this.options.indent)
-                : yaml.safeDump(objectToSend, { noRefs: true, noCompatMode: true });
-        if (this.options.splitMessages) {
+            options.outputType == OutputType.JSON
+                ? JSON.stringify(objectToSend, null, options.indent)
+                : yaml.safeDump(objectToSend, { noRefs: true, noCompatMode: true, skipInvalid: true });
+
+        if (options.splitMessages) {
             // Split the output when needed
-            const blockCount = Math.ceil(outputText.length / this.options.threshold);
+            const blockCount = Math.ceil(outputText.length / options.threshold);
             for (let i = 0; i < blockCount; i++) {
-                const block = outputText.substring(i * this.options.threshold, (i + 1) * this.options.threshold);
-                await this.sendToDiscord(block, whisper, message);
+                const block = outputText.substring(i * options.threshold, (i + 1) * options.threshold);
+                await this.sendToDiscord(block, whisper, message, options);
             }
         } else {
             // Just send the message (probably from the web UI)
-            await this.sendToDiscord(outputText, whisper, message);
+            await this.sendToDiscord(outputText, whisper, message, options);
         }
     }
-    private async sendToDiscord(outputText: string, whisper: boolean, message: Message) {
-        const chatToSend = `\`\`\`${this.options.outputType.toLowerCase()}\n${outputText}\n\`\`\``;
+    private async sendToDiscord(outputText: string, whisper: boolean, message: Message, options: ChatterServiceOptions) {
+        const chatToSend = `\`\`\`${options.outputType.toLowerCase()}\n${outputText}\n\`\`\``;
         if (whisper) {
             await message.author.createDM().then(c => {
                 c.send(chatToSend);
@@ -34,22 +39,22 @@ export class ChatterService {
     }
 }
 
-export interface ChatterServiceOptions {
-    indent: number;
-    threshold: number;
-    splitMessages: boolean;
-    outputType: OutputType;
+export class ChatterServiceOptions {
+    indent: number = 2;
+    threshold: number = 1900;
+    splitMessages: boolean = true;
+    outputType: OutputType = OutputType.JSON;
+
+    mergeWith(obj: any): ChatterServiceOptions {
+        return Object.assign(new ChatterServiceOptions(), this, obj);
+    }
+
+    clone(): ChatterServiceOptions {
+        return Object.assign(new ChatterServiceOptions(), this);
+    }
 }
 
-export const OutputType = strEnum(['JSON', 'YAML']);
-export type OutputType = keyof typeof OutputType;
-
-export const defaultChatterOptions = {
-    indent: 2,
-    threshold: 1900,
-    splitMessages: true,
-    outputType: OutputType.JSON,
-    mergeWith(obj: any): ChatterServiceOptions {
-        return Object.assign({}, this, obj);
-    }
-};
+export enum OutputType {
+    JSON = 'JSON',
+    YAML = 'YAML'
+}

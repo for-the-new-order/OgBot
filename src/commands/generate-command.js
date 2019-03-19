@@ -12,6 +12,17 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var ChatCommandBase_1 = require("./ChatCommandBase");
 var random_service_1 = require("../generators/random-service");
@@ -22,6 +33,7 @@ var data_1 = require("../../data");
 var star_wars_adventure_generator_1 = require("../generators/star-wars-adventure-generator");
 var imperial_mission_generator_1 = require("../generators/imperial-mission-generator");
 var space_traffic_generator_1 = require("../generators/space-traffic-generator");
+var ChatterService_1 = require("./ChatterService");
 var AlignmentAndAttitudeGenerator_1 = require("../CentralCasting/AlignmentAndAttitudeGenerator");
 var CentralCastingHeroesForTomorrowHub_1 = require("../CentralCasting/CentralCastingHeroesForTomorrowHub");
 var GenerateCommand = /** @class */ (function (_super) {
@@ -44,6 +56,7 @@ var GenerateCommand = /** @class */ (function (_super) {
         return _this;
     }
     GenerateCommand.prototype.handle = function (message, commandArgs) {
+        var _this = this;
         // Create sub-command object (this could become recursive to create a "command-tree" of sort)
         var subCommand = commandArgs.convertToSubCommand();
         // Set the random seed
@@ -115,6 +128,17 @@ var GenerateCommand = /** @class */ (function (_super) {
             var tmpGender = commandArgs.findArgumentValue('gender');
             gender = tmpGender === 'f' ? name_generator_1.Gender.Female : tmpGender === 'm' ? name_generator_1.Gender.Male : name_generator_1.Gender.Unknown;
         }
+        // Output type
+        var outputType = this.chatterService.options.outputType;
+        if (commandArgs.argumentExists('output')) {
+            var tmpOutput = commandArgs.findArgumentValue('output');
+            outputType = tmpOutput === ChatterService_1.OutputType.YAML ? ChatterService_1.OutputType.YAML : tmpOutput === ChatterService_1.OutputType.JSON ? ChatterService_1.OutputType.JSON : outputType;
+        }
+        var chatterOptions = this.chatterService.options.mergeWith({ outputType: outputType });
+        var sendChat = function (objectToSend) {
+            var objectToSendWithSeed = _this.withSeed(initialSeed, objectToSend);
+            _this.chatterService.send(objectToSendWithSeed, whisper, message, chatterOptions);
+        };
         // Evaluate the command
         var switchCondition = subCommand ? subCommand.trigger : '';
         this.baseName = 'Base';
@@ -129,38 +153,38 @@ var GenerateCommand = /** @class */ (function (_super) {
                     personalityOptions.alignmentThreshold = parseInt(subCommand.findArgumentValue('alignmentThreshold'));
                 }
                 var personality = this.centralCastingHub.alignmentAndAttitude.generate(personalityOptions);
-                this.chatterService.send(personality, whisper, message);
+                sendChat(personality);
                 break;
             case 'spacecraft':
             case '866':
             case 'spaceship':
                 var ship = this.centralCastingHub.spaceship.generate();
-                this.chatterService.send(ship, whisper, message);
+                sendChat(ship);
                 break;
             case 'spacetraffic':
                 var traffic = this.spaceTrafficGenerator.generate({ amount: count });
-                this.chatterService.send(traffic, whisper, message);
+                sendChat(traffic);
                 break;
             case 'imperialmission':
                 var mission = this.imperialMissionGenerator.generate();
-                this.chatterService.send(mission, whisper, message);
+                sendChat(mission);
                 break;
             case 'imperialbase':
                 this.baseName = 'Imperial Base';
                 var imperialbase = this.baseGenerator.generate();
-                this.chatterService.send(imperialbase, whisper, message);
+                sendChat(imperialbase);
                 break;
             case 'rebelbase':
                 this.baseName = 'Rebel Base';
                 var rebelbase = this.baseGenerator.generate();
-                this.chatterService.send(rebelbase, whisper, message);
+                sendChat(rebelbase);
                 break;
             case 'base':
                 if (commandArgs.argumentExists('name')) {
                     this.baseName = commandArgs.findArgumentValue('name');
                 }
                 var base = this.baseGenerator.generate();
-                this.chatterService.send(base, whisper, message);
+                sendChat(base);
                 break;
             case 'adventure':
                 // Execute command
@@ -168,14 +192,14 @@ var GenerateCommand = /** @class */ (function (_super) {
                 if (adventureElement) {
                     var distinct = subCommand.argumentExists('distinct');
                     var result = this.starWarsAdventureGenerator.generateAdventureElement(adventureElement, count, distinct);
-                    this.chatterService.send(result, whisper, message);
+                    sendChat(result);
                 }
                 else if (subCommand.command) {
-                    this.chatterService.send({ error: subCommand.command + " is not a valid adventure element." }, whisper, message);
+                    sendChat({ error: subCommand.command + " is not a valid adventure element." });
                 }
                 else {
                     var result = this.starWarsAdventureGenerator.generateAdventure();
-                    this.chatterService.send(result, whisper, message);
+                    sendChat(result);
                 }
                 break;
             case 'name':
@@ -187,23 +211,21 @@ var GenerateCommand = /** @class */ (function (_super) {
                     }
                     names.push(this.generateName(gender));
                 }
-                var nameResult = this.withSeed(initialSeed, names);
-                this.chatterService.send(nameResult, whisper, message);
+                sendChat(names);
                 break;
             case 'droidname':
                 var droidNames = [];
                 for (var i = 0; i < count; i++) {
                     droidNames.push(this.nameGenerator.droid());
                 }
-                var droidNameResult = this.withSeed(initialSeed, droidNames);
-                this.chatterService.send(droidNameResult, whisper, message);
+                sendChat(droidNames);
                 break;
             case 'alienname':
                 var aliennames = [];
                 for (var i = 0; i < count; i++) {
                     aliennames.push(this.generateAlienName());
                 }
-                this.chatterService.send(aliennames, whisper, message);
+                sendChat(aliennames);
                 break;
             case 'motivations':
                 var motivationType = subCommand.command;
@@ -211,24 +233,21 @@ var GenerateCommand = /** @class */ (function (_super) {
                     motivationType = NpcType.Nemesis;
                 }
                 var motivation = this.generateMotivations(motivationType);
-                var motivationWithSeed = this.withSeed(initialSeed, motivation);
-                this.chatterService.send(motivationWithSeed, whisper, message);
+                sendChat(motivation);
                 break;
             case 'personality':
                 var personalities = [];
                 for (var i = 0; i < count; i++) {
                     personalities.push(this.generatePersonality());
                 }
-                var personalityWithSeed = this.withSeed(initialSeed, personalities);
-                this.chatterService.send(personalityWithSeed, whisper, message);
+                sendChat(personalities);
                 break;
             case 'place':
                 var places = [];
                 for (var i = 0; i < count; i++) {
                     places.push(this.generatePlace());
                 }
-                var placeWithSeed = this.withSeed(initialSeed, places);
-                this.chatterService.send(placeWithSeed, whisper, message);
+                sendChat(places);
                 break;
             case 'rank':
                 // Generate rank(s)
@@ -236,18 +255,17 @@ var GenerateCommand = /** @class */ (function (_super) {
                 for (var i = 0; i < count; i++) {
                     generatedRanks.push(this.generateRank(factionRanks));
                 }
-                var ranksWithSeed = this.withSeed(initialSeed, generatedRanks);
-                this.chatterService.send(ranksWithSeed, whisper, message);
+                sendChat(generatedRanks);
                 break;
             case 'default':
-                this.chatterService.send(this.defaultValues, whisper, message);
+                sendChat(this.defaultValues);
                 break;
             case 'species':
                 var species_1 = [];
                 for (var i = 0; i < count; i++) {
                     species_1.push(this.generateSpecies());
                 }
-                this.chatterService.send(species_1, whisper, message);
+                sendChat(species_1);
                 break;
             default:
                 var name_1 = this.generateAnyName(gender);
@@ -271,7 +289,7 @@ var GenerateCommand = /** @class */ (function (_super) {
                 if (commandArgs.argumentExists('defaults')) {
                     Object.assign(character, this.defaultValues);
                 }
-                this.chatterService.send(obj, whisper, message);
+                sendChat(obj);
                 break;
         }
         if (message.deletable) {
@@ -381,7 +399,7 @@ var GenerateCommand = /** @class */ (function (_super) {
         return this.randomService.pickOne(data_1.personalityTraits).value;
     };
     GenerateCommand.prototype.withSeed = function (initialSeed, value) {
-        return { value: value, initialSeed: initialSeed };
+        return __assign({}, value, { initialSeed: initialSeed });
     };
     GenerateCommand.prototype.generateRank = function (corpRanks, range) {
         if (corpRanks.length === 0) {

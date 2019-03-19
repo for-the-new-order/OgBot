@@ -1,5 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var CentralCastingHeroesForTomorrowHub_1 = require("./CentralCastingHeroesForTomorrowHub");
+var AlignmentAndAttitudeGenerator_1 = require("./AlignmentAndAttitudeGenerator");
+var name_generator_1 = require("../generators/name-generator");
 // 866: Spacecraft
 var SpaceshipGenerator = /** @class */ (function () {
     function SpaceshipGenerator(randomService) {
@@ -43,11 +46,21 @@ var SpaceshipGenerator = /** @class */ (function () {
         this.specialFeaturesGenerator = new RerollGenerator(new BaseGenerator(this.randomService, [
             { weight: 5, generate: function () { return ({ name: 'None', description: 'Nothing special.' }); } },
             { weight: 2, generate: function () {
-                    // TODO: Develop a personality for it.
-                    // Roll 6 times on Table 312A: Personality Trait.
-                    // Check to select personality traits.
-                    // Decide whether it is "male" or "female"
-                    return { name: "Personalized ship's computer", description: '' };
+                    // Personalized ship's computer
+                    var gender = _this.randomService.pickOne([name_generator_1.Gender.Male, name_generator_1.Gender.Male, name_generator_1.Gender.Female, name_generator_1.Gender.Female]).value;
+                    var hub = CentralCastingHeroesForTomorrowHub_1.CentralCastingFactory.createHub(_this.randomService);
+                    var nameGenerator = new name_generator_1.NameGenerator(_this.randomService);
+                    var personality = hub.alignmentAndAttitude.generate(Object.assign(new AlignmentAndAttitudeGenerator_1.PersonalityOptions(), { randomPersonalityTrait: 6 }));
+                    return {
+                        name: "Personalized ship's computer",
+                        description: 'The ship has an onboard computer with a personality of its own.',
+                        gender: gender,
+                        nameIdeas: [
+                            nameGenerator.firstname(gender), nameGenerator.firstname(gender), nameGenerator.firstname(gender),
+                            nameGenerator.droid(), nameGenerator.droid(), nameGenerator.droid()
+                        ],
+                        personality: personality,
+                    };
                 } },
             { weight: 1, generate: function () {
                     // TODO: Select this item on Table 855: Techno-Wonders.

@@ -42,8 +42,10 @@ var EchoHelpService_1 = require("./src/commands/EchoHelpService");
 var ChatCommandManager_1 = require("./src/commands/ChatCommandManager");
 var config = require('./config').configuration;
 var bot = new Discord.Client();
-var echoHelpService = new EchoHelpService_1.EchoHelpService(new ChatterService_1.ChatterService(ChatterService_1.defaultChatterOptions.mergeWith({ outputType: ChatterService_1.OutputType.YAML })));
-var chatterService = new ChatterService_1.ChatterService();
+//const chatterJSON = new ChatterServiceOptions();
+var chatterYAML = new ChatterService_1.ChatterServiceOptions().mergeWith({ outputType: ChatterService_1.OutputType.YAML });
+var echoHelpService = new EchoHelpService_1.EchoHelpService(new ChatterService_1.ChatterService(chatterYAML));
+var chatterService = new ChatterService_1.ChatterService(chatterYAML);
 var chatCommandManager = new ChatCommandManager_1.ChatCommandManager(chatterService, echoHelpService);
 bot.login(config.auth.token);
 bot.on('ready', function (evt) {

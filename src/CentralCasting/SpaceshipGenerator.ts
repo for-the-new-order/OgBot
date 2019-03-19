@@ -1,5 +1,7 @@
 import { RandomService } from '../generators/random-service';
-import { CentralCastingHeroesForTomorrowHub } from './CentralCastingHeroesForTomorrowHub';
+import { CentralCastingHeroesForTomorrowHub, CentralCastingFactory } from './CentralCastingHeroesForTomorrowHub';
+import { PersonalityOptions } from './AlignmentAndAttitudeGenerator';
+import { Gender, DroidNameGenerator, NameGenerator } from '../generators/name-generator';
 
 // 866: Spacecraft
 export class SpaceshipGenerator {
@@ -8,6 +10,7 @@ export class SpaceshipGenerator {
     private armamentGenerator: BaseGenerator<RandomElement>;
     private specialFeaturesGenerator: RerollGenerator;
     private liabilitiesGenerator: RerollGenerator;
+
     constructor(private randomService: RandomService) {
         // prettier-ignore
         this.spaceshipTypeGenerator = new BaseGenerator<RandomElement>(this.randomService, [
@@ -43,16 +46,27 @@ export class SpaceshipGenerator {
                 return ({ name: 'Planet-buster', description: 'The unbelievable firepower in this spacecraft could level a planet' });
             } }
         ]);
+
         // prettier-ignore
         this.specialFeaturesGenerator = new RerollGenerator(
             new BaseGenerator<RandomElement>(this.randomService, [
                 { weight: 5, generate: () => ({ name: 'None', description: 'Nothing special.' }) },
                 { weight: 2, generate: () => {
-                        // TODO: Develop a personality for it.
-                        // Roll 6 times on Table 312A: Personality Trait.
-                        // Check to select personality traits.
-                        // Decide whether it is "male" or "female"
-                        return { name: "Personalized ship's computer", description: '' };
+                    // Personalized ship's computer
+                    const gender = this.randomService.pickOne([Gender.Male, Gender.Male, Gender.Female, Gender.Female]).value;
+                    const hub = CentralCastingFactory.createHub(this.randomService);
+                    const nameGenerator = new NameGenerator(this.randomService);
+                    const personality = hub.alignmentAndAttitude.generate(Object.assign(new PersonalityOptions(), { randomPersonalityTrait: 6 }));
+                    return {
+                        name: "Personalized ship's computer",
+                        description: 'The ship has an onboard computer with a personality of its own.',
+                        gender,
+                        nameIdeas: [
+                            nameGenerator.firstname(gender), nameGenerator.firstname(gender), nameGenerator.firstname(gender),
+                            nameGenerator.droid(), nameGenerator.droid(), nameGenerator.droid()
+                        ],
+                        personality,
+                    };
                 } },
                 { weight: 1, generate: () => {
                         // TODO: Select this item on Table 855: Techno-Wonders.

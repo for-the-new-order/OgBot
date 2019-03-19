@@ -1,13 +1,16 @@
 import * as Discord from 'discord.js';
-import { OutputType, defaultChatterOptions, ChatterService } from './src/commands/ChatterService';
+import { OutputType, ChatterService, ChatterServiceOptions } from './src/commands/ChatterService';
 import { EchoHelpService } from './src/commands/EchoHelpService';
 import { ChatCommandManager } from './src/commands/ChatCommandManager';
 
 const config = require('./config').configuration;
 const bot = new Discord.Client();
 
-const echoHelpService = new EchoHelpService(new ChatterService(defaultChatterOptions.mergeWith({ outputType: OutputType.YAML })));
-const chatterService = new ChatterService();
+//const chatterJSON = new ChatterServiceOptions();
+const chatterYAML = new ChatterServiceOptions().mergeWith({ outputType: OutputType.YAML });
+
+const echoHelpService = new EchoHelpService(new ChatterService(chatterYAML));
+const chatterService = new ChatterService(chatterYAML);
 const chatCommandManager = new ChatCommandManager(chatterService, echoHelpService);
 
 bot.login(config.auth.token);

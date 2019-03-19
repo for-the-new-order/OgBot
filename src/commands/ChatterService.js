@@ -35,30 +35,38 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var strEnum_1 = require("../utilities/strEnum");
 var yaml = require("js-yaml");
 var ChatterService = /** @class */ (function () {
-    function ChatterService(options) {
-        if (options === void 0) { options = exports.defaultChatterOptions; }
-        this.options = options;
+    function ChatterService(defaultOptions) {
+        if (defaultOptions === void 0) { defaultOptions = new ChatterServiceOptions(); }
+        this.defaultOptions = defaultOptions;
     }
-    ChatterService.prototype.send = function (objectToSend, whisper, message) {
+    Object.defineProperty(ChatterService.prototype, "options", {
+        get: function () {
+            return this.defaultOptions.clone();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    ChatterService.prototype.send = function (objectToSend, whisper, message, sendOptions) {
+        if (sendOptions === void 0) { sendOptions = null; }
         return __awaiter(this, void 0, void 0, function () {
-            var outputText, blockCount, i, block;
+            var options, outputText, blockCount, i, block;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        outputText = this.options.outputType == exports.OutputType.JSON
-                            ? JSON.stringify(objectToSend, null, this.options.indent)
-                            : yaml.safeDump(objectToSend, { noRefs: true, noCompatMode: true });
-                        if (!this.options.splitMessages) return [3 /*break*/, 5];
-                        blockCount = Math.ceil(outputText.length / this.options.threshold);
+                        options = Object.assign({}, this.defaultOptions, sendOptions);
+                        outputText = options.outputType == OutputType.JSON
+                            ? JSON.stringify(objectToSend, null, options.indent)
+                            : yaml.safeDump(objectToSend, { noRefs: true, noCompatMode: true, skipInvalid: true });
+                        if (!options.splitMessages) return [3 /*break*/, 5];
+                        blockCount = Math.ceil(outputText.length / options.threshold);
                         i = 0;
                         _a.label = 1;
                     case 1:
                         if (!(i < blockCount)) return [3 /*break*/, 4];
-                        block = outputText.substring(i * this.options.threshold, (i + 1) * this.options.threshold);
-                        return [4 /*yield*/, this.sendToDiscord(block, whisper, message)];
+                        block = outputText.substring(i * options.threshold, (i + 1) * options.threshold);
+                        return [4 /*yield*/, this.sendToDiscord(block, whisper, message, options)];
                     case 2:
                         _a.sent();
                         _a.label = 3;
@@ -68,7 +76,7 @@ var ChatterService = /** @class */ (function () {
                     case 4: return [3 /*break*/, 7];
                     case 5: 
                     // Just send the message (probably from the web UI)
-                    return [4 /*yield*/, this.sendToDiscord(outputText, whisper, message)];
+                    return [4 /*yield*/, this.sendToDiscord(outputText, whisper, message, options)];
                     case 6:
                         // Just send the message (probably from the web UI)
                         _a.sent();
@@ -78,13 +86,13 @@ var ChatterService = /** @class */ (function () {
             });
         });
     };
-    ChatterService.prototype.sendToDiscord = function (outputText, whisper, message) {
+    ChatterService.prototype.sendToDiscord = function (outputText, whisper, message, options) {
         return __awaiter(this, void 0, void 0, function () {
             var chatToSend;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        chatToSend = "```" + this.options.outputType.toLowerCase() + "\n" + outputText + "\n```";
+                        chatToSend = "```" + options.outputType.toLowerCase() + "\n" + outputText + "\n```";
                         if (!whisper) return [3 /*break*/, 2];
                         return [4 /*yield*/, message.author.createDM().then(function (c) {
                                 c.send(chatToSend);
@@ -104,14 +112,25 @@ var ChatterService = /** @class */ (function () {
     return ChatterService;
 }());
 exports.ChatterService = ChatterService;
-exports.OutputType = strEnum_1.strEnum(['JSON', 'YAML']);
-exports.defaultChatterOptions = {
-    indent: 2,
-    threshold: 1900,
-    splitMessages: true,
-    outputType: exports.OutputType.JSON,
-    mergeWith: function (obj) {
-        return Object.assign({}, this, obj);
+var ChatterServiceOptions = /** @class */ (function () {
+    function ChatterServiceOptions() {
+        this.indent = 2;
+        this.threshold = 1900;
+        this.splitMessages = true;
+        this.outputType = OutputType.JSON;
     }
-};
+    ChatterServiceOptions.prototype.mergeWith = function (obj) {
+        return Object.assign(new ChatterServiceOptions(), this, obj);
+    };
+    ChatterServiceOptions.prototype.clone = function () {
+        return Object.assign(new ChatterServiceOptions(), this);
+    };
+    return ChatterServiceOptions;
+}());
+exports.ChatterServiceOptions = ChatterServiceOptions;
+var OutputType;
+(function (OutputType) {
+    OutputType["JSON"] = "JSON";
+    OutputType["YAML"] = "YAML";
+})(OutputType = exports.OutputType || (exports.OutputType = {}));
 //# sourceMappingURL=ChatterService.js.map

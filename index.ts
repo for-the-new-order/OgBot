@@ -5,14 +5,13 @@ import * as path from 'path';
 import { Message, TextChannel, User } from 'discord.js';
 import * as TypeMoq from 'typemoq';
 import { IActionN } from 'typemoq/_all';
-import { ChatterService, defaultChatterOptions, OutputType } from './src/commands/ChatterService';
+import { ChatterService, OutputType, ChatterServiceOptions } from './src/commands/ChatterService';
 import { EchoHelpService } from './src/commands/EchoHelpService';
 
-const chatterOptions = defaultChatterOptions.mergeWith({ splitMessages: false });
-const chatterService = new ChatterService(chatterOptions);
-const echoHelpService = new EchoHelpService(
-    new ChatterService(defaultChatterOptions.mergeWith({ splitMessages: false, outputType: OutputType.YAML }))
-);
+//const chatterJSON = new ChatterServiceOptions().mergeWith({ splitMessages: false });
+const chatterYAML = new ChatterServiceOptions().mergeWith({ splitMessages: false, outputType: OutputType.YAML });
+const chatterService = new ChatterService(chatterYAML);
+const echoHelpService = new EchoHelpService(new ChatterService(chatterYAML));
 const chatCommandManager = new ChatCommandManager(chatterService, echoHelpService);
 
 const app = express();
