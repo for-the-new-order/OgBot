@@ -36,6 +36,7 @@ var space_traffic_generator_1 = require("../generators/space-traffic-generator")
 var ChatterService_1 = require("./ChatterService");
 var AlignmentAndAttitudeGenerator_1 = require("../CentralCasting/AlignmentAndAttitudeGenerator");
 var CentralCastingHeroesForTomorrowHub_1 = require("../CentralCasting/CentralCastingHeroesForTomorrowHub");
+var util_1 = require("util");
 var GenerateCommand = /** @class */ (function (_super) {
     __extends(GenerateCommand, _super);
     function GenerateCommand(chatterService) {
@@ -399,7 +400,12 @@ var GenerateCommand = /** @class */ (function (_super) {
         return this.randomService.pickOne(data_1.personalityTraits).value;
     };
     GenerateCommand.prototype.withSeed = function (initialSeed, value) {
-        return __assign({}, value, { initialSeed: initialSeed });
+        if (util_1.isArray(value)) {
+            return { values: value, initialSeed: initialSeed };
+        }
+        else {
+            return __assign({}, value, { initialSeed: initialSeed });
+        }
     };
     GenerateCommand.prototype.generateRank = function (corpRanks, range) {
         if (corpRanks.length === 0) {

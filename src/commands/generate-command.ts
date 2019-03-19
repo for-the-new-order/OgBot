@@ -14,6 +14,7 @@ import { SpaceTrafficGenerator } from '../generators/space-traffic-generator';
 import { ChatterService, OutputType } from './ChatterService';
 import { AlignmentAndAttitudeGenerator, PersonalityOptions } from '../CentralCasting/AlignmentAndAttitudeGenerator';
 import { CentralCastingHeroesForTomorrowHub, CentralCastingFactory } from '../CentralCasting/CentralCastingHeroesForTomorrowHub';
+import { isArray } from 'util';
 
 export class GenerateCommand extends ChatCommandBase {
     protected supportedCommands = ['generate', 'gen', 'g'];
@@ -404,7 +405,11 @@ export class GenerateCommand extends ChatCommandBase {
     }
 
     private withSeed(initialSeed: number, value: any): any {
-        return { ...value, initialSeed };
+        if (isArray(value)) {
+            return { values: value, initialSeed };
+        } else {
+            return { ...value, initialSeed };
+        }
     }
 
     private generateRank(
