@@ -190,11 +190,11 @@ export interface TraitDevelopedFromEvent extends Nameable {
 // Generalized elements
 // TODO: fine tune and replace other more specific implemetnations by those to uniformize the generators.
 //
-interface Nameable {
+export interface Nameable {
     name: string;
 }
 
-interface Descriptible extends Nameable {
+export interface Descriptible extends Nameable {
     description: string;
 }
 
@@ -202,14 +202,14 @@ interface Alignable {
     stronglyAligned: boolean;
 }
 
-interface WeightenElement<TModel, TOuput> extends Generator<TModel, TOuput> {
+export interface WeightenElement<TModel, TOuput> extends Generator<TModel, TOuput> {
     weight: number;
 }
-interface Generator<TModel, TOuput> {
+export interface Generator<TModel, TOuput> {
     generate(input: TModel): TOuput;
 }
 
-class RandomGenerator<TModel, TOuput, TElement extends Generator<TModel, TOuput>> implements Generator<TModel, TOuput> {
+export class RandomGenerator<TModel, TOuput, TElement extends Generator<TModel, TOuput>> implements Generator<TModel, TOuput> {
     constructor(protected randomService: RandomService, private elements: TElement[]) {}
 
     generate(input: TModel): TOuput {
@@ -218,7 +218,7 @@ class RandomGenerator<TModel, TOuput, TElement extends Generator<TModel, TOuput>
     }
 }
 
-class WeightenGenerator<TModel, TOuput, TElement extends WeightenElement<TModel, TOuput>> implements Generator<TModel, TOuput> {
+export class WeightenGenerator<TModel, TOuput, TElement extends WeightenElement<TModel, TOuput>> implements Generator<TModel, TOuput> {
     protected elements: TElement[];
 
     constructor(protected randomService: RandomService, elements: TElement[]) {
@@ -235,7 +235,7 @@ class WeightenGenerator<TModel, TOuput, TElement extends WeightenElement<TModel,
     }
 }
 
-class RerollDecorator<TModel, TOuput extends Nameable> implements Generator<TModel, TOuput[]> {
+export class RerollDecorator<TModel, TOuput extends Nameable> implements Generator<TModel, TOuput[]> {
     constructor(private generator: Generator<TModel, TOuput>) {}
     generate(input: TModel): TOuput[] {
         const result = new Array<TOuput>();

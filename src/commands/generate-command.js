@@ -190,6 +190,14 @@ var GenerateCommand = /** @class */ (function (_super) {
                 var nameResult = this.withSeed(initialSeed, names);
                 this.chatterService.send(nameResult, whisper, message);
                 break;
+            case 'droidname':
+                var droidNames = [];
+                for (var i = 0; i < count; i++) {
+                    droidNames.push(this.nameGenerator.droid());
+                }
+                var droidNameResult = this.withSeed(initialSeed, droidNames);
+                this.chatterService.send(droidNameResult, whisper, message);
+                break;
             case 'alienname':
                 var aliennames = [];
                 for (var i = 0; i < count; i++) {
@@ -527,6 +535,11 @@ var GenerateCommand = /** @class */ (function (_super) {
                 {
                     command: 'name',
                     description: 'Generate some names.',
+                    options: [countOption, seedOption]
+                },
+                {
+                    command: 'droidname',
+                    description: 'Generate some droid names.',
                     options: [countOption, seedOption]
                 },
                 {

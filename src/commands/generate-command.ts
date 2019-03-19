@@ -190,6 +190,14 @@ export class GenerateCommand extends ChatCommandBase {
                 const nameResult = this.withSeed(initialSeed, names);
                 this.chatterService.send(nameResult, whisper, message);
                 break;
+            case 'droidname':
+                const droidNames: Array<string> = [];
+                for (let i = 0; i < count; i++) {
+                    droidNames.push(this.nameGenerator.droid());
+                }
+                const droidNameResult = this.withSeed(initialSeed, droidNames);
+                this.chatterService.send(droidNameResult, whisper, message);
+                break;
             case 'alienname':
                 var aliennames: Array<string> = [];
                 for (let i = 0; i < count; i++) {
@@ -560,6 +568,11 @@ export class GenerateCommand extends ChatCommandBase {
                 {
                     command: 'name',
                     description: 'Generate some names.',
+                    options: [countOption, seedOption]
+                },
+                {
+                    command: 'droidname',
+                    description: 'Generate some droid names.',
                     options: [countOption, seedOption]
                 },
                 {

@@ -173,6 +173,7 @@ var RandomGenerator = /** @class */ (function () {
     };
     return RandomGenerator;
 }());
+exports.RandomGenerator = RandomGenerator;
 var WeightenGenerator = /** @class */ (function () {
     function WeightenGenerator(randomService, elements) {
         var _this = this;
@@ -190,6 +191,7 @@ var WeightenGenerator = /** @class */ (function () {
     };
     return WeightenGenerator;
 }());
+exports.WeightenGenerator = WeightenGenerator;
 var RerollDecorator = /** @class */ (function () {
     function RerollDecorator(generator) {
         this.generator = generator;
@@ -222,6 +224,7 @@ var RerollDecorator = /** @class */ (function () {
     };
     return RerollDecorator;
 }());
+exports.RerollDecorator = RerollDecorator;
 //
 // Specific generators
 //
