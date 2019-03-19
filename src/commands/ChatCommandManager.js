@@ -59,7 +59,7 @@ var ChatCommandManager = /** @class */ (function () {
     }
     ChatCommandManager.prototype.Handle = function (message) {
         return __awaiter(this, void 0, void 0, function () {
-            var args, commandArgs, outputHelp, i, command, help;
+            var args, commandArgs, outputHelp, i, command;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -96,8 +96,7 @@ var ChatCommandManager = /** @class */ (function () {
                         command = this.commands[i];
                         if (!command.canHandle(commandArgs)) return [3 /*break*/, 8];
                         if (!outputHelp) return [3 /*break*/, 6];
-                        help = command.help(commandArgs);
-                        return [4 /*yield*/, this.echoHelpService.echo(help, false, message)];
+                        return [4 /*yield*/, this.echoHelpService.echoOne(command, commandArgs, false, message)];
                     case 5:
                         _a.sent();
                         return [3 /*break*/, 7];
@@ -115,24 +114,23 @@ var ChatCommandManager = /** @class */ (function () {
     };
     ChatCommandManager.prototype.echoHelp = function (message, commandArgs) {
         return __awaiter(this, void 0, void 0, function () {
-            var i, command, help;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        i = 0;
-                        _a.label = 1;
+                    case 0: 
+                    // for (let i = 0; i < this.commands.length; i++) {
+                    //     const command = this.commands[i];
+                    //     const help = command.help(commandArgs);
+                    //     await this.echoHelpService.echo(help, false, message);
+                    // }
+                    return [4 /*yield*/, this.echoHelpService.echoMany(this.commands, commandArgs, false, message)];
                     case 1:
-                        if (!(i < this.commands.length)) return [3 /*break*/, 4];
-                        command = this.commands[i];
-                        help = command.help(commandArgs);
-                        return [4 /*yield*/, this.echoHelpService.echo(help, false, message)];
-                    case 2:
+                        // for (let i = 0; i < this.commands.length; i++) {
+                        //     const command = this.commands[i];
+                        //     const help = command.help(commandArgs);
+                        //     await this.echoHelpService.echo(help, false, message);
+                        // }
                         _a.sent();
-                        _a.label = 3;
-                    case 3:
-                        i++;
-                        return [3 /*break*/, 1];
-                    case 4: return [2 /*return*/];
+                        return [2 /*return*/];
                 }
             });
         });

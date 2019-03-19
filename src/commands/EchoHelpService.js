@@ -39,7 +39,52 @@ var EchoHelpService = /** @class */ (function () {
     function EchoHelpService(sendChatService) {
         this.sendChatService = sendChatService;
     }
-    EchoHelpService.prototype.echo = function (help, whisper, message) {
+    EchoHelpService.prototype.echoOne = function (command, commandArgs, whisper, message) {
+        return __awaiter(this, void 0, void 0, function () {
+            var help, simplified;
+            return __generator(this, function (_a) {
+                help = command.help(commandArgs);
+                simplified = this.projectToSummary(help, 1);
+                this.sendChatService.send(simplified, whisper, message);
+                return [2 /*return*/];
+            });
+        });
+    };
+    EchoHelpService.prototype.echoMany = function (commands, commandArgs, whisper, message) {
+        return __awaiter(this, void 0, void 0, function () {
+            var summary, i, command, help;
+            return __generator(this, function (_a) {
+                summary = [];
+                for (i = 0; i < commands.length; i++) {
+                    command = commands[i];
+                    help = command.help(commandArgs);
+                    summary.push(this.projectToSummary(help, 1));
+                }
+                this.sendChatService.send(summary, whisper, message);
+                return [2 /*return*/];
+            });
+        });
+    };
+    EchoHelpService.prototype.projectToSummary = function (help, depth) {
+        var _this = this;
+        var subcommands = undefined;
+        if (help.subcommands && help.subcommands.length > 1) {
+            subcommands = [];
+            help.subcommands.forEach(function (subcommand) {
+                subcommands.push(_this.projectToSummary(subcommand, depth + 1));
+            });
+        }
+        else if (depth < 2) {
+            subcommands = help.subcommands;
+        }
+        return {
+            command: help.command,
+            description: help.description,
+            alias: help.alias,
+            subcommands: subcommands
+        };
+    };
+    EchoHelpService.prototype.echoX = function (help, whisper, message) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 this.sendChatService.send(help, whisper, message);

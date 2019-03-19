@@ -65,8 +65,7 @@ export class ChatCommandManager {
             const command = this.commands[i];
             if (command.canHandle(commandArgs)) {
                 if (outputHelp) {
-                    const help = command.help(commandArgs);
-                    await this.echoHelpService.echo(help, false, message);
+                    await this.echoHelpService.echoOne(command, commandArgs, false, message);
                 } else {
                     command.handle(message, commandArgs);
                 }
@@ -76,11 +75,12 @@ export class ChatCommandManager {
     }
 
     private async echoHelp(message: Message, commandArgs: CommandArgs) {
-        for (let i = 0; i < this.commands.length; i++) {
-            const command = this.commands[i];
-            const help = command.help(commandArgs);
-            await this.echoHelpService.echo(help, false, message);
-        }
+        // for (let i = 0; i < this.commands.length; i++) {
+        //     const command = this.commands[i];
+        //     const help = command.help(commandArgs);
+        //     await this.echoHelpService.echo(help, false, message);
+        // }
+        await this.echoHelpService.echoMany(this.commands, commandArgs, false, message);
     }
 }
 
