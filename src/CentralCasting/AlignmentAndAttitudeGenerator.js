@@ -13,11 +13,9 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var strEnum_1 = require("../utilities/strEnum");
 // 312: Alignment & Attitude
 var AlignmentAndAttitudeGenerator = /** @class */ (function () {
     function AlignmentAndAttitudeGenerator(randomService) {
-        this.randomService = randomService;
         this.traitStrengthGenerator = new WeightenGenerator(randomService, [
             { weight: 2, generate: function () { return PersonalityStrength.Trivial; } },
             { weight: 4, generate: function () { return PersonalityStrength.Weak; } },
@@ -27,11 +25,11 @@ var AlignmentAndAttitudeGenerator = /** @class */ (function () {
             { weight: 1, generate: function () { return PersonalityStrength.Obsessive; } }
         ]);
         this.personalityTraitTypesGenerator = new WeightenGenerator(randomService, [
-            { weight: 10, generate: function () { return PersonalityTraitTypes.None; } },
-            { weight: 3, generate: function () { return PersonalityTraitTypes.Lightside; } },
-            { weight: 3, generate: function () { return PersonalityTraitTypes.Neutral; } },
-            { weight: 3, generate: function () { return PersonalityTraitTypes.Darkside; } },
-            { weight: 1, generate: function () { return PersonalityTraitTypes.Exotic; } }
+            { weight: 10, generate: function () { return TraitTypes.None; } },
+            { weight: 3, generate: function () { return TraitTypes.Lightside; } },
+            { weight: 3, generate: function () { return TraitTypes.Neutral; } },
+            { weight: 3, generate: function () { return TraitTypes.Darkside; } },
+            { weight: 1, generate: function () { return TraitTypes.Exotic; } }
         ]);
         this.traitAlignmentGenerator = new TraitAlignmentGenerator(randomService);
         this.attitudeGenerator = new AttitudeGenerator(randomService);
@@ -48,17 +46,19 @@ var AlignmentAndAttitudeGenerator = /** @class */ (function () {
             }
             input.events.push({
                 name: "Random Event " + (i + 1),
-                alignment: traitType,
+                alignment: EventAligment[traitType],
                 strength: TraitStrength.Random
             });
         }
         // Generate the random PersonalityTrait strength and alignment based on past events
         input.events.forEach(function (event) {
             if (event.strength == TraitStrength.Random) {
-                event.strength = _this.traitStrengthGenerator.generate({ personality: personality, event: event });
+                var strength = _this.traitStrengthGenerator.generate({ personality: personality, event: event });
+                event.strength = TraitStrength[strength];
             }
             if (event.alignment == 'Random') {
-                event.alignment = _this.traitAlignmentGenerator.generate({ personality: personality, event: event });
+                var alignment = _this.traitAlignmentGenerator.generate({ personality: personality, event: event });
+                event.alignment = EventAligment[alignment];
             }
         });
         // Start by generating Exotic PersonalityTrait so one could flip Personality.hasSplitPersonality to true,
@@ -90,23 +90,23 @@ var AlignmentAndAttitudeGenerator = /** @class */ (function () {
         //
         // Sets the character's alignment
         if (couldBeEvil && !couldBeGood) {
-            personality.alignment.value = 'Darkside';
+            personality.alignment.value = PersonalityAlignmentType.Darkside;
         }
         else if (!couldBeEvil && couldBeGood) {
-            personality.alignment.value = 'Lightside';
+            personality.alignment.value = PersonalityAlignmentType.Lightside;
         }
         else if (couldBeEvil && couldBeGood && lightSided != darksided) {
-            personality.alignment.value = lightSided > darksided ? 'Lightside' : 'Darkside';
+            personality.alignment.value = lightSided > darksided ? PersonalityAlignmentType.Lightside : PersonalityAlignmentType.Darkside;
         }
         // Sets the character's alignment "tend toward" value
         if (darksided > lightSided && darksided > neutralSided && personality.alignment.value != 'Darkside') {
-            personality.alignment.tendToward = 'Darkside';
+            personality.alignment.tendToward = PersonalityAlignmentType.Darkside;
         }
         if (lightSided > darksided && lightSided > neutralSided && personality.alignment.value != 'Lightside') {
-            personality.alignment.tendToward = 'Lightside';
+            personality.alignment.tendToward = PersonalityAlignmentType.Lightside;
         }
         if (neutralSided > darksided && neutralSided > lightSided && personality.alignment.value != 'Neutral') {
-            personality.alignment.tendToward = 'Neutral';
+            personality.alignment.tendToward = PersonalityAlignmentType.Neutral;
         }
         // Compute attitude
         personality.attitude = this.attitudeGenerator.generate(personality);
@@ -137,7 +137,7 @@ var Personality = /** @class */ (function () {
 exports.Personality = Personality;
 var PersonalityAlignment = /** @class */ (function () {
     function PersonalityAlignment() {
-        this.value = 'Neutral';
+        this.value = PersonalityAlignmentType.Neutral;
         this.metrics = new PersonalityAlignmentMetrics();
     }
     return PersonalityAlignment;
@@ -155,13 +155,50 @@ var PersonalityTrait = /** @class */ (function () {
     return PersonalityTrait;
 }());
 exports.PersonalityTrait = PersonalityTrait;
-var PersonalityStrength = strEnum_1.strEnum(['Trivial', 'Weak', 'Average', 'Strong', 'Driving', 'Obsessive']);
+var PersonalityStrength;
+(function (PersonalityStrength) {
+    PersonalityStrength["Trivial"] = "Trivial";
+    PersonalityStrength["Weak"] = "Weak";
+    PersonalityStrength["Average"] = "Average";
+    PersonalityStrength["Strong"] = "Strong";
+    PersonalityStrength["Driving"] = "Driving";
+    PersonalityStrength["Obsessive"] = "Obsessive";
+})(PersonalityStrength || (PersonalityStrength = {}));
+var PersonalityAlignmentType;
+(function (PersonalityAlignmentType) {
+    PersonalityAlignmentType["Lightside"] = "Lightside";
+    PersonalityAlignmentType["Neutral"] = "Neutral";
+    PersonalityAlignmentType["Darkside"] = "Darkside";
+})(PersonalityAlignmentType || (PersonalityAlignmentType = {}));
 //
 // Generation models
 //
-var PersonalityAlignmentType = strEnum_1.strEnum(['Lightside', 'Neutral', 'Darkside']);
-var PersonalityTraitTypes = strEnum_1.strEnum(['None', 'Lightside', 'Neutral', 'Darkside', 'Exotic']);
-var TraitStrength = strEnum_1.strEnum(['Trivial', 'Weak', 'Average', 'Strong', 'Driving', 'Obsessive', 'Random']);
+var TraitTypes;
+(function (TraitTypes) {
+    TraitTypes["None"] = "None";
+    TraitTypes["Lightside"] = "Lightside";
+    TraitTypes["Neutral"] = "Neutral";
+    TraitTypes["Darkside"] = "Darkside";
+    TraitTypes["Exotic"] = "Exotic";
+})(TraitTypes || (TraitTypes = {}));
+var TraitStrength;
+(function (TraitStrength) {
+    TraitStrength["Trivial"] = "Trivial";
+    TraitStrength["Weak"] = "Weak";
+    TraitStrength["Average"] = "Average";
+    TraitStrength["Strong"] = "Strong";
+    TraitStrength["Driving"] = "Driving";
+    TraitStrength["Obsessive"] = "Obsessive";
+    TraitStrength["Random"] = "Random";
+})(TraitStrength || (TraitStrength = {}));
+var EventAligment;
+(function (EventAligment) {
+    EventAligment["Lightside"] = "Lightside";
+    EventAligment["Neutral"] = "Neutral";
+    EventAligment["Darkside"] = "Darkside";
+    EventAligment["Exotic"] = "Exotic";
+    EventAligment["Random"] = "Random";
+})(EventAligment = exports.EventAligment || (exports.EventAligment = {}));
 var RandomGenerator = /** @class */ (function () {
     function RandomGenerator(randomService, elements) {
         this.randomService = randomService;
@@ -278,17 +315,8 @@ var AttitudeGenerator = /** @class */ (function () {
     return AttitudeGenerator;
 }());
 exports.AttitudeGenerator = AttitudeGenerator;
-var DescriptibleAndAlignableGenerator = /** @class */ (function (_super) {
-    __extends(DescriptibleAndAlignableGenerator, _super);
-    function DescriptibleAndAlignableGenerator(randomService, elements) {
-        return _super.call(this, randomService, elements.map(function (e) {
-            return Object.assign(e, {
-                generate: function () { return e; }
-            });
-        })) || this;
-    }
-    return DescriptibleAndAlignableGenerator;
-}(RandomGenerator));
+// p.69-70
+// 643: Personality Traits
 var PersonalityTraitGenerator = /** @class */ (function () {
     function PersonalityTraitGenerator(randomService) {
         this.randomService = randomService;
@@ -430,19 +458,19 @@ var PersonalityTraitGenerator = /** @class */ (function () {
         var roller;
         switch (input.event.alignment) {
             // Lightside Trait: use Table 643A: Lightside Traits
-            case PersonalityTraitTypes.Lightside:
+            case EventAligment.Lightside:
                 roller = this.lightGenerator;
                 break;
             // Neutral Trait: use Table 643B: Neutral Traits
-            case PersonalityTraitTypes.Neutral:
+            case EventAligment.Neutral:
                 roller = this.neutralGenerator;
                 break;
             // Darkside Trait: use Table 643C: Darkside Traits
-            case PersonalityTraitTypes.Darkside:
+            case EventAligment.Darkside:
                 roller = this.darkGenerator;
                 break;
             // Exotic Personality Feature: use Table 644: Exotic Personality Traits
-            case PersonalityTraitTypes.Exotic:
+            case EventAligment.Exotic:
                 roller = this.exoticGenerator;
                 break;
         }
@@ -455,6 +483,21 @@ var PersonalityTraitGenerator = /** @class */ (function () {
     };
     return PersonalityTraitGenerator;
 }());
+exports.PersonalityTraitGenerator = PersonalityTraitGenerator;
+var DescriptibleAndAlignableGenerator = /** @class */ (function (_super) {
+    __extends(DescriptibleAndAlignableGenerator, _super);
+    function DescriptibleAndAlignableGenerator(randomService, elements) {
+        return _super.call(this, randomService, elements.map(function (e) {
+            return Object.assign(e, {
+                generate: function () { return e; }
+            });
+        })) || this;
+    }
+    return DescriptibleAndAlignableGenerator;
+}(RandomGenerator));
+exports.DescriptibleAndAlignableGenerator = DescriptibleAndAlignableGenerator;
+// p.71
+// 644: Exotic Personality Traits
 var ExoticPersonalityTraitGenerator = /** @class */ (function () {
     function ExoticPersonalityTraitGenerator(randomService) {
         this.traitAlignmentGenerator = new TraitAlignmentGenerator(randomService);
@@ -472,6 +515,7 @@ var ExoticPersonalityTraitGenerator = /** @class */ (function () {
     };
     return ExoticPersonalityTraitGenerator;
 }());
+exports.ExoticPersonalityTraitGenerator = ExoticPersonalityTraitGenerator;
 var ExoticPersonalityTrait = /** @class */ (function (_super) {
     __extends(ExoticPersonalityTrait, _super);
     function ExoticPersonalityTrait() {
@@ -479,9 +523,11 @@ var ExoticPersonalityTrait = /** @class */ (function (_super) {
     }
     return ExoticPersonalityTrait;
 }(PersonalityTrait));
+exports.ExoticPersonalityTrait = ExoticPersonalityTrait;
 var ExoticFeature = /** @class */ (function () {
     function ExoticFeature() {
     }
     return ExoticFeature;
 }());
+exports.ExoticFeature = ExoticFeature;
 //# sourceMappingURL=AlignmentAndAttitudeGenerator.js.map

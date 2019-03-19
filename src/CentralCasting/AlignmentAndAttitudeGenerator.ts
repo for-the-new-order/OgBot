@@ -1,5 +1,4 @@
 import { RandomService } from '../generators/random-service';
-import { strEnum } from '../utilities/strEnum';
 
 // 312: Alignment & Attitude
 export class AlignmentAndAttitudeGenerator implements Generator<PersonalityOptions, Personality> {
@@ -8,16 +7,12 @@ export class AlignmentAndAttitudeGenerator implements Generator<PersonalityOptio
         PersonalityStrength,
         WeightenElement<{ personality: Personality; event: TraitDevelopedFromEvent }, PersonalityStrength>
     >;
-    private personalityTraitTypesGenerator: WeightenGenerator<
-        Personality,
-        PersonalityTraitTypes,
-        WeightenElement<Personality, PersonalityTraitTypes>
-    >;
+    private personalityTraitTypesGenerator: WeightenGenerator<Personality, TraitTypes, WeightenElement<Personality, TraitTypes>>;
     private traitAlignmentGenerator: TraitAlignmentGenerator;
     private attitudeGenerator: AttitudeGenerator;
     private personalityTraitGenerator: PersonalityTraitGenerator;
 
-    constructor(private randomService: RandomService) {
+    constructor(randomService: RandomService) {
         this.traitStrengthGenerator = new WeightenGenerator(randomService, [
             { weight: 2, generate: () => PersonalityStrength.Trivial },
             { weight: 4, generate: () => PersonalityStrength.Weak },
@@ -27,11 +22,11 @@ export class AlignmentAndAttitudeGenerator implements Generator<PersonalityOptio
             { weight: 1, generate: () => PersonalityStrength.Obsessive }
         ]);
         this.personalityTraitTypesGenerator = new WeightenGenerator(randomService, [
-            { weight: 10, generate: () => PersonalityTraitTypes.None },
-            { weight: 3, generate: () => PersonalityTraitTypes.Lightside },
-            { weight: 3, generate: () => PersonalityTraitTypes.Neutral },
-            { weight: 3, generate: () => PersonalityTraitTypes.Darkside },
-            { weight: 1, generate: () => PersonalityTraitTypes.Exotic }
+            { weight: 10, generate: () => TraitTypes.None },
+            { weight: 3, generate: () => TraitTypes.Lightside },
+            { weight: 3, generate: () => TraitTypes.Neutral },
+            { weight: 3, generate: () => TraitTypes.Darkside },
+            { weight: 1, generate: () => TraitTypes.Exotic }
         ]);
         this.traitAlignmentGenerator = new TraitAlignmentGenerator(randomService);
         this.attitudeGenerator = new AttitudeGenerator(randomService);
@@ -49,7 +44,7 @@ export class AlignmentAndAttitudeGenerator implements Generator<PersonalityOptio
             }
             input.events.push({
                 name: `Random Event ${i + 1}`,
-                alignment: traitType,
+                alignment: EventAligment[traitType],
                 strength: TraitStrength.Random
             });
         }
@@ -57,10 +52,12 @@ export class AlignmentAndAttitudeGenerator implements Generator<PersonalityOptio
         // Generate the random PersonalityTrait strength and alignment based on past events
         input.events.forEach(event => {
             if (event.strength == TraitStrength.Random) {
-                event.strength = this.traitStrengthGenerator.generate({ personality, event });
+                const strength = this.traitStrengthGenerator.generate({ personality, event });
+                event.strength = TraitStrength[strength];
             }
             if (event.alignment == 'Random') {
-                event.alignment = this.traitAlignmentGenerator.generate({ personality, event });
+                const alignment = this.traitAlignmentGenerator.generate({ personality, event });
+                event.alignment = EventAligment[alignment];
             }
         });
 
@@ -99,22 +96,22 @@ export class AlignmentAndAttitudeGenerator implements Generator<PersonalityOptio
 
         // Sets the character's alignment
         if (couldBeEvil && !couldBeGood) {
-            personality.alignment.value = 'Darkside';
+            personality.alignment.value = PersonalityAlignmentType.Darkside;
         } else if (!couldBeEvil && couldBeGood) {
-            personality.alignment.value = 'Lightside';
+            personality.alignment.value = PersonalityAlignmentType.Lightside;
         } else if (couldBeEvil && couldBeGood && lightSided != darksided) {
-            personality.alignment.value = lightSided > darksided ? 'Lightside' : 'Darkside';
+            personality.alignment.value = lightSided > darksided ? PersonalityAlignmentType.Lightside : PersonalityAlignmentType.Darkside;
         }
 
         // Sets the character's alignment "tend toward" value
         if (darksided > lightSided && darksided > neutralSided && personality.alignment.value != 'Darkside') {
-            personality.alignment.tendToward = 'Darkside';
+            personality.alignment.tendToward = PersonalityAlignmentType.Darkside;
         }
         if (lightSided > darksided && lightSided > neutralSided && personality.alignment.value != 'Lightside') {
-            personality.alignment.tendToward = 'Lightside';
+            personality.alignment.tendToward = PersonalityAlignmentType.Lightside;
         }
         if (neutralSided > darksided && neutralSided > lightSided && personality.alignment.value != 'Neutral') {
-            personality.alignment.tendToward = 'Neutral';
+            personality.alignment.tendToward = PersonalityAlignmentType.Neutral;
         }
 
         // Compute attitude
@@ -141,7 +138,7 @@ export class Personality {
 }
 
 export class PersonalityAlignment {
-    value: PersonalityAlignmentType = 'Neutral';
+    value: PersonalityAlignmentType = PersonalityAlignmentType.Neutral;
     tendToward?: PersonalityAlignmentType;
     metrics: PersonalityAlignmentMetrics = new PersonalityAlignmentMetrics();
 }
@@ -159,31 +156,59 @@ export class PersonalityAlignmentMetrics {
 export class PersonalityTrait implements Descriptible {
     description: string;
     name: string;
-    alignment: PersonalityAlignmentType | 'None';
+    alignment: PersonalityAlignmentType;
     strength: PersonalityStrength;
     stronglyAligned: boolean;
     isExotic: boolean;
     source?: Descriptible;
 }
 
-const PersonalityStrength = strEnum(['Trivial', 'Weak', 'Average', 'Strong', 'Driving', 'Obsessive']);
-declare type PersonalityStrength = keyof typeof PersonalityStrength;
+enum PersonalityStrength {
+    Trivial = 'Trivial',
+    Weak = 'Weak',
+    Average = 'Average',
+    Strong = 'Strong',
+    Driving = 'Driving',
+    Obsessive = 'Obsessive'
+}
+
+enum PersonalityAlignmentType {
+    Lightside = 'Lightside',
+    Neutral = 'Neutral',
+    Darkside = 'Darkside'
+}
 
 //
 // Generation models
 //
-const PersonalityAlignmentType = strEnum(['Lightside', 'Neutral', 'Darkside']);
-type PersonalityAlignmentType = keyof typeof PersonalityAlignmentType;
-
-const PersonalityTraitTypes = strEnum(['None', 'Lightside', 'Neutral', 'Darkside', 'Exotic']);
-declare type PersonalityTraitTypes = keyof typeof PersonalityTraitTypes;
-
-const TraitStrength = strEnum(['Trivial', 'Weak', 'Average', 'Strong', 'Driving', 'Obsessive', 'Random']);
-declare type TraitStrength = keyof typeof TraitStrength;
+enum TraitTypes {
+    None = 'None',
+    Lightside = 'Lightside',
+    Neutral = 'Neutral',
+    Darkside = 'Darkside',
+    Exotic = 'Exotic'
+}
+enum TraitStrength {
+    Trivial = 'Trivial',
+    Weak = 'Weak',
+    Average = 'Average',
+    Strong = 'Strong',
+    Driving = 'Driving',
+    Obsessive = 'Obsessive',
+    Random = 'Random'
+}
 
 export interface TraitDevelopedFromEvent extends Nameable {
-    alignment: PersonalityAlignmentType | 'Exotic' | 'Random';
+    alignment: EventAligment;
     strength: TraitStrength;
+}
+
+export enum EventAligment {
+    Lightside = 'Lightside',
+    Neutral = 'Neutral',
+    Darkside = 'Darkside',
+    Exotic = 'Exotic',
+    Random = 'Random'
 }
 
 //
@@ -196,10 +221,6 @@ export interface Nameable {
 
 export interface Descriptible extends Nameable {
     description: string;
-}
-
-interface Alignable {
-    stronglyAligned: boolean;
 }
 
 export interface WeightenElement<TModel, TOuput> extends Generator<TModel, TOuput> {
@@ -268,7 +289,6 @@ export class RerollDecorator<TModel, TOuput extends Nameable> implements Generat
 //
 // Specific generators
 //
-
 export class TraitAlignmentGenerator extends WeightenGenerator<
     { personality: Personality; event: TraitDevelopedFromEvent },
     PersonalityAlignmentType,
@@ -324,11 +344,189 @@ export class AttitudeGenerator implements Generator<Personality, Descriptible> {
     }
 }
 
-// p.71
+// p.69-70
 // 643: Personality Traits
-type DescriptibleAndAlignable = Descriptible & Alignable;
+export class PersonalityTraitGenerator
+    implements Generator<{ personality: Personality; event: TraitDevelopedFromEvent }, PersonalityTrait[]> {
+    private lightGenerator: RerollDecorator<{ personality: Personality; event: TraitDevelopedFromEvent }, DescriptibleAndAlignable>;
+    private neutralGenerator: RerollDecorator<{ personality: Personality; event: TraitDevelopedFromEvent }, DescriptibleAndAlignable>;
+    private darkGenerator: RerollDecorator<{ personality: Personality; event: TraitDevelopedFromEvent }, DescriptibleAndAlignable>;
+    private exoticGenerator: ExoticPersonalityTraitGenerator;
 
-class DescriptibleAndAlignableGenerator extends RandomGenerator<any, DescriptibleAndAlignable, Generator<any, DescriptibleAndAlignable>> {
+    constructor(private randomService: RandomService) {
+        this.exoticGenerator = new ExoticPersonalityTraitGenerator(randomService);
+        // prettier-ignore
+        this.lightGenerator = new RerollDecorator(new DescriptibleAndAlignableGenerator(randomService, [
+            { stronglyAligned: false, name: 'Optimist', description: 'always see the good side of things. ' },
+            { stronglyAligned: true, name: 'Altruist', description: "selfless concern or others' welfare. " },
+            { stronglyAligned: false, name: 'Helpful', description: 'helps others in need ' },
+            { stronglyAligned: true, name: 'Kindly', description: 'warmhearted and friendly. ' },
+            { stronglyAligned: false, name: 'Careful', description: 'cautious in thought and deed. ' },
+            { stronglyAligned: false, name: 'Considerate', description: "thinks of others' feelings. " },
+            { stronglyAligned: false, name: 'Sober', description: 'serious, plain-thinking, straightforward. ' },
+            { stronglyAligned: false, name: 'Teetotaler', description: 'abstains from drinking alcohol. ' },
+            { stronglyAligned: true, name: 'Trusting', description: 'trusts others to behave correctly. ' },
+            { stronglyAligned: false, name: 'Peaceful', description: 'serene Of spirit. ' },
+            { stronglyAligned: false, name: 'Peacemaker', description: 'attempts to calm others. ' },
+            { stronglyAligned: false, name: 'Pious', description: 'reverently devoted to the worship of God. ' },
+            { stronglyAligned: true, name: 'Honest', description: 'always gives what is due. ' },
+            { stronglyAligned: false, name: 'Loving', description: 'affectionately concerned for others. ' },
+            { stronglyAligned: false, name: 'Giving', description: 'gives of self and possessions. ' },
+            { stronglyAligned: false, name: 'Organized', description: 'everything has a place ' },
+            { stronglyAligned: false, name: 'Clean', description: 'practices good hygiene. ' },
+            { stronglyAligned: false, name: 'Punctual', description: 'always on time ' },
+            { stronglyAligned: false, name: 'Self-confident', description: 'sure Of self and abilities. ' },
+            { stronglyAligned: false, name: 'Courageous', description: 'brave in the face of adversity. ' },
+            { stronglyAligned: false, name: 'Respectful', description: 'shows respect for others. ' },
+            { stronglyAligned: false, name: 'Calm', description: 'difficult to anger, a peaceful spirit. ' },
+            { stronglyAligned: false, name: 'Patient', description: 'able to wait with calmness. ' },
+            { stronglyAligned: false, name: 'Wise', description: 'understands what is true, or lasting. ' },
+            { stronglyAligned: false, name: 'Generous', description: 'willing to give more than fairly. ' },
+            { stronglyAligned: false, name: 'Imaginative', description: 'a clever, resourceful mind. ' },
+            { stronglyAligned: true, name: 'Forgiving', description: 'able to pardon faults in others. ' },
+            { stronglyAligned: true, name: 'Virtuous', description: 'chaste. pure, of excellent morals. ' },
+            { stronglyAligned: false, name: 'Dependable', description: 'does duties reliably, responsibly. ' },
+            { stronglyAligned: false, name: 'Well-mannered', description: 'polite, courteous. ' },
+            { stronglyAligned: true, name: 'Benign', description: 'gentle, inoffensive. ' },
+            { stronglyAligned: false, name: 'Friendly', description: 'warm and comforting. ' },
+            { stronglyAligned: false, name: 'Humble', description: 'lack of pretense, not proud. ' },
+            { stronglyAligned: false, name: 'Energetic', description: 'does things quickly, with verve. ' },
+            { stronglyAligned: true, name: 'Truthful', description: 'always tells the truth. ' },
+            { stronglyAligned: false, name: 'Cheerful', description: 'always happy and smiling. ' },
+            { stronglyAligned: false, name: 'Enthusiastic', description: "excited, can't wait to act. " },
+            { stronglyAligned: false, name: 'Thrifty', description: 'careful with money. ' },
+            { stronglyAligned: false, name: 'Diplomatic', description: 'careful to say the right thing. ' },
+            { stronglyAligned: false, name: 'Extra trait', description: 'roll twice more on this table ' }
+        ]));
+        // prettier-ignore
+        this.neutralGenerator = new RerollDecorator(new DescriptibleAndAlignableGenerator(randomService, [
+            { stronglyAligned: false, name: 'Curious', description: 'inquisitive, needs to know.' },
+            { stronglyAligned: false, name: 'Hedonist', description: 'pleasure is the most important thing.' },
+            { stronglyAligned: false, name: 'Precise', description: 'always exacting.' },
+            { stronglyAligned: false, name: 'Studious', description: 'studios often, pays attention to detail.' },
+            { stronglyAligned: false, name: 'Mysterious', description: 'has an air of mystery about him.' },
+            { stronglyAligned: false, name: 'Loquacious', description: 'talks and talks and talks and ...' },
+            { stronglyAligned: false, name: 'Silent', description: 'rarely talks.' },
+            { stronglyAligned: false, name: 'Foppish', description: 'vain. preoccupied with appearance.' },
+            { stronglyAligned: false, name: 'Immaculate', description: 'clean and orderly.' },
+            { stronglyAligned: false, name: 'Rough', description: 'unpolished, unrefined.' },
+            { stronglyAligned: false, name: 'Skeptic', description: 'disbelieving of things unproven.' },
+            { stronglyAligned: false, name: 'Immature', description: 'acts younger than age.' },
+            { stronglyAligned: false, name: 'Even-tempered', description: 'rarely angry or over joyous.' },
+            { stronglyAligned: false, name: 'Rash', description: 'acts before thinking.' },
+            { stronglyAligned: false, name: 'Extroverted', description: 'outgoing.' },
+            { stronglyAligned: false, name: 'Introverted', description: "focus one's interests in oneself." },
+            { stronglyAligned: false, name: 'Materialistic', description: 'puts emphasis on possessions.' },
+            { stronglyAligned: false, name: 'Aesthetic', description: 'possessions are unnecessary.' },
+            { stronglyAligned: false, name: 'Amoral', description: 'no care for right or wrong.' },
+            { stronglyAligned: false, name: 'Dreamy', description: 'a distant daydreamer.' },
+            { stronglyAligned: false, name: 'Creative', description: 'able to make something out of nothing.' },
+            { stronglyAligned: false, name: 'Leader', description: 'takes initiative, can take command.' },
+            { stronglyAligned: false, name: 'Follower', description: 'prefers to let others lead.' },
+            { stronglyAligned: false, name: 'Emotional', description: 'rarely keeps emotions in check.' },
+            { stronglyAligned: false, name: 'Emotionless', description: 'rarely shows emotions.' },
+            { stronglyAligned: false, name: 'Humorous', description: 'appreciates humor and Ikes to joke.' },
+            { stronglyAligned: false, name: 'Grim', description: 'unsmiling. humorless, stern of purpose.' },
+            { stronglyAligned: false, name: 'Conservative', description: 'restrained, opposed to change.' },
+            { stronglyAligned: false, name: 'Liberal', description: 'tolerant of Others, open to change.' },
+            { stronglyAligned: false, name: 'Aggressive', description: 'assertive, bold, enterprising.' },
+            { stronglyAligned: false, name: 'Passive', description: 'accepts things without resisting them.' },
+            { stronglyAligned: false, name: 'Self-sufficient', description: 'does not need others.' },
+            { stronglyAligned: false, name: 'Dependent', description: 'needs others around him.' },
+            { stronglyAligned: false, name: 'Romantic', description: 'given to feelings of romance.' },
+            { stronglyAligned: false, name: 'Logical', description: 'uses deductive reasoning.' },
+            { stronglyAligned: false, name: 'Illogical', description: 'may not use reason to make decisions.' },
+            { stronglyAligned: false, name: 'Frivolous', description: 'flighty. harebrained, rarely serious.' },
+            { stronglyAligned: false, name: 'Aloof', description: 'distant from others, even cold.' },
+            { stronglyAligned: false, name: 'Atheistic', description: 'denies the existence of the supernatural.' },
+            { stronglyAligned: false, name: 'Extra trait', description: 'roll twice more on this table ' }
+        ]));
+        // prettier-ignore
+        this.darkGenerator = new RerollDecorator(new DescriptibleAndAlignableGenerator(randomService, [
+            { stronglyAligned: false, name: 'Pessimist', description: 'always see the bad side Of things.' },
+            { stronglyAligned: false, name: 'Egoist', description: 'selfish concern for own welfare.' },
+            { stronglyAligned: false, name: 'Obstructive', description: 'acts to block Others actions.' },
+            { stronglyAligned: true, name: 'Cruel', description: 'coldhearted and hurtful.' },
+            { stronglyAligned: false, name: 'Careless', description: 'incautious in thought and deed.' },
+            { stronglyAligned: false, name: 'Thoughtless', description: "rarely thinks of others' feelings." },
+            { stronglyAligned: false, name: 'Flippant', description: 'unable to be serious about anything.' },
+            { stronglyAligned: false, name: 'Drunkard', description: 'constantly overindulges in alcohol.' },
+            { stronglyAligned: false, name: 'Suspicious', description: 'trusts no one.' },
+            { stronglyAligned: true, name: 'Violent', description: 'seeks physical conflict.' },
+            { stronglyAligned: false, name: 'Argumentative', description: 'starts arguments and fights.' },
+            { stronglyAligned: true, name: 'Irreverent', description: 'mocks religion and the gods.' },
+            { stronglyAligned: true, name: 'Cheat', description: 'shortchanges others of their due.' },
+            { stronglyAligned: true, name: 'Hateful', description: 'strongly dislikes others.' },
+            { stronglyAligned: false, name: 'Selfish', description: 'unwilling to share time and possessions.' },
+            { stronglyAligned: false, name: 'Slovenly', description: 'messy, nothing is ever put away.' },
+            { stronglyAligned: false, name: 'Filthy', description: 'knows nothing of hygiene.' },
+            { stronglyAligned: false, name: 'Tardy', description: 'always late.' },
+            { stronglyAligned: false, name: 'Self-doubting', description: 'unsure Of self and abilities.' },
+            { stronglyAligned: false, name: 'Cowardly', description: 'afraid to face adversity.' },
+            { stronglyAligned: false, name: 'Disrespectful', description: 'does not show respect.' },
+            { stronglyAligned: false, name: 'Angry', description: 'spirit always unsettled. never at peace.' },
+            { stronglyAligned: false, name: 'Inpatient', description: 'unable to wait with calmness.' },
+            { stronglyAligned: false, name: 'Foolish', description: 'unable to discern what is true or wise.' },
+            { stronglyAligned: false, name: 'Greedy', description: 'hoards all for self.' },
+            { stronglyAligned: false, name: 'Dull', description: 'a slow, uncreative mind.' },
+            { stronglyAligned: false, name: 'Vengeful', description: 'revenge is the way to punish faults.' },
+            { stronglyAligned: false, name: 'Immoral', description: 'lecherous, lawless, devoid of morals.' },
+            { stronglyAligned: true, name: 'Untrustworthy', description: 'not worth trusting.' },
+            { stronglyAligned: false, name: 'Rude', description: 'polite, courteous.' },
+            { stronglyAligned: false, name: 'Harsh', description: 'ungentle, sharp-tongued.' },
+            { stronglyAligned: false, name: 'Unfriendly', description: 'cold and distant.' },
+            { stronglyAligned: false, name: 'Egotistic', description: 'proud and conceited.' },
+            { stronglyAligned: false, name: 'Lazy', description: 'difficult to get motivated.' },
+            { stronglyAligned: false, name: 'Liar', description: 'hardly ever tells the truth.' },
+            { stronglyAligned: false, name: 'Morose', description: 'always gloomy and moody.' },
+            { stronglyAligned: false, name: 'Unenthusiastic', description: 'get excited.' },
+            { stronglyAligned: false, name: 'Spendthrift', description: 'spends money without thought.' },
+            { stronglyAligned: false, name: 'Tactless', description: 'speaks before thinking.' },
+            { stronglyAligned: false, name: 'Extra trait', description: 'roll twice more on this table ' }
+        ]));
+    }
+    generate(input: { personality: Personality; event: TraitDevelopedFromEvent }): PersonalityTrait[] {
+        const traits = new Array<PersonalityTrait>();
+        // Make one
+        let roller: Generator<{ personality: Personality; event: TraitDevelopedFromEvent }, DescriptibleAndAlignable[]>;
+        switch (input.event.alignment) {
+            // Lightside Trait: use Table 643A: Lightside Traits
+            case EventAligment.Lightside:
+                roller = this.lightGenerator;
+                break;
+            // Neutral Trait: use Table 643B: Neutral Traits
+            case EventAligment.Neutral:
+                roller = this.neutralGenerator;
+                break;
+            // Darkside Trait: use Table 643C: Darkside Traits
+            case EventAligment.Darkside:
+                roller = this.darkGenerator;
+                break;
+            // Exotic Personality Feature: use Table 644: Exotic Personality Traits
+            case EventAligment.Exotic:
+                roller = this.exoticGenerator;
+                break;
+        }
+        const result = roller.generate(input).map(r => this.createTraitFrom(input.event, r));
+        traits.push(...result);
+        return traits;
+    }
+    private createTraitFrom(event: TraitDevelopedFromEvent, description: DescriptibleAndAlignable): PersonalityTrait {
+        return Object.assign(new PersonalityTrait(), event, description, { source: { name: event.name } });
+    }
+}
+
+export interface Alignable {
+    stronglyAligned: boolean;
+}
+
+export type DescriptibleAndAlignable = Descriptible & Alignable;
+
+export class DescriptibleAndAlignableGenerator extends RandomGenerator<
+    any,
+    DescriptibleAndAlignable,
+    Generator<any, DescriptibleAndAlignable>
+> {
     constructor(randomService: RandomService, elements: DescriptibleAndAlignable[]) {
         super(
             randomService,
@@ -341,185 +539,9 @@ class DescriptibleAndAlignableGenerator extends RandomGenerator<any, Descriptibl
     }
 }
 
-class PersonalityTraitGenerator implements Generator<{ personality: Personality; event: TraitDevelopedFromEvent }, PersonalityTrait[]> {
-    private lightGenerator: RerollDecorator<{ personality: Personality; event: TraitDevelopedFromEvent }, DescriptibleAndAlignable>;
-    private neutralGenerator: RerollDecorator<{ personality: Personality; event: TraitDevelopedFromEvent }, DescriptibleAndAlignable>;
-    private darkGenerator: RerollDecorator<{ personality: Personality; event: TraitDevelopedFromEvent }, DescriptibleAndAlignable>;
-    private exoticGenerator: ExoticPersonalityTraitGenerator;
-
-    constructor(private randomService: RandomService) {
-        this.exoticGenerator = new ExoticPersonalityTraitGenerator(randomService);
-        // prettier-ignore
-        this.lightGenerator = new RerollDecorator(
-            new DescriptibleAndAlignableGenerator(randomService, [
-                { stronglyAligned: false, name: 'Optimist', description: 'always see the good side of things. ' },
-                { stronglyAligned: true, name: 'Altruist', description: "selfless concern or others' welfare. " },
-                { stronglyAligned: false, name: 'Helpful', description: 'helps others in need ' },
-                { stronglyAligned: true, name: 'Kindly', description: 'warmhearted and friendly. ' },
-                { stronglyAligned: false, name: 'Careful', description: 'cautious in thought and deed. ' },
-                { stronglyAligned: false, name: 'Considerate', description: "thinks of others' feelings. " },
-                { stronglyAligned: false, name: 'Sober', description: 'serious, plain-thinking, straightforward. ' },
-                { stronglyAligned: false, name: 'Teetotaler', description: 'abstains from drinking alcohol. ' },
-                { stronglyAligned: true, name: 'Trusting', description: 'trusts others to behave correctly. ' },
-                { stronglyAligned: false, name: 'Peaceful', description: 'serene Of spirit. ' },
-                { stronglyAligned: false, name: 'Peacemaker', description: 'attempts to calm others. ' },
-                { stronglyAligned: false, name: 'Pious', description: 'reverently devoted to the worship of God. ' },
-                { stronglyAligned: true, name: 'Honest', description: 'always gives what is due. ' },
-                { stronglyAligned: false, name: 'Loving', description: 'affectionately concerned for others. ' },
-                { stronglyAligned: false, name: 'Giving', description: 'gives of self and possessions. ' },
-                { stronglyAligned: false, name: 'Organized', description: 'everything has a place ' },
-                { stronglyAligned: false, name: 'Clean', description: 'practices good hygiene. ' },
-                { stronglyAligned: false, name: 'Punctual', description: 'always on time ' },
-                { stronglyAligned: false, name: 'Self-confident', description: 'sure Of self and abilities. ' },
-                { stronglyAligned: false, name: 'Courageous', description: 'brave in the face of adversity. ' },
-                { stronglyAligned: false, name: 'Respectful', description: 'shows respect for others. ' },
-                { stronglyAligned: false, name: 'Calm', description: 'difficult to anger, a peaceful spirit. ' },
-                { stronglyAligned: false, name: 'Patient', description: 'able to wait with calmness. ' },
-                { stronglyAligned: false, name: 'Wise', description: 'understands what is true, or lasting. ' },
-                { stronglyAligned: false, name: 'Generous', description: 'willing to give more than fairly. ' },
-                { stronglyAligned: false, name: 'Imaginative', description: 'a clever, resourceful mind. ' },
-                { stronglyAligned: true, name: 'Forgiving', description: 'able to pardon faults in others. ' },
-                { stronglyAligned: true, name: 'Virtuous', description: 'chaste. pure, of excellent morals. ' },
-                { stronglyAligned: false, name: 'Dependable', description: 'does duties reliably, responsibly. ' },
-                { stronglyAligned: false, name: 'Well-mannered', description: 'polite, courteous. ' },
-                { stronglyAligned: true, name: 'Benign', description: 'gentle, inoffensive. ' },
-                { stronglyAligned: false, name: 'Friendly', description: 'warm and comforting. ' },
-                { stronglyAligned: false, name: 'Humble', description: 'lack of pretense, not proud. ' },
-                { stronglyAligned: false, name: 'Energetic', description: 'does things quickly, with verve. ' },
-                { stronglyAligned: true, name: 'Truthful', description: 'always tells the truth. ' },
-                { stronglyAligned: false, name: 'Cheerful', description: 'always happy and smiling. ' },
-                { stronglyAligned: false, name: 'Enthusiastic', description: "excited, can't wait to act. " },
-                { stronglyAligned: false, name: 'Thrifty', description: 'careful with money. ' },
-                { stronglyAligned: false, name: 'Diplomatic', description: 'careful to say the right thing. ' },
-                { stronglyAligned: false, name: 'Extra trait', description: 'roll twice more on this table ' }
-            ])
-        );
-        // prettier-ignore
-        this.neutralGenerator = new RerollDecorator(
-            new DescriptibleAndAlignableGenerator(randomService, [
-                { stronglyAligned: false, name: 'Curious', description: 'inquisitive, needs to know.' },
-                { stronglyAligned: false, name: 'Hedonist', description: 'pleasure is the most important thing.' },
-                { stronglyAligned: false, name: 'Precise', description: 'always exacting.' },
-                { stronglyAligned: false, name: 'Studious', description: 'studios often, pays attention to detail.' },
-                { stronglyAligned: false, name: 'Mysterious', description: 'has an air of mystery about him.' },
-                { stronglyAligned: false, name: 'Loquacious', description: 'talks and talks and talks and ...' },
-                { stronglyAligned: false, name: 'Silent', description: 'rarely talks.' },
-                { stronglyAligned: false, name: 'Foppish', description: 'vain. preoccupied with appearance.' },
-                { stronglyAligned: false, name: 'Immaculate', description: 'clean and orderly.' },
-                { stronglyAligned: false, name: 'Rough', description: 'unpolished, unrefined.' },
-                { stronglyAligned: false, name: 'Skeptic', description: 'disbelieving of things unproven.' },
-                { stronglyAligned: false, name: 'Immature', description: 'acts younger than age.' },
-                { stronglyAligned: false, name: 'Even-tempered', description: 'rarely angry or over joyous.' },
-                { stronglyAligned: false, name: 'Rash', description: 'acts before thinking.' },
-                { stronglyAligned: false, name: 'Extroverted', description: 'outgoing.' },
-                { stronglyAligned: false, name: 'Introverted', description: "focus one's interests in oneself." },
-                { stronglyAligned: false, name: 'Materialistic', description: 'puts emphasis on possessions.' },
-                { stronglyAligned: false, name: 'Aesthetic', description: 'possessions are unnecessary.' },
-                { stronglyAligned: false, name: 'Amoral', description: 'no care for right or wrong.' },
-                { stronglyAligned: false, name: 'Dreamy', description: 'a distant daydreamer.' },
-                { stronglyAligned: false, name: 'Creative', description: 'able to make something out of nothing.' },
-                { stronglyAligned: false, name: 'Leader', description: 'takes initiative, can take command.' },
-                { stronglyAligned: false, name: 'Follower', description: 'prefers to let others lead.' },
-                { stronglyAligned: false, name: 'Emotional', description: 'rarely keeps emotions in check.' },
-                { stronglyAligned: false, name: 'Emotionless', description: 'rarely shows emotions.' },
-                { stronglyAligned: false, name: 'Humorous', description: 'appreciates humor and Ikes to joke.' },
-                { stronglyAligned: false, name: 'Grim', description: 'unsmiling. humorless, stern of purpose.' },
-                { stronglyAligned: false, name: 'Conservative', description: 'restrained, opposed to change.' },
-                { stronglyAligned: false, name: 'Liberal', description: 'tolerant of Others, open to change.' },
-                { stronglyAligned: false, name: 'Aggressive', description: 'assertive, bold, enterprising.' },
-                { stronglyAligned: false, name: 'Passive', description: 'accepts things without resisting them.' },
-                { stronglyAligned: false, name: 'Self-sufficient', description: 'does not need others.' },
-                { stronglyAligned: false, name: 'Dependent', description: 'needs others around him.' },
-                { stronglyAligned: false, name: 'Romantic', description: 'given to feelings of romance.' },
-                { stronglyAligned: false, name: 'Logical', description: 'uses deductive reasoning.' },
-                { stronglyAligned: false, name: 'Illogical', description: 'may not use reason to make decisions.' },
-                { stronglyAligned: false, name: 'Frivolous', description: 'flighty. harebrained, rarely serious.' },
-                { stronglyAligned: false, name: 'Aloof', description: 'distant from others, even cold.' },
-                { stronglyAligned: false, name: 'Atheistic', description: 'denies the existence of the supernatural.' },
-                { stronglyAligned: false, name: 'Extra trait', description: 'roll twice more on this table ' }
-            ])
-        );
-        // prettier-ignore
-        this.darkGenerator = new RerollDecorator(
-            new DescriptibleAndAlignableGenerator(randomService, [
-                { stronglyAligned: false, name: 'Pessimist', description: 'always see the bad side Of things.' },
-                { stronglyAligned: false, name: 'Egoist', description: 'selfish concern for own welfare.' },
-                { stronglyAligned: false, name: 'Obstructive', description: 'acts to block Others actions.' },
-                { stronglyAligned: true, name: 'Cruel', description: 'coldhearted and hurtful.' },
-                { stronglyAligned: false, name: 'Careless', description: 'incautious in thought and deed.' },
-                { stronglyAligned: false, name: 'Thoughtless', description: "rarely thinks of others' feelings." },
-                { stronglyAligned: false, name: 'Flippant', description: 'unable to be serious about anything.' },
-                { stronglyAligned: false, name: 'Drunkard', description: 'constantly overindulges in alcohol.' },
-                { stronglyAligned: false, name: 'Suspicious', description: 'trusts no one.' },
-                { stronglyAligned: true, name: 'Violent', description: 'seeks physical conflict.' },
-                { stronglyAligned: false, name: 'Argumentative', description: 'starts arguments and fights.' },
-                { stronglyAligned: true, name: 'Irreverent', description: 'mocks religion and the gods.' },
-                { stronglyAligned: true, name: 'Cheat', description: 'shortchanges others of their due.' },
-                { stronglyAligned: true, name: 'Hateful', description: 'strongly dislikes others.' },
-                { stronglyAligned: false, name: 'Selfish', description: 'unwilling to share time and possessions.' },
-                { stronglyAligned: false, name: 'Slovenly', description: 'messy, nothing is ever put away.' },
-                { stronglyAligned: false, name: 'Filthy', description: 'knows nothing of hygiene.' },
-                { stronglyAligned: false, name: 'Tardy', description: 'always late.' },
-                { stronglyAligned: false, name: 'Self-doubting', description: 'unsure Of self and abilities.' },
-                { stronglyAligned: false, name: 'Cowardly', description: 'afraid to face adversity.' },
-                { stronglyAligned: false, name: 'Disrespectful', description: 'does not show respect.' },
-                { stronglyAligned: false, name: 'Angry', description: 'spirit always unsettled. never at peace.' },
-                { stronglyAligned: false, name: 'Inpatient', description: 'unable to wait with calmness.' },
-                { stronglyAligned: false, name: 'Foolish', description: 'unable to discern what is true or wise.' },
-                { stronglyAligned: false, name: 'Greedy', description: 'hoards all for self.' },
-                { stronglyAligned: false, name: 'Dull', description: 'a slow, uncreative mind.' },
-                { stronglyAligned: false, name: 'Vengeful', description: 'revenge is the way to punish faults.' },
-                { stronglyAligned: false, name: 'Immoral', description: 'lecherous, lawless, devoid of morals.' },
-                { stronglyAligned: true, name: 'Untrustworthy', description: 'not worth trusting.' },
-                { stronglyAligned: false, name: 'Rude', description: 'polite, courteous.' },
-                { stronglyAligned: false, name: 'Harsh', description: 'ungentle, sharp-tongued.' },
-                { stronglyAligned: false, name: 'Unfriendly', description: 'cold and distant.' },
-                { stronglyAligned: false, name: 'Egotistic', description: 'proud and conceited.' },
-                { stronglyAligned: false, name: 'Lazy', description: 'difficult to get motivated.' },
-                { stronglyAligned: false, name: 'Liar', description: 'hardly ever tells the truth.' },
-                { stronglyAligned: false, name: 'Morose', description: 'always gloomy and moody.' },
-                { stronglyAligned: false, name: 'Unenthusiastic', description: 'get excited.' },
-                { stronglyAligned: false, name: 'Spendthrift', description: 'spends money without thought.' },
-                { stronglyAligned: false, name: 'Tactless', description: 'speaks before thinking.' },
-                { stronglyAligned: false, name: 'Extra trait', description: 'roll twice more on this table ' }
-            ])
-        );
-    }
-
-    generate(input: { personality: Personality; event: TraitDevelopedFromEvent }): PersonalityTrait[] {
-        const traits = new Array<PersonalityTrait>();
-
-        // Make one
-        let roller: Generator<{ personality: Personality; event: TraitDevelopedFromEvent }, DescriptibleAndAlignable[]>;
-        switch (input.event.alignment) {
-            // Lightside Trait: use Table 643A: Lightside Traits
-            case PersonalityTraitTypes.Lightside:
-                roller = this.lightGenerator;
-                break;
-            // Neutral Trait: use Table 643B: Neutral Traits
-            case PersonalityTraitTypes.Neutral:
-                roller = this.neutralGenerator;
-                break;
-            // Darkside Trait: use Table 643C: Darkside Traits
-            case PersonalityTraitTypes.Darkside:
-                roller = this.darkGenerator;
-                break;
-            // Exotic Personality Feature: use Table 644: Exotic Personality Traits
-            case PersonalityTraitTypes.Exotic:
-                roller = this.exoticGenerator;
-                break;
-        }
-        const result = roller.generate(input).map(r => this.createTraitFrom(input.event, r));
-        traits.push(...result);
-        return traits;
-    }
-
-    private createTraitFrom(event: TraitDevelopedFromEvent, description: DescriptibleAndAlignable): PersonalityTrait {
-        return Object.assign(new PersonalityTrait(), event, description, { source: { name: event.name } });
-    }
-}
-
-class ExoticPersonalityTraitGenerator
+// p.71
+// 644: Exotic Personality Traits
+export class ExoticPersonalityTraitGenerator
     implements Generator<{ personality: Personality; event: TraitDevelopedFromEvent }, ExoticPersonalityTrait[]> {
     private traitAlignmentGenerator: TraitAlignmentGenerator;
     constructor(randomService: RandomService) {
@@ -541,9 +563,9 @@ class ExoticPersonalityTraitGenerator
     }
 }
 
-class ExoticPersonalityTrait extends PersonalityTrait {
+export class ExoticPersonalityTrait extends PersonalityTrait {
     features: ExoticFeature[];
 }
-class ExoticFeature {
+export class ExoticFeature {
     // TODO: design this
 }
