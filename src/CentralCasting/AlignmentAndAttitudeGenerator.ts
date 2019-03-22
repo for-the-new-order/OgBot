@@ -279,7 +279,11 @@ export class RerollDecorator<TModel, TOuput extends Nameable> implements Generat
 
     private parseReroll(value: string): number {
         try {
-            return parseInt(value.replace('/reroll ', ''));
+            const rerollCount = parseInt(value.replace('/reroll ', ''));
+            if (isNaN(rerollCount)) {
+                return 1;
+            }
+            return rerollCount;
         } catch (error) {
             return 1;
         }
@@ -396,7 +400,7 @@ export class PersonalityTraitGenerator
             { stronglyAligned: false, name: 'Enthusiastic', description: "excited, can't wait to act. " },
             { stronglyAligned: false, name: 'Thrifty', description: 'careful with money. ' },
             { stronglyAligned: false, name: 'Diplomatic', description: 'careful to say the right thing. ' },
-            { stronglyAligned: false, name: 'Extra trait', description: 'roll twice more on this table ' }
+            { stronglyAligned: false, name: '/reroll', description: 'roll twice more on this table ' }
         ]));
         // prettier-ignore
         this.neutralGenerator = new RerollDecorator(new DescriptibleAndAlignableGenerator(randomService, [
@@ -439,7 +443,7 @@ export class PersonalityTraitGenerator
             { stronglyAligned: false, name: 'Frivolous', description: 'flighty. harebrained, rarely serious.' },
             { stronglyAligned: false, name: 'Aloof', description: 'distant from others, even cold.' },
             { stronglyAligned: false, name: 'Atheistic', description: 'denies the existence of the supernatural.' },
-            { stronglyAligned: false, name: 'Extra trait', description: 'roll twice more on this table ' }
+            { stronglyAligned: false, name: '/reroll', description: 'roll twice more on this table ' }
         ]));
         // prettier-ignore
         this.darkGenerator = new RerollDecorator(new DescriptibleAndAlignableGenerator(randomService, [
@@ -482,7 +486,7 @@ export class PersonalityTraitGenerator
             { stronglyAligned: false, name: 'Unenthusiastic', description: 'get excited.' },
             { stronglyAligned: false, name: 'Spendthrift', description: 'spends money without thought.' },
             { stronglyAligned: false, name: 'Tactless', description: 'speaks before thinking.' },
-            { stronglyAligned: false, name: 'Extra trait', description: 'roll twice more on this table ' }
+            { stronglyAligned: false, name: '/reroll', description: 'roll twice more on this table ' }
         ]));
     }
     generate(input: { personality: Personality; event: TraitDevelopedFromEvent }): PersonalityTrait[] {
