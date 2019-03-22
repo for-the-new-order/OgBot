@@ -155,6 +155,12 @@ var PersonalityTrait = /** @class */ (function () {
     return PersonalityTrait;
 }());
 exports.PersonalityTrait = PersonalityTrait;
+var PersonalityTraitStrength = /** @class */ (function () {
+    function PersonalityTraitStrength() {
+    }
+    return PersonalityTraitStrength;
+}());
+exports.PersonalityTraitStrength = PersonalityTraitStrength;
 var PersonalityStrength;
 (function (PersonalityStrength) {
     PersonalityStrength["Trivial"] = "Trivial";
@@ -164,6 +170,15 @@ var PersonalityStrength;
     PersonalityStrength["Driving"] = "Driving";
     PersonalityStrength["Obsessive"] = "Obsessive";
 })(PersonalityStrength || (PersonalityStrength = {}));
+var PersonalityStrengthDescription;
+(function (PersonalityStrengthDescription) {
+    PersonalityStrengthDescription["Trivial"] = "Feature is barely noticeable, even when actively af- fecting the character. Special circumstancesm ay have to exist for the feature to come into play.";
+    PersonalityStrengthDescription["Weak"] = "Feature is easily sublimated, overcome, or ignored, but is noticable when actively affecting character.";
+    PersonalityStrengthDescription["Average"] = "There is an uneasy balance. Feature is not active unless the character is caught off guard or is too fatigued to control himself.";
+    PersonalityStrengthDescription["Strong"] = "Unless character consciously resists the feature, it manifests itself strongly.";
+    PersonalityStrengthDescription["Driving"] = "Feature dominates the character's life - character finds it difficult to resist its compulsions.";
+    PersonalityStrengthDescription["Obsessive"] = "Character cannot rest or find peace unless actively pursuing the desires, needs or compulsions of the feature.";
+})(PersonalityStrengthDescription || (PersonalityStrengthDescription = {}));
 var PersonalityAlignmentType;
 (function (PersonalityAlignmentType) {
     PersonalityAlignmentType["Lightside"] = "Lightside";
@@ -327,132 +342,132 @@ var PersonalityTraitGenerator = /** @class */ (function () {
         this.exoticGenerator = new ExoticPersonalityTraitGenerator(randomService);
         // prettier-ignore
         this.lightGenerator = new RerollDecorator(new DescriptibleAndAlignableGenerator(randomService, [
-            { stronglyAligned: false, name: 'Optimist', description: 'always see the good side of things. ' },
-            { stronglyAligned: true, name: 'Altruist', description: "selfless concern or others' welfare. " },
-            { stronglyAligned: false, name: 'Helpful', description: 'helps others in need ' },
-            { stronglyAligned: true, name: 'Kindly', description: 'warmhearted and friendly. ' },
-            { stronglyAligned: false, name: 'Careful', description: 'cautious in thought and deed. ' },
-            { stronglyAligned: false, name: 'Considerate', description: "thinks of others' feelings. " },
-            { stronglyAligned: false, name: 'Sober', description: 'serious, plain-thinking, straightforward. ' },
-            { stronglyAligned: false, name: 'Teetotaler', description: 'abstains from drinking alcohol. ' },
-            { stronglyAligned: true, name: 'Trusting', description: 'trusts others to behave correctly. ' },
-            { stronglyAligned: false, name: 'Peaceful', description: 'serene Of spirit. ' },
-            { stronglyAligned: false, name: 'Peacemaker', description: 'attempts to calm others. ' },
-            { stronglyAligned: false, name: 'Pious', description: 'reverently devoted to the worship of God. ' },
-            { stronglyAligned: true, name: 'Honest', description: 'always gives what is due. ' },
-            { stronglyAligned: false, name: 'Loving', description: 'affectionately concerned for others. ' },
-            { stronglyAligned: false, name: 'Giving', description: 'gives of self and possessions. ' },
-            { stronglyAligned: false, name: 'Organized', description: 'everything has a place ' },
-            { stronglyAligned: false, name: 'Clean', description: 'practices good hygiene. ' },
-            { stronglyAligned: false, name: 'Punctual', description: 'always on time ' },
-            { stronglyAligned: false, name: 'Self-confident', description: 'sure Of self and abilities. ' },
-            { stronglyAligned: false, name: 'Courageous', description: 'brave in the face of adversity. ' },
-            { stronglyAligned: false, name: 'Respectful', description: 'shows respect for others. ' },
-            { stronglyAligned: false, name: 'Calm', description: 'difficult to anger, a peaceful spirit. ' },
-            { stronglyAligned: false, name: 'Patient', description: 'able to wait with calmness. ' },
-            { stronglyAligned: false, name: 'Wise', description: 'understands what is true, or lasting. ' },
-            { stronglyAligned: false, name: 'Generous', description: 'willing to give more than fairly. ' },
-            { stronglyAligned: false, name: 'Imaginative', description: 'a clever, resourceful mind. ' },
-            { stronglyAligned: true, name: 'Forgiving', description: 'able to pardon faults in others. ' },
-            { stronglyAligned: true, name: 'Virtuous', description: 'chaste. pure, of excellent morals. ' },
-            { stronglyAligned: false, name: 'Dependable', description: 'does duties reliably, responsibly. ' },
-            { stronglyAligned: false, name: 'Well-mannered', description: 'polite, courteous. ' },
-            { stronglyAligned: true, name: 'Benign', description: 'gentle, inoffensive. ' },
-            { stronglyAligned: false, name: 'Friendly', description: 'warm and comforting. ' },
-            { stronglyAligned: false, name: 'Humble', description: 'lack of pretense, not proud. ' },
-            { stronglyAligned: false, name: 'Energetic', description: 'does things quickly, with verve. ' },
-            { stronglyAligned: true, name: 'Truthful', description: 'always tells the truth. ' },
-            { stronglyAligned: false, name: 'Cheerful', description: 'always happy and smiling. ' },
-            { stronglyAligned: false, name: 'Enthusiastic', description: "excited, can't wait to act. " },
-            { stronglyAligned: false, name: 'Thrifty', description: 'careful with money. ' },
-            { stronglyAligned: false, name: 'Diplomatic', description: 'careful to say the right thing. ' },
-            { stronglyAligned: false, name: '/reroll', description: 'roll twice more on this table ' }
+            { name: 'Optimist', description: 'always see the good side of things. ', stronglyAligned: false },
+            { name: 'Altruist', description: "selfless concern or others' welfare. ", stronglyAligned: true },
+            { name: 'Helpful', description: 'helps others in need ', stronglyAligned: false },
+            { name: 'Kindly', description: 'warmhearted and friendly. ', stronglyAligned: true },
+            { name: 'Careful', description: 'cautious in thought and deed. ', stronglyAligned: false },
+            { name: 'Considerate', description: "thinks of others' feelings. ", stronglyAligned: false },
+            { name: 'Sober', description: 'serious, plain-thinking, straightforward. ', stronglyAligned: false },
+            { name: 'Teetotaler', description: 'abstains from drinking alcohol. ', stronglyAligned: false },
+            { name: 'Trusting', description: 'trusts others to behave correctly. ', stronglyAligned: true },
+            { name: 'Peaceful', description: 'serene Of spirit. ', stronglyAligned: false },
+            { name: 'Peacemaker', description: 'attempts to calm others. ', stronglyAligned: false },
+            { name: 'Pious', description: 'reverently devoted to the worship of God. ', stronglyAligned: false },
+            { name: 'Honest', description: 'always gives what is due. ', stronglyAligned: true },
+            { name: 'Loving', description: 'affectionately concerned for others. ', stronglyAligned: false },
+            { name: 'Giving', description: 'gives of self and possessions. ', stronglyAligned: false },
+            { name: 'Organized', description: 'everything has a place ', stronglyAligned: false },
+            { name: 'Clean', description: 'practices good hygiene. ', stronglyAligned: false },
+            { name: 'Punctual', description: 'always on time ', stronglyAligned: false },
+            { name: 'Self-confident', description: 'sure Of self and abilities. ', stronglyAligned: false },
+            { name: 'Courageous', description: 'brave in the face of adversity. ', stronglyAligned: false },
+            { name: 'Respectful', description: 'shows respect for others. ', stronglyAligned: false },
+            { name: 'Calm', description: 'difficult to anger, a peaceful spirit. ', stronglyAligned: false },
+            { name: 'Patient', description: 'able to wait with calmness. ', stronglyAligned: false },
+            { name: 'Wise', description: 'understands what is true, or lasting. ', stronglyAligned: false },
+            { name: 'Generous', description: 'willing to give more than fairly. ', stronglyAligned: false },
+            { name: 'Imaginative', description: 'a clever, resourceful mind. ', stronglyAligned: false },
+            { name: 'Forgiving', description: 'able to pardon faults in others. ', stronglyAligned: true },
+            { name: 'Virtuous', description: 'chaste. pure, of excellent morals. ', stronglyAligned: true },
+            { name: 'Dependable', description: 'does duties reliably, responsibly. ', stronglyAligned: false },
+            { name: 'Well-mannered', description: 'polite, courteous. ', stronglyAligned: false },
+            { name: 'Benign', description: 'gentle, inoffensive. ', stronglyAligned: true },
+            { name: 'Friendly', description: 'warm and comforting. ', stronglyAligned: false },
+            { name: 'Humble', description: 'lack of pretense, not proud. ', stronglyAligned: false },
+            { name: 'Energetic', description: 'does things quickly, with verve. ', stronglyAligned: false },
+            { name: 'Truthful', description: 'always tells the truth. ', stronglyAligned: true },
+            { name: 'Cheerful', description: 'always happy and smiling. ', stronglyAligned: false },
+            { name: 'Enthusiastic', description: "excited, can't wait to act. ", stronglyAligned: false },
+            { name: 'Thrifty', description: 'careful with money. ', stronglyAligned: false },
+            { name: 'Diplomatic', description: 'careful to say the right thing. ', stronglyAligned: false },
+            { name: '/reroll', description: 'roll twice more on this table', stronglyAligned: false }
         ]));
         // prettier-ignore
         this.neutralGenerator = new RerollDecorator(new DescriptibleAndAlignableGenerator(randomService, [
-            { stronglyAligned: false, name: 'Curious', description: 'inquisitive, needs to know.' },
-            { stronglyAligned: false, name: 'Hedonist', description: 'pleasure is the most important thing.' },
-            { stronglyAligned: false, name: 'Precise', description: 'always exacting.' },
-            { stronglyAligned: false, name: 'Studious', description: 'studios often, pays attention to detail.' },
-            { stronglyAligned: false, name: 'Mysterious', description: 'has an air of mystery about him.' },
-            { stronglyAligned: false, name: 'Loquacious', description: 'talks and talks and talks and ...' },
-            { stronglyAligned: false, name: 'Silent', description: 'rarely talks.' },
-            { stronglyAligned: false, name: 'Foppish', description: 'vain. preoccupied with appearance.' },
-            { stronglyAligned: false, name: 'Immaculate', description: 'clean and orderly.' },
-            { stronglyAligned: false, name: 'Rough', description: 'unpolished, unrefined.' },
-            { stronglyAligned: false, name: 'Skeptic', description: 'disbelieving of things unproven.' },
-            { stronglyAligned: false, name: 'Immature', description: 'acts younger than age.' },
-            { stronglyAligned: false, name: 'Even-tempered', description: 'rarely angry or over joyous.' },
-            { stronglyAligned: false, name: 'Rash', description: 'acts before thinking.' },
-            { stronglyAligned: false, name: 'Extroverted', description: 'outgoing.' },
-            { stronglyAligned: false, name: 'Introverted', description: "focus one's interests in oneself." },
-            { stronglyAligned: false, name: 'Materialistic', description: 'puts emphasis on possessions.' },
-            { stronglyAligned: false, name: 'Aesthetic', description: 'possessions are unnecessary.' },
-            { stronglyAligned: false, name: 'Amoral', description: 'no care for right or wrong.' },
-            { stronglyAligned: false, name: 'Dreamy', description: 'a distant daydreamer.' },
-            { stronglyAligned: false, name: 'Creative', description: 'able to make something out of nothing.' },
-            { stronglyAligned: false, name: 'Leader', description: 'takes initiative, can take command.' },
-            { stronglyAligned: false, name: 'Follower', description: 'prefers to let others lead.' },
-            { stronglyAligned: false, name: 'Emotional', description: 'rarely keeps emotions in check.' },
-            { stronglyAligned: false, name: 'Emotionless', description: 'rarely shows emotions.' },
-            { stronglyAligned: false, name: 'Humorous', description: 'appreciates humor and Ikes to joke.' },
-            { stronglyAligned: false, name: 'Grim', description: 'unsmiling. humorless, stern of purpose.' },
-            { stronglyAligned: false, name: 'Conservative', description: 'restrained, opposed to change.' },
-            { stronglyAligned: false, name: 'Liberal', description: 'tolerant of Others, open to change.' },
-            { stronglyAligned: false, name: 'Aggressive', description: 'assertive, bold, enterprising.' },
-            { stronglyAligned: false, name: 'Passive', description: 'accepts things without resisting them.' },
-            { stronglyAligned: false, name: 'Self-sufficient', description: 'does not need others.' },
-            { stronglyAligned: false, name: 'Dependent', description: 'needs others around him.' },
-            { stronglyAligned: false, name: 'Romantic', description: 'given to feelings of romance.' },
-            { stronglyAligned: false, name: 'Logical', description: 'uses deductive reasoning.' },
-            { stronglyAligned: false, name: 'Illogical', description: 'may not use reason to make decisions.' },
-            { stronglyAligned: false, name: 'Frivolous', description: 'flighty. harebrained, rarely serious.' },
-            { stronglyAligned: false, name: 'Aloof', description: 'distant from others, even cold.' },
-            { stronglyAligned: false, name: 'Atheistic', description: 'denies the existence of the supernatural.' },
-            { stronglyAligned: false, name: '/reroll', description: 'roll twice more on this table ' }
+            { name: 'Curious', description: 'inquisitive, needs to know.', stronglyAligned: false },
+            { name: 'Hedonist', description: 'pleasure is the most important thing.', stronglyAligned: false },
+            { name: 'Precise', description: 'always exacting.', stronglyAligned: false },
+            { name: 'Studious', description: 'studios often, pays attention to detail.', stronglyAligned: false },
+            { name: 'Mysterious', description: 'has an air of mystery about him.', stronglyAligned: false },
+            { name: 'Loquacious', description: 'talks and talks and talks and ...', stronglyAligned: false },
+            { name: 'Silent', description: 'rarely talks.', stronglyAligned: false },
+            { name: 'Foppish', description: 'vain. preoccupied with appearance.', stronglyAligned: false },
+            { name: 'Immaculate', description: 'clean and orderly.', stronglyAligned: false },
+            { name: 'Rough', description: 'unpolished, unrefined.', stronglyAligned: false },
+            { name: 'Skeptic', description: 'disbelieving of things unproven.', stronglyAligned: false },
+            { name: 'Immature', description: 'acts younger than age.', stronglyAligned: false },
+            { name: 'Even-tempered', description: 'rarely angry or over joyous.', stronglyAligned: false },
+            { name: 'Rash', description: 'acts before thinking.', stronglyAligned: false },
+            { name: 'Extroverted', description: 'outgoing.', stronglyAligned: false },
+            { name: 'Introverted', description: "focus one's interests in oneself.", stronglyAligned: false },
+            { name: 'Materialistic', description: 'puts emphasis on possessions.', stronglyAligned: false },
+            { name: 'Aesthetic', description: 'possessions are unnecessary.', stronglyAligned: false },
+            { name: 'Amoral', description: 'no care for right or wrong.', stronglyAligned: false },
+            { name: 'Dreamy', description: 'a distant daydreamer.', stronglyAligned: false },
+            { name: 'Creative', description: 'able to make something out of nothing.', stronglyAligned: false },
+            { name: 'Leader', description: 'takes initiative, can take command.', stronglyAligned: false },
+            { name: 'Follower', description: 'prefers to let others lead.', stronglyAligned: false },
+            { name: 'Emotional', description: 'rarely keeps emotions in check.', stronglyAligned: false },
+            { name: 'Emotionless', description: 'rarely shows emotions.', stronglyAligned: false },
+            { name: 'Humorous', description: 'appreciates humor and Ikes to joke.', stronglyAligned: false },
+            { name: 'Grim', description: 'unsmiling. humorless, stern of purpose.', stronglyAligned: false },
+            { name: 'Conservative', description: 'restrained, opposed to change.', stronglyAligned: false },
+            { name: 'Liberal', description: 'tolerant of Others, open to change.', stronglyAligned: false },
+            { name: 'Aggressive', description: 'assertive, bold, enterprising.', stronglyAligned: false },
+            { name: 'Passive', description: 'accepts things without resisting them.', stronglyAligned: false },
+            { name: 'Self-sufficient', description: 'does not need others.', stronglyAligned: false },
+            { name: 'Dependent', description: 'needs others around him.', stronglyAligned: false },
+            { name: 'Romantic', description: 'given to feelings of romance.', stronglyAligned: false },
+            { name: 'Logical', description: 'uses deductive reasoning.', stronglyAligned: false },
+            { name: 'Illogical', description: 'may not use reason to make decisions.', stronglyAligned: false },
+            { name: 'Frivolous', description: 'flighty. harebrained, rarely serious.', stronglyAligned: false },
+            { name: 'Aloof', description: 'distant from others, even cold.', stronglyAligned: false },
+            { name: 'Atheistic', description: 'denies the existence of the supernatural.', stronglyAligned: false },
+            { name: '/reroll', description: 'roll twice more on this table ', stronglyAligned: false }
         ]));
         // prettier-ignore
         this.darkGenerator = new RerollDecorator(new DescriptibleAndAlignableGenerator(randomService, [
-            { stronglyAligned: false, name: 'Pessimist', description: 'always see the bad side Of things.' },
-            { stronglyAligned: false, name: 'Egoist', description: 'selfish concern for own welfare.' },
-            { stronglyAligned: false, name: 'Obstructive', description: 'acts to block Others actions.' },
-            { stronglyAligned: true, name: 'Cruel', description: 'coldhearted and hurtful.' },
-            { stronglyAligned: false, name: 'Careless', description: 'incautious in thought and deed.' },
-            { stronglyAligned: false, name: 'Thoughtless', description: "rarely thinks of others' feelings." },
-            { stronglyAligned: false, name: 'Flippant', description: 'unable to be serious about anything.' },
-            { stronglyAligned: false, name: 'Drunkard', description: 'constantly overindulges in alcohol.' },
-            { stronglyAligned: false, name: 'Suspicious', description: 'trusts no one.' },
-            { stronglyAligned: true, name: 'Violent', description: 'seeks physical conflict.' },
-            { stronglyAligned: false, name: 'Argumentative', description: 'starts arguments and fights.' },
-            { stronglyAligned: true, name: 'Irreverent', description: 'mocks religion and the gods.' },
-            { stronglyAligned: true, name: 'Cheat', description: 'shortchanges others of their due.' },
-            { stronglyAligned: true, name: 'Hateful', description: 'strongly dislikes others.' },
-            { stronglyAligned: false, name: 'Selfish', description: 'unwilling to share time and possessions.' },
-            { stronglyAligned: false, name: 'Slovenly', description: 'messy, nothing is ever put away.' },
-            { stronglyAligned: false, name: 'Filthy', description: 'knows nothing of hygiene.' },
-            { stronglyAligned: false, name: 'Tardy', description: 'always late.' },
-            { stronglyAligned: false, name: 'Self-doubting', description: 'unsure Of self and abilities.' },
-            { stronglyAligned: false, name: 'Cowardly', description: 'afraid to face adversity.' },
-            { stronglyAligned: false, name: 'Disrespectful', description: 'does not show respect.' },
-            { stronglyAligned: false, name: 'Angry', description: 'spirit always unsettled. never at peace.' },
-            { stronglyAligned: false, name: 'Inpatient', description: 'unable to wait with calmness.' },
-            { stronglyAligned: false, name: 'Foolish', description: 'unable to discern what is true or wise.' },
-            { stronglyAligned: false, name: 'Greedy', description: 'hoards all for self.' },
-            { stronglyAligned: false, name: 'Dull', description: 'a slow, uncreative mind.' },
-            { stronglyAligned: false, name: 'Vengeful', description: 'revenge is the way to punish faults.' },
-            { stronglyAligned: false, name: 'Immoral', description: 'lecherous, lawless, devoid of morals.' },
-            { stronglyAligned: true, name: 'Untrustworthy', description: 'not worth trusting.' },
-            { stronglyAligned: false, name: 'Rude', description: 'polite, courteous.' },
-            { stronglyAligned: false, name: 'Harsh', description: 'ungentle, sharp-tongued.' },
-            { stronglyAligned: false, name: 'Unfriendly', description: 'cold and distant.' },
-            { stronglyAligned: false, name: 'Egotistic', description: 'proud and conceited.' },
-            { stronglyAligned: false, name: 'Lazy', description: 'difficult to get motivated.' },
-            { stronglyAligned: false, name: 'Liar', description: 'hardly ever tells the truth.' },
-            { stronglyAligned: false, name: 'Morose', description: 'always gloomy and moody.' },
-            { stronglyAligned: false, name: 'Unenthusiastic', description: 'get excited.' },
-            { stronglyAligned: false, name: 'Spendthrift', description: 'spends money without thought.' },
-            { stronglyAligned: false, name: 'Tactless', description: 'speaks before thinking.' },
-            { stronglyAligned: false, name: '/reroll', description: 'roll twice more on this table ' }
+            { name: 'Pessimist', description: 'always see the bad side Of things.', stronglyAligned: false },
+            { name: 'Egoist', description: 'selfish concern for own welfare.', stronglyAligned: false },
+            { name: 'Obstructive', description: 'acts to block Others actions.', stronglyAligned: false },
+            { name: 'Cruel', description: 'coldhearted and hurtful.', stronglyAligned: true },
+            { name: 'Careless', description: 'incautious in thought and deed.', stronglyAligned: false },
+            { name: 'Thoughtless', description: "rarely thinks of others' feelings.", stronglyAligned: false },
+            { name: 'Flippant', description: 'unable to be serious about anything.', stronglyAligned: false },
+            { name: 'Drunkard', description: 'constantly overindulges in alcohol.', stronglyAligned: false },
+            { name: 'Suspicious', description: 'trusts no one.', stronglyAligned: false },
+            { name: 'Violent', description: 'seeks physical conflict.', stronglyAligned: true },
+            { name: 'Argumentative', description: 'starts arguments and fights.', stronglyAligned: false },
+            { name: 'Irreverent', description: 'mocks religion and the gods.', stronglyAligned: true },
+            { name: 'Cheat', description: 'shortchanges others of their due.', stronglyAligned: true },
+            { name: 'Hateful', description: 'strongly dislikes others.', stronglyAligned: true },
+            { name: 'Selfish', description: 'unwilling to share time and possessions.', stronglyAligned: false },
+            { name: 'Slovenly', description: 'messy, nothing is ever put away.', stronglyAligned: false },
+            { name: 'Filthy', description: 'knows nothing of hygiene.', stronglyAligned: false },
+            { name: 'Tardy', description: 'always late.', stronglyAligned: false },
+            { name: 'Self-doubting', description: 'unsure Of self and abilities.', stronglyAligned: false },
+            { name: 'Cowardly', description: 'afraid to face adversity.', stronglyAligned: false },
+            { name: 'Disrespectful', description: 'does not show respect.', stronglyAligned: false },
+            { name: 'Angry', description: 'spirit always unsettled. never at peace.', stronglyAligned: false },
+            { name: 'Inpatient', description: 'unable to wait with calmness.', stronglyAligned: false },
+            { name: 'Foolish', description: 'unable to discern what is true or wise.', stronglyAligned: false },
+            { name: 'Greedy', description: 'hoards all for self.', stronglyAligned: false },
+            { name: 'Dull', description: 'a slow, uncreative mind.', stronglyAligned: false },
+            { name: 'Vengeful', description: 'revenge is the way to punish faults.', stronglyAligned: false },
+            { name: 'Immoral', description: 'lecherous, lawless, devoid of morals.', stronglyAligned: false },
+            { name: 'Untrustworthy', description: 'not worth trusting.', stronglyAligned: true },
+            { name: 'Rude', description: 'polite, courteous.', stronglyAligned: false },
+            { name: 'Harsh', description: 'ungentle, sharp-tongued.', stronglyAligned: false },
+            { name: 'Unfriendly', description: 'cold and distant.', stronglyAligned: false },
+            { name: 'Egotistic', description: 'proud and conceited.', stronglyAligned: false },
+            { name: 'Lazy', description: 'difficult to get motivated.', stronglyAligned: false },
+            { name: 'Liar', description: 'hardly ever tells the truth.', stronglyAligned: false },
+            { name: 'Morose', description: 'always gloomy and moody.', stronglyAligned: false },
+            { name: 'Unenthusiastic', description: 'get excited.', stronglyAligned: false },
+            { name: 'Spendthrift', description: 'spends money without thought.', stronglyAligned: false },
+            { name: 'Tactless', description: 'speaks before thinking.', stronglyAligned: false },
+            { name: '/reroll', description: 'roll twice more on this table ', stronglyAligned: false }
         ]));
     }
     PersonalityTraitGenerator.prototype.generate = function (input) {
@@ -483,7 +498,15 @@ var PersonalityTraitGenerator = /** @class */ (function () {
         return traits;
     };
     PersonalityTraitGenerator.prototype.createTraitFrom = function (event, description) {
-        return Object.assign(new PersonalityTrait(), event, description, { source: { name: event.name } });
+        var custom = {
+            alignment: event.alignment,
+            source: { name: event.name },
+            strength: {
+                name: PersonalityStrength[event.strength],
+                description: PersonalityStrengthDescription[event.strength]
+            }
+        };
+        return Object.assign(new PersonalityTrait(), description, custom);
     };
     return PersonalityTraitGenerator;
 }());
