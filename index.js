@@ -42,7 +42,6 @@ var discord_js_1 = require("discord.js");
 var TypeMoq = require("typemoq");
 var ChatterService_1 = require("./src/commands/ChatterService");
 var EchoHelpService_1 = require("./src/commands/EchoHelpService");
-//const chatterJSON = new ChatterServiceOptions().mergeWith({ splitMessages: false });
 var chatterYAML = new ChatterService_1.ChatterServiceOptions().mergeWith({ splitMessages: false, outputType: ChatterService_1.OutputType.YAML });
 var chatterService = new ChatterService_1.ChatterService(chatterYAML);
 var echoHelpService = new EchoHelpService_1.EchoHelpService(new ChatterService_1.ChatterService(chatterYAML));

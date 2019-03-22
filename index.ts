@@ -8,7 +8,6 @@ import { IActionN } from 'typemoq/_all';
 import { ChatterService, OutputType, ChatterServiceOptions } from './src/commands/ChatterService';
 import { EchoHelpService } from './src/commands/EchoHelpService';
 
-//const chatterJSON = new ChatterServiceOptions().mergeWith({ splitMessages: false });
 const chatterYAML = new ChatterServiceOptions().mergeWith({ splitMessages: false, outputType: OutputType.YAML });
 const chatterService = new ChatterService(chatterYAML);
 const echoHelpService = new EchoHelpService(new ChatterService(chatterYAML));
