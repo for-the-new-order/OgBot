@@ -105,25 +105,26 @@ export class AlignmentService {
     }
 
     public findAlignmentThendencies(metrics: PersonalityAlignmentMetrics): PersonalityAlignmentType {
-        if (metrics.isEvil && metrics.light + metrics.neutral >= metrics.dark) {
+        var totals = metrics.totals;
+        if (metrics.isEvil && totals.light + totals.neutral >= totals.dark) {
             return PersonalityAlignmentType.Neutral;
         }
-        if (metrics.isGood && metrics.dark + metrics.neutral >= metrics.light) {
+        if (metrics.isGood && totals.dark + totals.neutral >= totals.light) {
             return PersonalityAlignmentType.Neutral;
         }
         if (metrics.isNeutral || metrics.isDefault) {
             const halfThreshold = metrics.threshold / 2.0;
-            if (metrics.light == 0 && metrics.dark - halfThreshold >= 0) {
+            if (totals.light == 0 && totals.dark - halfThreshold >= 0) {
                 return PersonalityAlignmentType.Darkside;
             }
-            if (metrics.dark == 0 && metrics.light - halfThreshold >= 0) {
+            if (totals.dark == 0 && totals.light - halfThreshold >= 0) {
                 return PersonalityAlignmentType.Lightside;
             }
-            if (metrics.light + metrics.dark > metrics.neutral) {
-                const darkIsStrongerThanLight = metrics.dark > metrics.light;
-                const darkIsStrongerThanLightAndNeutral = metrics.dark > metrics.neutral + metrics.light;
-                const lightIsStrongerThanDark = metrics.light > metrics.dark;
-                const lightIsStrongerThanDarkAndNeutral = metrics.light > metrics.neutral + metrics.dark;
+            if (totals.light + totals.dark > totals.neutral) {
+                const darkIsStrongerThanLight = totals.dark > totals.light;
+                const darkIsStrongerThanLightAndNeutral = totals.dark > totals.neutral + totals.light;
+                const lightIsStrongerThanDark = totals.light > totals.dark;
+                const lightIsStrongerThanDarkAndNeutral = totals.light > totals.neutral + totals.dark;
                 if (darkIsStrongerThanLight && darkIsStrongerThanLightAndNeutral) {
                     return PersonalityAlignmentType.Darkside;
                 }
@@ -135,7 +136,7 @@ export class AlignmentService {
         return null;
     }
 
-    public findAlignmentValue(metrics: PersonalityAlignmentMetrics) {
+    public findAlignmentValue(metrics: PersonalityAlignmentMetrics): PersonalityAlignmentType {
         if (metrics.isEvil) {
             return PersonalityAlignmentType.Darkside;
         } else if (metrics.isGood) {
@@ -146,7 +147,45 @@ export class AlignmentService {
 
     public computeAlignmentMetrics(traits: Array<PersonalityTrait>, threshold: number): PersonalityAlignmentMetrics {
         // Takes the strength of traits into account to compute the character's alignment
-        const computeStrength: (
+        const neutral = this.computePersonalityAlignmentMetricsSide(traits, PersonalityAlignmentType.Neutral);
+        const light = this.computePersonalityAlignmentMetricsSide(traits, PersonalityAlignmentType.Lightside);
+        const dark = this.computePersonalityAlignmentMetricsSide(traits, PersonalityAlignmentType.Darkside);
+
+        // Analyze thresholds to find out the alignment
+        const validateThreshold: (
+            value: PersonalityAlignmentMetricsSide,
+            against1: PersonalityAlignmentMetricsSide,
+            against2: PersonalityAlignmentMetricsSide
+        ) => boolean = function(value, against1, against2) {
+            return value.value - threshold >= against1.value && value.value - threshold >= against2.value;
+        };
+        const isEvil = validateThreshold(dark, light, neutral);
+        const isGood = validateThreshold(light, dark, neutral);
+        const isNeutral = validateThreshold(neutral, light, dark);
+        const isDefault = !(isNeutral || isGood || isEvil);
+
+        // Count amount of exotic traits
+        const exotic = traits.filter(trait => trait.isExotic).length;
+
+        // Return PersonalityAlignmentMetrics
+        return Object.assign(new PersonalityAlignmentMetrics(), {
+            threshold,
+            light,
+            neutral,
+            dark,
+            isGood,
+            isNeutral,
+            isEvil,
+            isDefault,
+            exotic
+        });
+    }
+
+    public computePersonalityAlignmentMetricsSide(
+        traits: Array<PersonalityTrait>,
+        type: PersonalityAlignmentType
+    ): PersonalityAlignmentMetricsSide {
+        const computeContribution: (
             previousValue: number,
             currentValue: PersonalityTrait,
             currentIndex: number,
@@ -154,22 +193,26 @@ export class AlignmentService {
         ) => number = function(accumulator, currentValue) {
             return accumulator + currentValue.strength.weight;
         };
-        const neutralSided = traits.filter(trait => trait.alignment == 'Neutral').reduce(computeStrength, 0);
-        const lightSided = traits.filter(trait => trait.alignment == 'Lightside').reduce(computeStrength, 0);
-        const darksided = traits.filter(trait => trait.alignment == 'Darkside').reduce(computeStrength, 0);
-
-        // Analyze thresholds
-        const validateThreshold: (value: number, against1: number, against2: number) => boolean = function(value, against1, against2) {
-            return value - threshold >= against1 && value - threshold >= against2;
+        const computeStrongContribution: (
+            previousValue: number,
+            currentValue: PersonalityTrait,
+            currentIndex: number,
+            array: PersonalityTrait[]
+        ) => number = function(accumulator, currentValue) {
+            return accumulator + (currentValue.stronglyAligned ? currentValue.strength.weight : 0);
         };
-        const isEvil = validateThreshold(darksided, lightSided, neutralSided);
-        const isGood = validateThreshold(lightSided, darksided, neutralSided);
-        const isNeutral = validateThreshold(neutralSided, lightSided, darksided);
-        const isDefault = !(isNeutral || isGood || isEvil);
-        const exotic = traits.filter(trait => trait.isExotic).length;
+        const count = traits.filter(trait => trait.alignment == type).length;
+        const strongCount = traits.filter(trait => trait.alignment == type && trait.stronglyAligned).length;
+        const contribution = traits.filter(trait => trait.alignment == type).reduce(computeContribution, 0);
+        const strongContribution = traits.filter(trait => trait.alignment == type).reduce(computeStrongContribution, 0);
 
-        // Return
-        return { threshold, light: lightSided, neutral: neutralSided, dark: darksided, isGood, isNeutral, isEvil, isDefault, exotic };
+        return {
+            count,
+            strongCount,
+            contribution,
+            strongContribution,
+            value: contribution + strongContribution
+        };
     }
 }
 
@@ -195,15 +238,46 @@ export class PersonalityAlignment {
 }
 
 export class PersonalityAlignmentMetrics {
-    light: number;
-    neutral: number;
-    dark: number;
-    exotic: number;
     threshold: number;
+
+    light: PersonalityAlignmentMetricsSide;
+    neutral: PersonalityAlignmentMetricsSide;
+    dark: PersonalityAlignmentMetricsSide;
+
+    public get totals(): PersonalityAlignmentMetricsTotals {
+        var copy = Object.assign({}, this);
+        return new PersonalityAlignmentMetricsTotals(copy);
+    }
+
+    exotic: number;
+
     isEvil: boolean;
     isGood: boolean;
     isNeutral: boolean;
     isDefault: boolean;
+}
+export class PersonalityAlignmentMetricsTotals {
+    constructor(private owner: PersonalityAlignmentMetrics) {}
+    public get light(): number {
+        return this.owner.light.value;
+    }
+    public get neutral(): number {
+        return this.owner.neutral.value;
+    }
+    public get dark(): number {
+        return this.owner.dark.value;
+    }
+}
+
+export class PersonalityAlignmentMetricsSide {
+    count: number;
+    strongCount: number;
+    contribution: number;
+    strongContribution: number;
+
+    public get value(): number {
+        return this.contribution + this.strongContribution;
+    }
 }
 
 export class PersonalityTrait implements Descriptible {

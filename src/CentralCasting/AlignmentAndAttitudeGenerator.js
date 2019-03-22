@@ -100,25 +100,26 @@ var AlignmentService = /** @class */ (function () {
         return { value: value, tendToward: tendToward, metrics: metrics };
     };
     AlignmentService.prototype.findAlignmentThendencies = function (metrics) {
-        if (metrics.isEvil && metrics.light + metrics.neutral >= metrics.dark) {
+        var totals = metrics.totals;
+        if (metrics.isEvil && totals.light + totals.neutral >= totals.dark) {
             return PersonalityAlignmentType.Neutral;
         }
-        if (metrics.isGood && metrics.dark + metrics.neutral >= metrics.light) {
+        if (metrics.isGood && totals.dark + totals.neutral >= totals.light) {
             return PersonalityAlignmentType.Neutral;
         }
         if (metrics.isNeutral || metrics.isDefault) {
             var halfThreshold = metrics.threshold / 2.0;
-            if (metrics.light == 0 && metrics.dark - halfThreshold >= 0) {
+            if (totals.light == 0 && totals.dark - halfThreshold >= 0) {
                 return PersonalityAlignmentType.Darkside;
             }
-            if (metrics.dark == 0 && metrics.light - halfThreshold >= 0) {
+            if (totals.dark == 0 && totals.light - halfThreshold >= 0) {
                 return PersonalityAlignmentType.Lightside;
             }
-            if (metrics.light + metrics.dark > metrics.neutral) {
-                var darkIsStrongerThanLight = metrics.dark > metrics.light;
-                var darkIsStrongerThanLightAndNeutral = metrics.dark > metrics.neutral + metrics.light;
-                var lightIsStrongerThanDark = metrics.light > metrics.dark;
-                var lightIsStrongerThanDarkAndNeutral = metrics.light > metrics.neutral + metrics.dark;
+            if (totals.light + totals.dark > totals.neutral) {
+                var darkIsStrongerThanLight = totals.dark > totals.light;
+                var darkIsStrongerThanLightAndNeutral = totals.dark > totals.neutral + totals.light;
+                var lightIsStrongerThanDark = totals.light > totals.dark;
+                var lightIsStrongerThanDarkAndNeutral = totals.light > totals.neutral + totals.dark;
                 if (darkIsStrongerThanLight && darkIsStrongerThanLightAndNeutral) {
                     return PersonalityAlignmentType.Darkside;
                 }
@@ -140,23 +141,50 @@ var AlignmentService = /** @class */ (function () {
     };
     AlignmentService.prototype.computeAlignmentMetrics = function (traits, threshold) {
         // Takes the strength of traits into account to compute the character's alignment
-        var computeStrength = function (accumulator, currentValue) {
+        var neutral = this.computePersonalityAlignmentMetricsSide(traits, PersonalityAlignmentType.Neutral);
+        var light = this.computePersonalityAlignmentMetricsSide(traits, PersonalityAlignmentType.Lightside);
+        var dark = this.computePersonalityAlignmentMetricsSide(traits, PersonalityAlignmentType.Darkside);
+        // Analyze thresholds to find out the alignment
+        var validateThreshold = function (value, against1, against2) {
+            return value.value - threshold >= against1.value && value.value - threshold >= against2.value;
+        };
+        var isEvil = validateThreshold(dark, light, neutral);
+        var isGood = validateThreshold(light, dark, neutral);
+        var isNeutral = validateThreshold(neutral, light, dark);
+        var isDefault = !(isNeutral || isGood || isEvil);
+        // Count amount of exotic traits
+        var exotic = traits.filter(function (trait) { return trait.isExotic; }).length;
+        // Return PersonalityAlignmentMetrics
+        return Object.assign(new PersonalityAlignmentMetrics(), {
+            threshold: threshold,
+            light: light,
+            neutral: neutral,
+            dark: dark,
+            isGood: isGood,
+            isNeutral: isNeutral,
+            isEvil: isEvil,
+            isDefault: isDefault,
+            exotic: exotic
+        });
+    };
+    AlignmentService.prototype.computePersonalityAlignmentMetricsSide = function (traits, type) {
+        var computeContribution = function (accumulator, currentValue) {
             return accumulator + currentValue.strength.weight;
         };
-        var neutralSided = traits.filter(function (trait) { return trait.alignment == 'Neutral'; }).reduce(computeStrength, 0);
-        var lightSided = traits.filter(function (trait) { return trait.alignment == 'Lightside'; }).reduce(computeStrength, 0);
-        var darksided = traits.filter(function (trait) { return trait.alignment == 'Darkside'; }).reduce(computeStrength, 0);
-        // Analyze thresholds
-        var validateThreshold = function (value, against1, against2) {
-            return value - threshold >= against1 && value - threshold >= against2;
+        var computeStrongContribution = function (accumulator, currentValue) {
+            return accumulator + (currentValue.stronglyAligned ? currentValue.strength.weight : 0);
         };
-        var isEvil = validateThreshold(darksided, lightSided, neutralSided);
-        var isGood = validateThreshold(lightSided, darksided, neutralSided);
-        var isNeutral = validateThreshold(neutralSided, lightSided, darksided);
-        var isDefault = !(isNeutral || isGood || isEvil);
-        var exotic = traits.filter(function (trait) { return trait.isExotic; }).length;
-        // Return
-        return { threshold: threshold, light: lightSided, neutral: neutralSided, dark: darksided, isGood: isGood, isNeutral: isNeutral, isEvil: isEvil, isDefault: isDefault, exotic: exotic };
+        var count = traits.filter(function (trait) { return trait.alignment == type; }).length;
+        var strongCount = traits.filter(function (trait) { return trait.alignment == type && trait.stronglyAligned; }).length;
+        var contribution = traits.filter(function (trait) { return trait.alignment == type; }).reduce(computeContribution, 0);
+        var strongContribution = traits.filter(function (trait) { return trait.alignment == type; }).reduce(computeStrongContribution, 0);
+        return {
+            count: count,
+            strongCount: strongCount,
+            contribution: contribution,
+            strongContribution: strongContribution,
+            value: contribution + strongContribution
+        };
     };
     return AlignmentService;
 }());
@@ -192,9 +220,58 @@ exports.PersonalityAlignment = PersonalityAlignment;
 var PersonalityAlignmentMetrics = /** @class */ (function () {
     function PersonalityAlignmentMetrics() {
     }
+    Object.defineProperty(PersonalityAlignmentMetrics.prototype, "totals", {
+        get: function () {
+            var copy = Object.assign({}, this);
+            return new PersonalityAlignmentMetricsTotals(copy);
+        },
+        enumerable: true,
+        configurable: true
+    });
     return PersonalityAlignmentMetrics;
 }());
 exports.PersonalityAlignmentMetrics = PersonalityAlignmentMetrics;
+var PersonalityAlignmentMetricsTotals = /** @class */ (function () {
+    function PersonalityAlignmentMetricsTotals(owner) {
+        this.owner = owner;
+    }
+    Object.defineProperty(PersonalityAlignmentMetricsTotals.prototype, "light", {
+        get: function () {
+            return this.owner.light.value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(PersonalityAlignmentMetricsTotals.prototype, "neutral", {
+        get: function () {
+            return this.owner.neutral.value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(PersonalityAlignmentMetricsTotals.prototype, "dark", {
+        get: function () {
+            return this.owner.dark.value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return PersonalityAlignmentMetricsTotals;
+}());
+exports.PersonalityAlignmentMetricsTotals = PersonalityAlignmentMetricsTotals;
+var PersonalityAlignmentMetricsSide = /** @class */ (function () {
+    function PersonalityAlignmentMetricsSide() {
+    }
+    Object.defineProperty(PersonalityAlignmentMetricsSide.prototype, "value", {
+        get: function () {
+            return this.contribution + this.strongContribution;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return PersonalityAlignmentMetricsSide;
+}());
+exports.PersonalityAlignmentMetricsSide = PersonalityAlignmentMetricsSide;
 var PersonalityTrait = /** @class */ (function () {
     function PersonalityTrait() {
     }
