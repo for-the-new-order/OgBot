@@ -16,7 +16,7 @@ const chatCommandManager = new ChatCommandManager(chatterService, echoHelpServic
 
 const app = express();
 app.use(express.urlencoded());
-const listener = app.listen(8888, function() {
+const listener = app.listen(8889, function() {
     console.log('Listening on port ' + (listener.address() as AddressInfo).port);
 });
 app.get('/', function(req, res) {

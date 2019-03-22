@@ -49,7 +49,7 @@ var echoHelpService = new EchoHelpService_1.EchoHelpService(new ChatterService_1
 var chatCommandManager = new ChatCommandManager_1.ChatCommandManager(chatterService, echoHelpService);
 var app = express();
 app.use(express.urlencoded());
-var listener = app.listen(8888, function () {
+var listener = app.listen(8889, function () {
     console.log('Listening on port ' + listener.address().port);
 });
 app.get('/', function (req, res) {
