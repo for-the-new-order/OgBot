@@ -77,18 +77,9 @@
                     data: { chatCommand: command }
                 }).done(msg => appendContentToCard(card, msg, id, button));
                 chat.prepend(card);
-                highlightCode(card);
                 saveCommand(command);
             });
             $('#cleanMessages').on('click', () => chat.empty());
-
-            function highlightCode(card) {
-                // var element = $('.card-body code', card).get(0);
-                // Prism.highlightElement(element);
-                setTimeout(() => {
-                    Prism.highlightAll();
-                }, 10);
-            }
 
             function appendHeaderToCard(card, content, id) {
                 const button = $('<button class="btn btn-link">')
@@ -102,8 +93,10 @@
                 h5.append(button);
                 return button;
             }
+
             function appendContentToCard(card, content, id, button) {
-                var markedContent = marked(content);
+                var filteredContent = filter(content);
+                var markedContent = marked(filteredContent);
                 const cardBody = $('<pre class="card-body">').html(markedContent);
 
                 const collapseWrapper = $('<div class="collapse">')
@@ -113,6 +106,29 @@
 
                 card.append(collapseWrapper);
                 button.get(0).click();
+
+                highlightCode(card);
+            }
+
+            function filter(content) {
+                return content;
+                // var jsonStartIndex = content.indexOf('{');
+                // var jsonEndIndex = content.lastIndexOf('}');
+                // var jsonString = content.substring(jsonStartIndex, jsonEndIndex + 1);
+                // var obj = JSON.parse(jsonString);
+                // var output = JSON.stringify(
+                //     {
+                //         alignment: obj.alignment,
+                //         seed: obj.initialSeed
+                //     },
+                //     null,
+                //     2
+                // );
+                // return '```json\r\n' + output + '\r\n```';
+            }
+
+            function highlightCode(card) {
+                Prism.highlightElement($('.card-body code', card).get(0));
             }
 
             // History
@@ -130,6 +146,7 @@
                     $historyMenu.prepend($(`<a class="dropdown-item" href="#">${command}</a>`));
                 }
             }
+            Prism.highlightAll();
         </script>
     </body>
 </html>
