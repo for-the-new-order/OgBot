@@ -7,12 +7,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
         <!-- Bootstrap CSS -->
-        <link
-            rel="stylesheet"
-            href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
-            integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
-            crossorigin="anonymous"
-        />
+        <link rel="stylesheet" href="bootstrap-dark/bootstrap-dark.css" />
+        <link rel="stylesheet" href="css/prism.css" />
     </head>
     <body>
         <div class="container">
@@ -59,6 +55,12 @@
             integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
             crossorigin="anonymous"
         ></script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/marked@0.6.1/marked.min.js"
+            integrity="sha256-dRC6ZSSJmlr23+v1PSka2NCREJXHfn1djETNTjmGFQ4="
+            crossorigin="anonymous"
+        ></script>
+        <script src="js/prism.js"></script>
         <script>
             const $chatCommand = $('#chatCommand');
             const chat = $('#chat');
@@ -75,9 +77,19 @@
                     data: { chatCommand: command }
                 }).done(msg => appendContentToCard(card, msg, id, button));
                 chat.prepend(card);
+                highlightCode(card);
                 saveCommand(command);
             });
             $('#cleanMessages').on('click', () => chat.empty());
+
+            function highlightCode(card) {
+                // var element = $('.card-body code', card).get(0);
+                // Prism.highlightElement(element);
+                setTimeout(() => {
+                    Prism.highlightAll();
+                }, 10);
+            }
+
             function appendHeaderToCard(card, content, id) {
                 const button = $('<button class="btn btn-link">')
                     .attr('data-toggle', 'collapse')
@@ -91,7 +103,8 @@
                 return button;
             }
             function appendContentToCard(card, content, id, button) {
-                const cardBody = $('<pre class="card-body">').text(content);
+                var markedContent = marked(content);
+                const cardBody = $('<pre class="card-body">').html(markedContent);
 
                 const collapseWrapper = $('<div class="collapse">')
                     .attr('id', id)

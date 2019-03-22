@@ -8,6 +8,7 @@
         "start": "node bot.js"
     },
     "dependencies": {
+        "@forevolve/bootstrap-dark": "^1.0.0-alpha.723",
         "discord.js": "^11.3.2",
         "express": "^4.16.3",
         "js-yaml": "^3.12.2",

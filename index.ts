@@ -16,6 +16,9 @@ const chatCommandManager = new ChatCommandManager(chatterService, echoHelpServic
 
 const app = express();
 app.use(express.urlencoded());
+app.use(express.static('assets'));
+app.use('/bootstrap-dark', express.static('node_modules\\@forevolve\\bootstrap-dark\\dist\\css'));
+
 const listener = app.listen(8889, function() {
     console.log('Listening on port ' + (listener.address() as AddressInfo).port);
 });
