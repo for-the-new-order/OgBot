@@ -140,8 +140,11 @@ export class GenerateCommand extends ChatCommandBase {
                 const personalityOptions = Object.assign(new PersonalityOptions(), {
                     randomPersonalityTrait: count
                 });
-                if (subCommand.argumentExists('alignmentThreshold')) {
-                    personalityOptions.alignmentThreshold = parseInt(subCommand.findArgumentValue('alignmentThreshold'));
+                if (subCommand.argumentExists('threshold')) {
+                    personalityOptions.alignmentThreshold = parseFloat(subCommand.findArgumentValue('threshold'));
+                    personalityOptions.alignmentThreshold = isNaN(personalityOptions.alignmentThreshold)
+                        ? 0
+                        : personalityOptions.alignmentThreshold;
                 }
                 const personality = this.centralCastingHub.alignmentAndAttitude.generate(personalityOptions);
                 sendChat(personality);
@@ -522,7 +525,7 @@ export class GenerateCommand extends ChatCommandBase {
                     options: [
                         countOption,
                         {
-                            command: '-alignmentThreshold [some number]',
+                            command: '-threshold [some number]',
                             description:
                                 'Change the alignment threshold needed to tell if a character is good, neutral or evil (default: 2).'
                         }

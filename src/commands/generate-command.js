@@ -150,8 +150,11 @@ var GenerateCommand = /** @class */ (function (_super) {
                 var personalityOptions = Object.assign(new AlignmentAndAttitudeGenerator_1.PersonalityOptions(), {
                     randomPersonalityTrait: count
                 });
-                if (subCommand.argumentExists('alignmentThreshold')) {
-                    personalityOptions.alignmentThreshold = parseInt(subCommand.findArgumentValue('alignmentThreshold'));
+                if (subCommand.argumentExists('threshold')) {
+                    personalityOptions.alignmentThreshold = parseFloat(subCommand.findArgumentValue('threshold'));
+                    personalityOptions.alignmentThreshold = isNaN(personalityOptions.alignmentThreshold)
+                        ? 0
+                        : personalityOptions.alignmentThreshold;
                 }
                 var personality = this.centralCastingHub.alignmentAndAttitude.generate(personalityOptions);
                 sendChat(personality);
@@ -503,7 +506,7 @@ var GenerateCommand = /** @class */ (function (_super) {
                     options: [
                         countOption,
                         {
-                            command: '-alignmentThreshold [some number]',
+                            command: '-threshold [some number]',
                             description: 'Change the alignment threshold needed to tell if a character is good, neutral or evil (default: 2).'
                         }
                     ]
