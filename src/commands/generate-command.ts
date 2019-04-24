@@ -12,7 +12,11 @@ import { Rank } from '../Models/Rank';
 import { ImperialMissionGenerator, BaseGenerator } from '../generators/imperial-mission-generator';
 import { SpaceTrafficGenerator } from '../generators/space-traffic-generator';
 import { ChatterService, OutputType } from './ChatterService';
-import { AlignmentAndAttitudeGenerator, PersonalityOptions } from '../CentralCasting/AlignmentAndAttitudeGenerator';
+import {
+    AlignmentAndAttitudeGenerator,
+    PersonalityOptions,
+    PersonalityAlignmentType
+} from '../CentralCasting/AlignmentAndAttitudeGenerator';
 import { CentralCastingHeroesForTomorrowHub, CentralCastingFactory } from '../CentralCasting/CentralCastingHeroesForTomorrowHub';
 import { isArray } from 'util';
 
@@ -145,6 +149,17 @@ export class GenerateCommand extends ChatCommandBase {
                     personalityOptions.alignmentThreshold = isNaN(personalityOptions.alignmentThreshold)
                         ? 0
                         : personalityOptions.alignmentThreshold;
+                }
+                if (subCommand.argumentExists('alignment')) {
+                    const allowed = [
+                        PersonalityAlignmentType.Lightside,
+                        PersonalityAlignmentType.Neutral,
+                        PersonalityAlignmentType.Darkside
+                    ];
+                    const alignment = subCommand.findArgumentValue('alignment') as PersonalityAlignmentType;
+                    if (allowed.indexOf(alignment) > -1) {
+                        personalityOptions.expectedAlignment = alignment;
+                    }
                 }
                 const personality = this.centralCastingHub.alignmentAndAttitude.generate(personalityOptions);
                 sendChat(personality);
@@ -528,6 +543,10 @@ export class GenerateCommand extends ChatCommandBase {
                             command: '-threshold [some number]',
                             description:
                                 'Change the alignment threshold needed to tell if a character is good, neutral or evil (default: 2).'
+                        },
+                        {
+                            command: '-alignment [Lightside|Neutral|Darkside]',
+                            description: 'Generate a personality of the specified alignment.'
                         }
                     ]
                 },

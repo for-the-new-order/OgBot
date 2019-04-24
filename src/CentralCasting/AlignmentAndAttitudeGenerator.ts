@@ -77,6 +77,12 @@ export class AlignmentAndAttitudeGenerator implements Generator<PersonalityOptio
         // Compute attitude
         personality.attitude = this.attitudeGenerator.generate(personality);
 
+        // Filter for expected alignment
+        if (input.expectedAlignment != null && input.expectedAlignment != personality.alignment.value) {
+            input.events = new Array<TraitDevelopedFromEvent>();
+            return this.generate(input);
+        }
+
         // Return the personality
         return personality;
     }
@@ -221,6 +227,7 @@ export class PersonalityOptions {
     events: TraitDevelopedFromEvent[] = new Array<TraitDevelopedFromEvent>();
     randomPersonalityTrait: number = 0;
     alignmentThreshold: number = 2;
+    expectedAlignment?: PersonalityAlignmentType;
 }
 
 // Output
@@ -313,7 +320,7 @@ enum PersonalityStrengthDescription {
     Obsessive = 'Character cannot rest or find peace unless actively pursuing the desires, needs or compulsions of the feature.'
 }
 
-enum PersonalityAlignmentType {
+export enum PersonalityAlignmentType {
     Lightside = 'Lightside',
     Neutral = 'Neutral',
     Darkside = 'Darkside'

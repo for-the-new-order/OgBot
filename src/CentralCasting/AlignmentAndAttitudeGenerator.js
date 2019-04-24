@@ -75,6 +75,11 @@ var AlignmentAndAttitudeGenerator = /** @class */ (function () {
         personality.alignment = this.alignmentService.createPersonalityAlignment(personality.traits, input);
         // Compute attitude
         personality.attitude = this.attitudeGenerator.generate(personality);
+        // Filter for expected alignment
+        if (input.expectedAlignment != null && input.expectedAlignment != personality.alignment.value) {
+            input.events = new Array();
+            return this.generate(input);
+        }
         // Return the personality
         return personality;
     };
@@ -307,7 +312,7 @@ var PersonalityAlignmentType;
     PersonalityAlignmentType["Lightside"] = "Lightside";
     PersonalityAlignmentType["Neutral"] = "Neutral";
     PersonalityAlignmentType["Darkside"] = "Darkside";
-})(PersonalityAlignmentType || (PersonalityAlignmentType = {}));
+})(PersonalityAlignmentType = exports.PersonalityAlignmentType || (exports.PersonalityAlignmentType = {}));
 //
 // Generation models
 //

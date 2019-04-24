@@ -112,19 +112,20 @@
 
             function filter(content) {
                 return content;
-                // var jsonStartIndex = content.indexOf('{');
-                // var jsonEndIndex = content.lastIndexOf('}');
-                // var jsonString = content.substring(jsonStartIndex, jsonEndIndex + 1);
-                // var obj = JSON.parse(jsonString);
-                // var output = JSON.stringify(
-                //     {
-                //         alignment: obj.alignment,
-                //         seed: obj.initialSeed
-                //     },
-                //     null,
-                //     2
-                // );
-                // return '```json\r\n' + output + '\r\n```';
+                // Comment the return to apply the filters
+                var jsonStartIndex = content.indexOf('{');
+                var jsonEndIndex = content.lastIndexOf('}');
+                var jsonString = content.substring(jsonStartIndex, jsonEndIndex + 1);
+                var obj = JSON.parse(jsonString);
+                var output = JSON.stringify(
+                    {
+                        alignment: obj.alignment,
+                        seed: obj.initialSeed
+                    },
+                    null,
+                    2
+                );
+                return '```json\r\n' + output + '\r\n```';
             }
 
             function highlightCode(card) {

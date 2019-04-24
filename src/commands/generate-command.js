@@ -156,6 +156,17 @@ var GenerateCommand = /** @class */ (function (_super) {
                         ? 0
                         : personalityOptions.alignmentThreshold;
                 }
+                if (subCommand.argumentExists('alignment')) {
+                    var allowed = [
+                        AlignmentAndAttitudeGenerator_1.PersonalityAlignmentType.Lightside,
+                        AlignmentAndAttitudeGenerator_1.PersonalityAlignmentType.Neutral,
+                        AlignmentAndAttitudeGenerator_1.PersonalityAlignmentType.Darkside
+                    ];
+                    var alignment = subCommand.findArgumentValue('alignment');
+                    if (allowed.indexOf(alignment) > -1) {
+                        personalityOptions.expectedAlignment = alignment;
+                    }
+                }
                 var personality = this.centralCastingHub.alignmentAndAttitude.generate(personalityOptions);
                 sendChat(personality);
                 break;
@@ -508,6 +519,10 @@ var GenerateCommand = /** @class */ (function (_super) {
                         {
                             command: '-threshold [some number]',
                             description: 'Change the alignment threshold needed to tell if a character is good, neutral or evil (default: 2).'
+                        },
+                        {
+                            command: '-alignment [Lightside|Neutral|Darkside]',
+                            description: 'Generate a personality of the specified alignment.'
                         }
                     ]
                 },
