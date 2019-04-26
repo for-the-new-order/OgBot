@@ -23,7 +23,7 @@ export class CommandArgs {
         if (trigger.startsWith('-')) {
             return null;
         }
-        let command = this.args.length > 1 ? this.args[1].toLowerCase() : '';
+        let command = this.args.length > 1 ? this.args[1] : '';
         let sliceIndex = 2;
 
         // Avoid splitted options

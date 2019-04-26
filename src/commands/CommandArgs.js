@@ -28,7 +28,7 @@ var CommandArgs = /** @class */ (function () {
         if (trigger.startsWith('-')) {
             return null;
         }
-        var command = this.args.length > 1 ? this.args[1].toLowerCase() : '';
+        var command = this.args.length > 1 ? this.args[1] : '';
         var sliceIndex = 2;
         // Avoid splitted options
         if (command.startsWith('-')) {
