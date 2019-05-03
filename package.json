@@ -1,7 +1,7 @@
 {
     "name": "og-bot",
     "version": "3.1.0",
-    "description": "My unstructured Discord Bot experiements",
+    "description": "My unstructured Discord Bot experiments",
     "main": "bot.js",
     "author": "Carl-Hugo Marcotte",
     "scripts": {
