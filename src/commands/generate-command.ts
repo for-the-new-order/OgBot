@@ -142,20 +142,14 @@ export class GenerateCommand extends ChatCommandBase {
         this.baseName = 'Base';
         switch (switchCondition) {
             case 'uglyspaceship':
-                const allGeneratedUgly = [];
+                const vehicleOutput: any = {};
                 for (let i = 0; i < count; i++) {
-                    const vehicleOutput: any = {};
                     const vehicle = this.uglySpaceshipGenerator.generate();
                     let vehicleObject = (vehicleOutput[vehicle.name] = {});
                     delete vehicle.name;
                     Object.assign(vehicleObject, vehicle);
-                    allGeneratedUgly.push(vehicleOutput);
                 }
-                if (count > 1) {
-                    sendChat(allGeneratedUgly);
-                } else {
-                    sendChat(allGeneratedUgly[0]);
-                }
+                sendChat(vehicleOutput);
                 break;
             case 'alignmentandattitude':
             case 'personality2':

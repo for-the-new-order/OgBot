@@ -147,21 +147,14 @@ var GenerateCommand = /** @class */ (function (_super) {
         this.baseName = 'Base';
         switch (switchCondition) {
             case 'uglyspaceship':
-                var allGeneratedUgly = [];
+                var vehicleOutput = {};
                 for (var i = 0; i < count; i++) {
-                    var vehicleOutput = {};
                     var vehicle = this.uglySpaceshipGenerator.generate();
                     var vehicleObject = (vehicleOutput[vehicle.name] = {});
                     delete vehicle.name;
                     Object.assign(vehicleObject, vehicle);
-                    allGeneratedUgly.push(vehicleOutput);
                 }
-                if (count > 1) {
-                    sendChat(allGeneratedUgly);
-                }
-                else {
-                    sendChat(allGeneratedUgly[0]);
-                }
+                sendChat(vehicleOutput);
                 break;
             case 'alignmentandattitude':
             case 'personality2':
