@@ -94,7 +94,7 @@ var UglySpaceshipGenerator = /** @class */ (function () {
         // delete sheet.sources.wing.randomService;
     };
     UglySpaceshipGenerator.prototype.makeUglyName = function (uglyBody, uglyWing, uglyEngine) {
-        return "Ugly's " + uglyBody.name + " body & " + uglyWing.name + " wings & " + uglyEngine.name + " engine";
+        return ("Ugly's " + uglyBody.name + " body & " + uglyWing.name + " wings & " + uglyEngine.name + " engine").replace(/[\\\/:]/, '-');
     };
     UglySpaceshipGenerator.prototype.makeUglyDescription = function (uglyBody, uglyWing, uglyEngine) {
         return "The ugly's is composed of a " + uglyBody.name + " body, " + uglyWing.name + " wings and what looks like a " + uglyEngine.name + " engine.";

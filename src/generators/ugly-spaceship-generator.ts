@@ -98,7 +98,7 @@ export class UglySpaceshipGenerator {
     }
 
     private makeUglyName(uglyBody: UglyBody, uglyWing: UglyWing, uglyEngine: UglyEngine): string {
-        return `Ugly's ${uglyBody.name} body & ${uglyWing.name} wings & ${uglyEngine.name} engine`;
+        return `Ugly's ${uglyBody.name} body & ${uglyWing.name} wings & ${uglyEngine.name} engine`.replace(/[\\\/:]/, '-');
     }
 
     private makeUglyDescription(uglyBody: UglyBody, uglyWing: UglyWing, uglyEngine: UglyEngine): string {
