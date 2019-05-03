@@ -19,6 +19,7 @@ import {
 } from '../CentralCasting/AlignmentAndAttitudeGenerator';
 import { CentralCastingHeroesForTomorrowHub, CentralCastingFactory } from '../CentralCasting/CentralCastingHeroesForTomorrowHub';
 import { isArray } from 'util';
+import { UglySpaceshipGenerator } from '../generators/ugly-spaceship-generator';
 
 export class GenerateCommand extends ChatCommandBase {
     protected supportedCommands = ['generate', 'gen', 'g'];
@@ -30,6 +31,7 @@ export class GenerateCommand extends ChatCommandBase {
     private imperialMissionGenerator: ImperialMissionGenerator;
     private spaceTrafficGenerator: SpaceTrafficGenerator;
     private centralCastingHub: CentralCastingHeroesForTomorrowHub;
+    private uglySpaceshipGenerator: UglySpaceshipGenerator;
 
     private baseGenerator: BaseGenerator;
     private baseName = '';
@@ -45,6 +47,7 @@ export class GenerateCommand extends ChatCommandBase {
         this.baseGenerator = new BaseGenerator(this.baseNameAction, this.randomService);
         this.spaceTrafficGenerator = new SpaceTrafficGenerator(this.randomService);
         this.centralCastingHub = CentralCastingFactory.createHub(this.randomService);
+        this.uglySpaceshipGenerator = new UglySpaceshipGenerator(this.randomService);
     }
 
     public handle(message: Message, commandArgs: CommandArgs) {
@@ -138,6 +141,22 @@ export class GenerateCommand extends ChatCommandBase {
         const switchCondition = subCommand ? subCommand.trigger : '';
         this.baseName = 'Base';
         switch (switchCondition) {
+            case 'uglyspaceship':
+                const allGeneratedUgly = [];
+                for (let i = 0; i < count; i++) {
+                    const vehicleOutput: any = {};
+                    const vehicle = this.uglySpaceshipGenerator.generate();
+                    let vehicleObject = (vehicleOutput[vehicle.name] = {});
+                    delete vehicle.name;
+                    Object.assign(vehicleObject, vehicle);
+                    allGeneratedUgly.push(vehicleOutput);
+                }
+                if (count > 1) {
+                    sendChat(allGeneratedUgly);
+                } else {
+                    sendChat(allGeneratedUgly[0]);
+                }
+                break;
             case 'alignmentandattitude':
             case 'personality2':
             case '312':
@@ -513,6 +532,11 @@ export class GenerateCommand extends ChatCommandBase {
             description: 'Generate random stuff; by default a character.',
             options: [wisperOption],
             subcommands: [
+                {
+                    command: 'uglyspaceship',
+                    description: 'Generate a spaceship that is composed from 2 or 3 other spaceships.',
+                    options: [countOption]
+                },
                 {
                     command: 'adventure',
                     description: 'Generate a Star Wars adventure.',

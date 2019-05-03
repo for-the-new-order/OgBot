@@ -37,6 +37,7 @@ var ChatterService_1 = require("./ChatterService");
 var AlignmentAndAttitudeGenerator_1 = require("../CentralCasting/AlignmentAndAttitudeGenerator");
 var CentralCastingHeroesForTomorrowHub_1 = require("../CentralCasting/CentralCastingHeroesForTomorrowHub");
 var util_1 = require("util");
+var ugly_spaceship_generator_1 = require("../generators/ugly-spaceship-generator");
 var GenerateCommand = /** @class */ (function (_super) {
     __extends(GenerateCommand, _super);
     function GenerateCommand(chatterService) {
@@ -54,6 +55,7 @@ var GenerateCommand = /** @class */ (function (_super) {
         _this.baseGenerator = new imperial_mission_generator_1.BaseGenerator(_this.baseNameAction, _this.randomService);
         _this.spaceTrafficGenerator = new space_traffic_generator_1.SpaceTrafficGenerator(_this.randomService);
         _this.centralCastingHub = CentralCastingHeroesForTomorrowHub_1.CentralCastingFactory.createHub(_this.randomService);
+        _this.uglySpaceshipGenerator = new ugly_spaceship_generator_1.UglySpaceshipGenerator(_this.randomService);
         return _this;
     }
     GenerateCommand.prototype.handle = function (message, commandArgs) {
@@ -144,6 +146,23 @@ var GenerateCommand = /** @class */ (function (_super) {
         var switchCondition = subCommand ? subCommand.trigger : '';
         this.baseName = 'Base';
         switch (switchCondition) {
+            case 'uglyspaceship':
+                var allGeneratedUgly = [];
+                for (var i = 0; i < count; i++) {
+                    var vehicleOutput = {};
+                    var vehicle = this.uglySpaceshipGenerator.generate();
+                    var vehicleObject = (vehicleOutput[vehicle.name] = {});
+                    delete vehicle.name;
+                    Object.assign(vehicleObject, vehicle);
+                    allGeneratedUgly.push(vehicleOutput);
+                }
+                if (count > 1) {
+                    sendChat(allGeneratedUgly);
+                }
+                else {
+                    sendChat(allGeneratedUgly[0]);
+                }
+                break;
             case 'alignmentandattitude':
             case 'personality2':
             case '312':
@@ -492,6 +511,11 @@ var GenerateCommand = /** @class */ (function (_super) {
             description: 'Generate random stuff; by default a character.',
             options: [wisperOption],
             subcommands: [
+                {
+                    command: 'uglyspaceship',
+                    description: 'Generate a spaceship that is composed from 2 or 3 other spaceships.',
+                    options: [countOption]
+                },
                 {
                     command: 'adventure',
                     description: 'Generate a Star Wars adventure.',
