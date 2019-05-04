@@ -115,7 +115,7 @@ export class UglySpaceshipGenerator {
 
 export class VehicleSheet {
     name: string;
-    image_path: string = '/assets/images/vehicles/250x250-generic.png';
+    image_path: string = '/assets/images/ugly/250x250-default.png';
     description: Array<string> = [];
     characteristics: VehicleCharacteristics = new VehicleCharacteristics();
     skill: 'Driving' | 'Piloting' | 'Operating';
