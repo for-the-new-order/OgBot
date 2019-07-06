@@ -26,18 +26,26 @@ export class ChatCommandManager {
     }
 
     public async Handle(message: Message): Promise<void> {
-        // Ignore messages sent by bots
-        if (message.author.bot) {
+        const commandPrefix = '!';
+        let commandPrefixLength = 1;
+
+        // Ignore messages sent without the "command character"
+        const startWithCommandPrefix = message.content.startsWith(commandPrefix);
+        if (!startWithCommandPrefix) {
             return;
         }
 
-        // Ignore messages sent without the "command character"
-        if (message.content.substring(0, 1) !== '!') {
-            return;
+        // Ignore messages sent by bots
+        const startWithBotCommandPrefix = message.content.startsWith(commandPrefix + commandPrefix);
+        if (message.author.bot) {
+            if (!startWithBotCommandPrefix) {
+                return;
+            }
+            commandPrefixLength = 2;
         }
 
         // Make sure there is at least one command
-        const args = message.content.substring(1).split(' ');
+        const args = message.content.substring(commandPrefixLength).split(' ');
         if (args.length == 0) {
             return;
         }
@@ -53,7 +61,7 @@ export class ChatCommandManager {
         // Transform the plain command arguments in a CommandArgs model
         const commandArgs = new CommandArgs(args[0].toLowerCase(), args[1].toLowerCase(), args.splice(2));
 
-        // When the command (trigger) is not 2!og", exit.
+        // When the command (trigger) is not !og", exit.
         if (commandArgs.trigger !== this.trigger) {
             return;
         }
