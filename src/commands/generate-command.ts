@@ -634,7 +634,7 @@ export class GenerateCommand extends ChatCommandBase {
                 {
                     command: 'personality',
                     description: 'Generate a personality.',
-                    options: [seedOption]
+                    options: [countOption, seedOption]
                 },
                 {
                     command: 'rank',
