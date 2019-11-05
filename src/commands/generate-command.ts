@@ -520,11 +520,16 @@ export class GenerateCommand extends ChatCommandBase {
             description: 'Select the maximum rank level (inclusive) for the generated NPC.'
         };
 
+        const outputOption = {
+            command: '-output [JSON|YAML]',
+            description: 'The selected output type (default: YAML)'
+        };
+
         const helpObject: CommandHelpDescriptor = {
             command: this.supportedCommands[0],
             alias: this.supportedCommands.slice(1).join(', '),
             description: 'Generate random stuff; by default a character.',
-            options: [wisperOption],
+            options: [wisperOption, outputOption],
             subcommands: [
                 {
                     command: 'uglyspaceship',

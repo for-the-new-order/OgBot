@@ -37,7 +37,8 @@ export class EchoHelpService {
             command: help.command,
             description: help.description,
             alias: help.alias,
-            subcommands
+            subcommands,
+            options: help.options
         };
     }
 
