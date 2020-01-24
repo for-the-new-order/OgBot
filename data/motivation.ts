@@ -94,8 +94,7 @@ export const motivations = {
         },
         {
             name: 'Obscurity',
-            description:
-                'Your character wishes to be remembered after they are gone and works tirelessly to secure their legacy.'
+            description: 'Your character wishes to be remembered after they are gone and works tirelessly to secure their legacy.'
         },
         {
             name: 'Poverty',
@@ -178,8 +177,7 @@ export const motivations = {
         },
         {
             name: 'Laziness',
-            description:
-                'Your character always seeks the path of least resistance and becomes intimidated by difficult or complex tasks.'
+            description: 'Your character always seeks the path of least resistance and becomes intimidated by difficult or complex tasks.'
         },
         {
             name: 'Ignorance',
