@@ -498,11 +498,15 @@ var GenerateCommand = /** @class */ (function (_super) {
             command: '-max [number]',
             description: 'Select the maximum rank level (inclusive) for the generated NPC.'
         };
+        var outputOption = {
+            command: '-output [JSON|YAML]',
+            description: 'The selected output type (default: YAML)'
+        };
         var helpObject = {
             command: this.supportedCommands[0],
             alias: this.supportedCommands.slice(1).join(', '),
             description: 'Generate random stuff; by default a character.',
-            options: [wisperOption],
+            options: [wisperOption, outputOption],
             subcommands: [
                 {
                     command: 'uglyspaceship',
@@ -609,7 +613,7 @@ var GenerateCommand = /** @class */ (function (_super) {
                 {
                     command: 'personality',
                     description: 'Generate a personality.',
-                    options: [seedOption]
+                    options: [countOption, seedOption]
                 },
                 {
                     command: 'rank',

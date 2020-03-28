@@ -81,7 +81,8 @@ var EchoHelpService = /** @class */ (function () {
             command: help.command,
             description: help.description,
             alias: help.alias,
-            subcommands: subcommands
+            subcommands: subcommands,
+            options: help.options
         };
     };
     EchoHelpService.prototype.echoX = function (help, whisper, message) {

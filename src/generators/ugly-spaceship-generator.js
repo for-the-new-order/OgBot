@@ -110,7 +110,7 @@ var UglySpaceshipGenerator = /** @class */ (function () {
 exports.UglySpaceshipGenerator = UglySpaceshipGenerator;
 var VehicleSheet = /** @class */ (function () {
     function VehicleSheet() {
-        this.image_path = '/assets/images/vehicles/250x250-generic.png';
+        this.image_path = '/assets/images/ugly/250x250-default.png';
         this.description = [];
         this.characteristics = new VehicleCharacteristics();
         this.complement = '';

@@ -59,19 +59,24 @@ var ChatCommandManager = /** @class */ (function () {
     }
     ChatCommandManager.prototype.Handle = function (message) {
         return __awaiter(this, void 0, void 0, function () {
-            var args, commandArgs, outputHelp, i, command;
+            var commandPrefix, commandPrefixLength, startWithCommandPrefix, startWithBotCommandPrefix, args, commandArgs, outputHelp, i, command;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        // Ignore messages sent by bots
+                        commandPrefix = '!';
+                        commandPrefixLength = 1;
+                        startWithCommandPrefix = message.content.startsWith(commandPrefix);
+                        if (!startWithCommandPrefix) {
+                            return [2 /*return*/];
+                        }
+                        startWithBotCommandPrefix = message.content.startsWith(commandPrefix + commandPrefix);
                         if (message.author.bot) {
-                            return [2 /*return*/];
+                            if (!startWithBotCommandPrefix) {
+                                return [2 /*return*/];
+                            }
+                            commandPrefixLength = 2;
                         }
-                        // Ignore messages sent without the "command character"
-                        if (message.content.substring(0, 1) !== '!') {
-                            return [2 /*return*/];
-                        }
-                        args = message.content.substring(1).split(' ');
+                        args = message.content.substring(commandPrefixLength).split(' ');
                         if (args.length == 0) {
                             return [2 /*return*/];
                         }
@@ -84,7 +89,7 @@ var ChatCommandManager = /** @class */ (function () {
                     case 2: return [2 /*return*/];
                     case 3:
                         commandArgs = new CommandArgs_1.CommandArgs(args[0].toLowerCase(), args[1].toLowerCase(), args.splice(2));
-                        // When the command (trigger) is not 2!og", exit.
+                        // When the command (trigger) is not !og", exit.
                         if (commandArgs.trigger !== this.trigger) {
                             return [2 /*return*/];
                         }
