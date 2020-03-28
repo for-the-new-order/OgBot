@@ -65,3 +65,4 @@ config.secrets.json
 
 # Generated JS files
 src/*.js
+build

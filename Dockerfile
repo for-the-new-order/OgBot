@@ -1,11 +1,15 @@
 FROM node:13.8.0-alpine AS build
-ENV NODE_ENV production
 WORKDIR /app
 
-RUN npm install -g typescript
+COPY package*.json ./
 
-COPY ["*.ts", "*.json", "./"]
-RUN npm ci --quiet && npm run build
+RUN npm install -g typescript
+RUN npm install --quiet
+RUN npm audit fix
+
+COPY . .
+
+RUN npm run build
 
 FROM node:13.8.0-alpine AS deploy
 ENV NODE_ENV=production
