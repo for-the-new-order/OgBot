@@ -1,133 +1,90 @@
-# DiscordBotExperiments
+# OgBot
 
-This is some unstructured Discord bot experiments.
+This is bot offers multiple random generators for FFG Star Wars.
 
-# Notes to myself
+# How to use
 
--   [TECHNOBABBLE GENERATOR](http://www.scifiideas.com/technobabble-generator/)
+All commands should start with `!og`.
 
-1. Vous devez supprimer le convertisseur d’ondes gravimétrique arrière.
-1. Vous devez augmenter la puissance des réservoirs de stockage d'antimatière.
-1. Nous devons inverser la polarité du générateur de puissance Araknyd.
-1. Il y a une signature d'hyper-ondes inhabituelle dans le variateur moléculaire.
-1. Nous devons réatténuer le réseau de capteurs de l'hyper-transpileur.
-1. Nous devons remplacer la bobine du compensateur coaxiale Kuat.
-1. Je détecte une série de signatures d'impulsions à micro-ondes dans la chambre de singularité lepton.
-1. Je dois calibrer le levier de vitesse lepton.
-1. Je dois harmoniser le compensateur Bose-Einstein.
-1. Nous devons améliorer les stabilisateurs d'inertie.
-1. Je détecte une pointe de puissance anormale dans le manipulateur de vortex hyper-spacial.
-1. Nous devons sceller le convertisseur de puissance biogénique ventral.
-1. Vous devez nettoyer le feu du moteur à résistance synthétique.
-1. Vous devez régénérer l'ordinateur quantique arrière.
-1. Je détecte une pointe de puissance dans le brouilleur à vide dynamique.
-1. Vous devez remplacer le système d'égouts dorsal.
-1. La nanosphère du spinner de vacuum est hors ligne.
-1. N'oubliez pas de calibrer l'intercepteur de particules transitoire, sinon vous pourriez vous retrouver avec une oscillation subharmonique indésirable.
-1. Je détecte une série de décharges statiques dans le réseau de capteurs multi-bandes.
-1. Je détecte une anomalie de phase dans le compensateur de réaction gamma de l'énergiseur atomique laser.
-1. Je détecte une signature d'onde gamma inhabituelle dans la tige heuristique du microfilament.
+For example `!og g base -name SomeCoolBase` could generate something similar to:
 
-## Rythm
-
-Bot to play YouTube music.
-
--   [Rythm's commands](https://rythmbot.co/features#list)
--   [Web Dashboard](https://web.rythmbot.co/)
-
-```
-!playskip URI
-!play URI
-!skip
-!join
-!loop
-!loopqueue
-!stop
-!clean
-!clear
-!disconnect
+```yaml
+name: SomeCoolBase
+purpose:
+    name: Data Vault
+location:
+    name: Underground / cave network
+status:
+    name: Commander is corrupt
+initialSeed: 196704
 ```
 
-### YouTube music
+You can replay the generated items by passing in the seed, like this: `!og g base -name SomeCoolBase -seed 196704`.
 
-**Ambiant music**
+## Help
 
-```bash
-# Unofficial Star Wars: Edge of the Empire RPG Music Mix
-!playskip https://www.youtube.com/watch?v=RKsaGXRaYTM
+You can add `-h` to get help like `!og g -h` would output the help of the `generate` command. For the initial list of commands type `!og`.
 
-# Star Wars - Epic Battle Mix
-!playskip https://www.youtube.com/watch?v=yKwzYDyx2ro
+# Commands
 
-# INTO THE VOID | 1-HOUR | Epic Futuristic Space Music Mix | Epic Sci-Fi Hybrid Music
-!playskip https://www.youtube.com/watch?v=9kEMzXw7P2A
+-   clean: delete messages, type `!og clean -h` for more info.
+-   info: , type `!og info -h` for more info.
+-   version: output the bot version
+-   generate: generate random stuff, type `!og generate -h` for more info.
 
-# White Noise Spaceship Sounds | Sleep, Study or Focus | 10 hours Engine Ambience (more than 3 hours; cannot play)
-# !play https://www.youtube.com/watch?v=aIv8V-3erg8
+# Generators
 
-# Spaceship Bedroom Ambience – Relaxing in the Sleeping Quarters (White Noise, ASMR, Relaxation)
-!playskip https://www.youtube.com/watch?v=HFBjfzsOtx0
+These are the generators that exists:
 
-# Millenium Falcon [ASMR] Star Wars Ambience ⧱ Spaceship & Hyperspace Sounds
-!playskip https://www.youtube.com/watch?v=nc5YHodcXpM
+-   `uglyspaceship`: type `!og g uglyspaceship -h` for more info.
+-   `adventure`: type `!og g adventure -h` for more info.
+-   `alignmentandattitude`: type `!og g alignmentandattitude -h` for more info.
+-   `spacecraft`: type `!og g spacecraft -h` for more info.
+-   `spacetraffic`: type `!og g spacetraffic -h` for more info.
+-   `imperialmission`: type `!og g imperialmission -h` for more info.
+-   `imperialbase`: type `!og g imperialbase -h` for more info.
+-   `rebelbase`: type `!og g rebelbase -h` for more info.
+-   `base`: type `!og g base -h` for more info.
+-   `motivations`: type `!og g motivations -h` for more info.
+-   `alienname`: type `!og g alienname -h` for more info.
+-   `name`: type `!og g name -h` for more info.
+-   `droidname`: type `!og g droidname -h` for more info.
+-   `place`: type `!og g place -h` for more info.
+-   `personality`: type `!og g personality -h` for more info.
+-   `rank`: type `!og g rank -h` for more info.
+-   `species`: type `!og g species -h` for more info.
+-   `default`: type `!og g default -h` for more info. You must omit the `default` for this one, like `!og g -clan empire -corp navy`.
 
-# Death Star | Star Wars Ambience
-!playskip https://www.youtube.com/watch?v=DNMujETKFNU
+Most generators supports a `-count 10` option to generate more than one element (useful for names so you can pick the more interesting ones).
 
-# Star Wars Ambience: Forest Moon of Endor (White Noise, Relaxation, ASMR)
-!playskip https://www.youtube.com/watch?v=fx7ED8iN-4Q
+If you prefer JSON to YAML, you can add `-output JSON` to any command.
 
-# Coruscant - Spaceport (Star Wars Background Ambience)
-!playskip https://www.youtube.com/watch?v=B7Qn1Pa6Mn4
+For example `!og g droidname -count 3` could output something like:
 
-# Sci-Fi Ambience: Hyperion Cryogenic Chambers (ASMR, White Noise, Relaxation)
-!playskip https://www.youtube.com/watch?v=8I5HCN4BS8I
-
-# The Imperial March
-!playskip https://www.youtube.com/watch?v=-bzWSJG93P8
-
-# Imperial Alert / Siren Sound
-!playskip https://www.youtube.com/watch?v=AfuQd_xZlKw
+```YAML
+values:
+  - 7W-C
+  - PM-79S
+  - B0-75
+initialSeed: 347645
 ```
 
-**Combat sounds**
+And `!og g droidname -count 3 -output JSON` could output something like:
 
-```bash
-# Star Wars Ambience - Space Battle Background (X-Wing, Tie Fighter, Star Destroyer Sound Effects)
-#!playskip https://www.youtube.com/watch?v=8scVEEcwKVc
-!playskip https://www.youtube.com/watch?v=4ZnhpS6VjgQ
-
-# Arma 3 Mission Scripting Ideas: Star Wars "Space Battle" Ambience #1
-!playskip https://www.youtube.com/watch?v=Tgk7tlXR0wQ
-
-# Star War™ Battlefront™ 2 Ambience - The Eviserator - Space Battle of Jakku/Sunset Star Destroyers
-!playskip https://www.youtube.com/watch?v=EPKr2EgN9gg
-
-# Star Wars Ambience: Tattooine // Distant Space Battle (ASMR, White Noise, Relaxation)
-!playskip https://www.youtube.com/watch?v=6DowOKyG4sU
+<!-- prettier-ignore -->
+```json
+{
+  "values": [
+    "W80-1",
+    "EB-1N",
+    "MD-332"
+  ],
+  "initialSeed": 19456
+}
 ```
 
-```bash
-# Use both Rythm bots
-!join
->join
-# Space Battle Background
-!playskip https://www.youtube.com/watch?v=Tgk7tlXR0wQ
-!loop
-# Arma 3 Mission
->playskip https://www.youtube.com/watch?v=yKwzYDyx2ro
->loop
-```
+# Release notes
 
-**Init**
+## 3.2.0
 
-https://github.com/SkyJedi/FFGNDS-Discord-Dice-Roller
-
-```
-!Init Set nppnn
-!Init
-!Init Reset
-!Init Next
-!Init Previous
-!Init Modify npnpn
-```
+-   Initial release on 2020-03-28, I'll start to keep track of changes from this point forward.

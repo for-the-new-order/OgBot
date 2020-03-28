@@ -1,9 +1,8 @@
-var allConfigs = require('./config.secrets.json');
-
-//var Configuration = require('merge-config');
-
-// const config = new Configuration();
-// config.file('config.json');
-// config.file('config.secrets.json');
-
-exports.configuration = allConfigs;
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.configuration = {
+    auth: {
+        token: process.env.AUTH_TOKEN
+    }
+};
+//# sourceMappingURL=config.js.map

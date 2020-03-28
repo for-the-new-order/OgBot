@@ -1,0 +1,33 @@
+trigger:
+  batch: true
+  branches:
+      include:
+          - master
+
+pool:
+  name: Hosted Ubuntu 1604
+
+variables:
+  bot.image: 'carlhugo/ogbot'
+  bot.imageName: 'ogbot'
+  bot.sshEndpoint: 'Google Cloud Bots'
+  bot.dockerRegistryEndpoint: 'Docker Hub'
+  bot.envFile: 'ogbot.env'
+
+resources:
+  repositories:
+    - repository: shared
+      type: github
+      name: for-the-new-order/BuildTemplates
+      endpoint: for-the-new-order
+
+jobs:
+  - template: BuildAndDeployBot.yml@shared
+    parameters:
+      bot:
+        image: $(bot.image)
+        imageName: $(bot.imageName)
+        sshEndpoint: $(bot.sshEndpoint)
+        dockerRegistryEndpoint: $(bot.dockerRegistryEndpoint)
+        envFile: $(bot.envFile)
+      buildNumber: $(Build.BuildNumber)
