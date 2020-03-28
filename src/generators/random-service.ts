@@ -1,4 +1,3 @@
-import { SeedableValue } from './random-service';
 import { engines, integer } from 'random-js';
 
 export class RandomService {

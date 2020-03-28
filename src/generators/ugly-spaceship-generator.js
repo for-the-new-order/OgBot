@@ -1,4 +1,11 @@
 "use strict";
+var __spreadArrays = (this && this.__spreadArrays) || function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var UglySpaceshipGenerator = /** @class */ (function () {
     function UglySpaceshipGenerator(randomService) {
@@ -20,39 +27,39 @@ var UglySpaceshipGenerator = /** @class */ (function () {
         ];
         var allUglyWing = [
             new UglyWing('Y-wing', 2, 2, -1, 0, randomService, new UglyEngine('Y-wing', 3, 2, 3, 0)),
-            new (UglyWing.bind.apply(UglyWing, [void 0, 'TIE/LN', 2, 2, 1, 0, randomService].concat(allUglyEngines)))(),
-            new (UglyWing.bind.apply(UglyWing, [void 0, 'Z-95', 2, 2, 1, 2, randomService].concat(allUglyEngines)))(),
-            new (UglyWing.bind.apply(UglyWing, [void 0, 'CloakShape', 3, 2, -1, 2, randomService].concat(allUglyEngines)))(),
-            new (UglyWing.bind.apply(UglyWing, [void 0, 'R-41', 2, 2, 0, 2, randomService].concat(allUglyEngines)))(),
-            new (UglyWing.bind.apply(UglyWing, [void 0, 'V-wing', 2, 2, 0, 3, randomService].concat(allUglyEngines)))(),
-            new (UglyWing.bind.apply(UglyWing, [void 0, 'TIE/IN', 2, 3, 2, 3, randomService].concat(allUglyEngines)))(),
-            new (UglyWing.bind.apply(UglyWing, [void 0, 'TIE/D', 2, 3, 1, 4, randomService].concat(allUglyEngines)))(),
-            new (UglyWing.bind.apply(UglyWing, [void 0, 'Eta-2', 2, 2, 1, 1, randomService].concat(allUglyEngines)))(),
-            new (UglyWing.bind.apply(UglyWing, [void 0, 'C-73', 2, 2, 0, 2, randomService].concat(allUglyEngines)))(),
-            new (UglyWing.bind.apply(UglyWing, [void 0, 'Toscan 8-Q', 2, 2, 0, 1, randomService].concat(allUglyEngines)))(),
-            new (UglyWing.bind.apply(UglyWing, [void 0, 'ARC-170', 3, 2, 1, 4, randomService].concat(allUglyEngines)))(),
-            new (UglyWing.bind.apply(UglyWing, [void 0, 'Z-95 MK I', 2, 1, 0, 2, randomService].concat(allUglyEngines)))(),
-            new (UglyWing.bind.apply(UglyWing, [void 0, 'Z-95 MK I', 2, 1, 1, 2, randomService].concat(allUglyEngines)))(),
-            new (UglyWing.bind.apply(UglyWing, [void 0, 'X-wing', 2, 2, 1, 4, randomService].concat(allUglyEngines)))(),
-            new (UglyWing.bind.apply(UglyWing, [void 0, 'Tri-Fighter', 3, 2, -1, 3, randomService].concat(allUglyEngines)))(),
-            new (UglyWing.bind.apply(UglyWing, [void 0, 'Pinook ', 2, 1, 0, 1, randomService].concat(allUglyEngines)))(),
-            new (UglyWing.bind.apply(UglyWing, [void 0, 'T-16', 1, 1, 0, 0, randomService].concat(allUglyEngines)))(),
-            new (UglyWing.bind.apply(UglyWing, [void 0, 'T-16', 1, 1, 1, 0, randomService].concat(allUglyEngines)))()
+            new (UglyWing.bind.apply(UglyWing, __spreadArrays([void 0, 'TIE/LN', 2, 2, 1, 0, randomService], allUglyEngines)))(),
+            new (UglyWing.bind.apply(UglyWing, __spreadArrays([void 0, 'Z-95', 2, 2, 1, 2, randomService], allUglyEngines)))(),
+            new (UglyWing.bind.apply(UglyWing, __spreadArrays([void 0, 'CloakShape', 3, 2, -1, 2, randomService], allUglyEngines)))(),
+            new (UglyWing.bind.apply(UglyWing, __spreadArrays([void 0, 'R-41', 2, 2, 0, 2, randomService], allUglyEngines)))(),
+            new (UglyWing.bind.apply(UglyWing, __spreadArrays([void 0, 'V-wing', 2, 2, 0, 3, randomService], allUglyEngines)))(),
+            new (UglyWing.bind.apply(UglyWing, __spreadArrays([void 0, 'TIE/IN', 2, 3, 2, 3, randomService], allUglyEngines)))(),
+            new (UglyWing.bind.apply(UglyWing, __spreadArrays([void 0, 'TIE/D', 2, 3, 1, 4, randomService], allUglyEngines)))(),
+            new (UglyWing.bind.apply(UglyWing, __spreadArrays([void 0, 'Eta-2', 2, 2, 1, 1, randomService], allUglyEngines)))(),
+            new (UglyWing.bind.apply(UglyWing, __spreadArrays([void 0, 'C-73', 2, 2, 0, 2, randomService], allUglyEngines)))(),
+            new (UglyWing.bind.apply(UglyWing, __spreadArrays([void 0, 'Toscan 8-Q', 2, 2, 0, 1, randomService], allUglyEngines)))(),
+            new (UglyWing.bind.apply(UglyWing, __spreadArrays([void 0, 'ARC-170', 3, 2, 1, 4, randomService], allUglyEngines)))(),
+            new (UglyWing.bind.apply(UglyWing, __spreadArrays([void 0, 'Z-95 MK I', 2, 1, 0, 2, randomService], allUglyEngines)))(),
+            new (UglyWing.bind.apply(UglyWing, __spreadArrays([void 0, 'Z-95 MK I', 2, 1, 1, 2, randomService], allUglyEngines)))(),
+            new (UglyWing.bind.apply(UglyWing, __spreadArrays([void 0, 'X-wing', 2, 2, 1, 4, randomService], allUglyEngines)))(),
+            new (UglyWing.bind.apply(UglyWing, __spreadArrays([void 0, 'Tri-Fighter', 3, 2, -1, 3, randomService], allUglyEngines)))(),
+            new (UglyWing.bind.apply(UglyWing, __spreadArrays([void 0, 'Pinook ', 2, 1, 0, 1, randomService], allUglyEngines)))(),
+            new (UglyWing.bind.apply(UglyWing, __spreadArrays([void 0, 'T-16', 1, 1, 0, 0, randomService], allUglyEngines)))(),
+            new (UglyWing.bind.apply(UglyWing, __spreadArrays([void 0, 'T-16', 1, 1, 1, 0, randomService], allUglyEngines)))()
         ];
         this.uglyBodies = [
-            new (UglyBody.bind.apply(UglyBody, [void 0, 'Y-wing', 6, 3, PlanetaryRange.Close, 1, 1, 0, 5, 3, randomService].concat(allUglyWing)))(),
-            new (UglyBody.bind.apply(UglyBody, [void 0, 'TIE', 3, 2, PlanetaryRange.Close, 1, 0, 0, 2, 2, randomService].concat(allUglyWing)))(),
-            new (UglyBody.bind.apply(UglyBody, [void 0, 'Z-95', 4, 2, PlanetaryRange.Close, 1, 0, 0, 3, 3, randomService].concat(allUglyWing)))(),
-            new (UglyBody.bind.apply(UglyBody, [void 0, 'CloakShape', 5, 2, PlanetaryRange.Close, 1, 0, 0, 3, 3, randomService].concat(allUglyWing)))(),
-            new (UglyBody.bind.apply(UglyBody, [void 0, 'R-41 ', 4, 2, PlanetaryRange.Close, 1, 0, 0, 3, 3, randomService].concat(allUglyWing)))(),
-            new (UglyBody.bind.apply(UglyBody, [void 0, 'V-wing', 3, 2, PlanetaryRange.Close, 1, 0, 0, 2, 2, randomService].concat(allUglyWing)))(),
-            new (UglyBody.bind.apply(UglyBody, [void 0, 'Eta-2', 2, 2, PlanetaryRange.Close, 1, 0, 0, 3, 2, randomService].concat(allUglyWing)))(),
-            new (UglyBody.bind.apply(UglyBody, [void 0, 'C-73', 3, 3, PlanetaryRange.Close, 1, 0, 0, 1, 2, randomService].concat(allUglyWing)))(),
-            new (UglyBody.bind.apply(UglyBody, [void 0, 'Toscan 8-Q', 4, 3, PlanetaryRange.Close, 1, 0, 0, 3, 3, randomService].concat(allUglyWing)))(),
-            new (UglyBody.bind.apply(UglyBody, [void 0, 'ARC-170', 6, 3, PlanetaryRange.Close, 1, 0, 2, 3, 3, randomService].concat(allUglyWing)))(),
-            new (UglyBody.bind.apply(UglyBody, [void 0, 'Z-95 MK I', 4, 2, PlanetaryRange.Close, 1, 0, 0, 3, 2, randomService].concat(allUglyWing)))(),
-            new (UglyBody.bind.apply(UglyBody, [void 0, 'X-wing', 5, 3, PlanetaryRange.Close, 1, 0, 0, 3, 3, randomService].concat(allUglyWing)))(),
-            new (UglyBody.bind.apply(UglyBody, [void 0, 'Pinook', 3, 2, PlanetaryRange.Close, 1, 0, 0, 2, 2, randomService].concat(allUglyWing)))()
+            new (UglyBody.bind.apply(UglyBody, __spreadArrays([void 0, 'Y-wing', 6, 3, PlanetaryRange.Close, 1, 1, 0, 5, 3, randomService], allUglyWing)))(),
+            new (UglyBody.bind.apply(UglyBody, __spreadArrays([void 0, 'TIE', 3, 2, PlanetaryRange.Close, 1, 0, 0, 2, 2, randomService], allUglyWing)))(),
+            new (UglyBody.bind.apply(UglyBody, __spreadArrays([void 0, 'Z-95', 4, 2, PlanetaryRange.Close, 1, 0, 0, 3, 3, randomService], allUglyWing)))(),
+            new (UglyBody.bind.apply(UglyBody, __spreadArrays([void 0, 'CloakShape', 5, 2, PlanetaryRange.Close, 1, 0, 0, 3, 3, randomService], allUglyWing)))(),
+            new (UglyBody.bind.apply(UglyBody, __spreadArrays([void 0, 'R-41 ', 4, 2, PlanetaryRange.Close, 1, 0, 0, 3, 3, randomService], allUglyWing)))(),
+            new (UglyBody.bind.apply(UglyBody, __spreadArrays([void 0, 'V-wing', 3, 2, PlanetaryRange.Close, 1, 0, 0, 2, 2, randomService], allUglyWing)))(),
+            new (UglyBody.bind.apply(UglyBody, __spreadArrays([void 0, 'Eta-2', 2, 2, PlanetaryRange.Close, 1, 0, 0, 3, 2, randomService], allUglyWing)))(),
+            new (UglyBody.bind.apply(UglyBody, __spreadArrays([void 0, 'C-73', 3, 3, PlanetaryRange.Close, 1, 0, 0, 1, 2, randomService], allUglyWing)))(),
+            new (UglyBody.bind.apply(UglyBody, __spreadArrays([void 0, 'Toscan 8-Q', 4, 3, PlanetaryRange.Close, 1, 0, 0, 3, 3, randomService], allUglyWing)))(),
+            new (UglyBody.bind.apply(UglyBody, __spreadArrays([void 0, 'ARC-170', 6, 3, PlanetaryRange.Close, 1, 0, 2, 3, 3, randomService], allUglyWing)))(),
+            new (UglyBody.bind.apply(UglyBody, __spreadArrays([void 0, 'Z-95 MK I', 4, 2, PlanetaryRange.Close, 1, 0, 0, 3, 2, randomService], allUglyWing)))(),
+            new (UglyBody.bind.apply(UglyBody, __spreadArrays([void 0, 'X-wing', 5, 3, PlanetaryRange.Close, 1, 0, 0, 3, 3, randomService], allUglyWing)))(),
+            new (UglyBody.bind.apply(UglyBody, __spreadArrays([void 0, 'Pinook', 3, 2, PlanetaryRange.Close, 1, 0, 0, 2, 2, randomService], allUglyWing)))()
         ];
         this.uglyWeaponGenerator = new UglyWeaponGenerator(randomService);
     }

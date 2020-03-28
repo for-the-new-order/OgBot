@@ -185,11 +185,11 @@ var allRebels = tmp.rebels.army
     .concat(tmp.rebels.navy.map(function (x) { return addCorp(x, 'navy'); }))
     .map(function (x) { return addClan(x, 'rebels'); });
 var all = allGeneric.concat(allEmpire, allRebels);
-exports.ranks = __assign({}, tmp, { empire: __assign({}, tmp.empire, { all: allEmpire }), generic: __assign({}, tmp.generic, { all: allGeneric }), rebels: __assign({}, tmp.rebels, { all: allRebels }), all: all });
+exports.ranks = __assign(__assign({}, tmp), { empire: __assign(__assign({}, tmp.empire), { all: allEmpire }), generic: __assign(__assign({}, tmp.generic), { all: allGeneric }), rebels: __assign(__assign({}, tmp.rebels), { all: allRebels }), all: all });
 function addClan(ranks, clanName) {
-    return __assign({}, ranks, { clan: clanName });
+    return __assign(__assign({}, ranks), { clan: clanName });
 }
 function addCorp(ranks, corpName) {
-    return __assign({}, ranks, { corp: corpName });
+    return __assign(__assign({}, ranks), { corp: corpName });
 }
 //# sourceMappingURL=ranks.js.map
