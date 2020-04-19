@@ -15,7 +15,7 @@ import { ChatterService, OutputType } from './ChatterService';
 import {
     AlignmentAndAttitudeGenerator,
     PersonalityOptions,
-    PersonalityAlignmentType
+    PersonalityAlignmentType,
 } from '../CentralCasting/AlignmentAndAttitudeGenerator';
 import { CentralCastingHeroesForTomorrowHub, CentralCastingFactory } from '../CentralCasting/CentralCastingHeroesForTomorrowHub';
 import { isArray } from 'util';
@@ -86,7 +86,7 @@ export class GenerateCommand extends ChatCommandBase {
             min: 0,
             max: 0,
             hasMin: false,
-            hasMax: false
+            hasMax: false,
         };
         if (commandArgs.argumentExists('min')) {
             range.min = parseInt(commandArgs.findArgumentValue('min'));
@@ -102,7 +102,7 @@ export class GenerateCommand extends ChatCommandBase {
         if (factionName && ranks.hasOwnProperty(factionName)) {
             const faction = ranks[factionName];
             if (corpName && faction.hasOwnProperty(corpName)) {
-                factionRanks = faction.all.filter(r => r.corp === corpName);
+                factionRanks = faction.all.filter((r) => r.corp === corpName);
             } else {
                 factionRanks = faction.all;
             }
@@ -111,11 +111,11 @@ export class GenerateCommand extends ChatCommandBase {
         }
 
         if (range.hasMin && range.hasMax) {
-            factionRanks = factionRanks.filter(r => r.level >= range.min && r.level <= range.max);
+            factionRanks = factionRanks.filter((r) => r.level >= range.min && r.level <= range.max);
         } else if (range.hasMin) {
-            factionRanks = factionRanks.filter(r => r.level >= range.min);
+            factionRanks = factionRanks.filter((r) => r.level >= range.min);
         } else if (range.hasMax) {
-            factionRanks = factionRanks.filter(r => r.level <= range.max);
+            factionRanks = factionRanks.filter((r) => r.level <= range.max);
         }
 
         // Gender
@@ -155,7 +155,7 @@ export class GenerateCommand extends ChatCommandBase {
             case 'personality2':
             case '312':
                 const personalityOptions = Object.assign(new PersonalityOptions(), {
-                    randomPersonalityTrait: count
+                    randomPersonalityTrait: count,
                 });
                 if (subCommand.argumentExists('threshold')) {
                     personalityOptions.alignmentThreshold = parseFloat(subCommand.findArgumentValue('threshold'));
@@ -167,7 +167,7 @@ export class GenerateCommand extends ChatCommandBase {
                     const allowed = [
                         PersonalityAlignmentType.Lightside,
                         PersonalityAlignmentType.Neutral,
-                        PersonalityAlignmentType.Darkside
+                        PersonalityAlignmentType.Darkside,
                     ];
                     const alignment = subCommand.findArgumentValue('alignment') as PersonalityAlignmentType;
                     if (allowed.indexOf(alignment) > -1) {
@@ -304,7 +304,7 @@ export class GenerateCommand extends ChatCommandBase {
                     clan: this.formatUtility.capitalize(rank.clan),
                     corp: this.formatUtility.capitalize(rank.corp),
                     personality: this.generatePersonality(),
-                    motivation: this.generateMotivations(type)
+                    motivation: this.generateMotivations(type),
                 };
                 Object.assign(character, generatedValues);
 
@@ -327,10 +327,10 @@ export class GenerateCommand extends ChatCommandBase {
                 wounds: 12,
                 defense: {
                     melee: 0,
-                    ranged: 0
+                    ranged: 0,
                 },
                 soak: 2,
-                strain: 12
+                strain: 12,
             },
             characteristics: {
                 brawn: 2,
@@ -338,20 +338,20 @@ export class GenerateCommand extends ChatCommandBase {
                 intellect: 2,
                 cunning: 2,
                 willpower: 2,
-                presence: 2
+                presence: 2,
             },
             skills: [],
             talents: [],
             abilities: [],
             equipment: [],
-            description: ['TODO: describe the NPC here...']
+            description: ['TODO: describe the NPC here...'],
         };
     }
 
     private send(json: string, whisper: boolean, message: Message) {
         const chatToSend = `\`\`\`json\n${json}\n\`\`\``;
         if (whisper) {
-            message.author.createDM().then(c => {
+            message.author.createDM().then((c) => {
                 c.send(chatToSend);
             });
         } else {
@@ -395,7 +395,7 @@ export class GenerateCommand extends ChatCommandBase {
                 isAlien: isAlien,
                 name: alienName,
                 species: this.generateSpecies(),
-                gender: gender
+                gender: gender,
             };
         }
         const humanName = this.generateName(gender);
@@ -403,7 +403,7 @@ export class GenerateCommand extends ChatCommandBase {
             isAlien: isAlien,
             name: humanName.name,
             species: { name: 'Human' },
-            gender
+            gender,
         };
     }
 
@@ -420,14 +420,14 @@ export class GenerateCommand extends ChatCommandBase {
         if (type === NpcType.Rival) {
             return {
                 strength: this.randomService.pickOne(motivations.strength).value,
-                flaw: this.randomService.pickOne(motivations.flaw).value
+                flaw: this.randomService.pickOne(motivations.flaw).value,
             };
         }
         return {
             desires: this.randomService.pickOne(motivations.desires).value,
             fear: this.randomService.pickOne(motivations.fear).value,
             strength: this.randomService.pickOne(motivations.strength).value,
-            flaw: this.randomService.pickOne(motivations.flaw).value
+            flaw: this.randomService.pickOne(motivations.flaw).value,
         };
     }
 
@@ -455,12 +455,12 @@ export class GenerateCommand extends ChatCommandBase {
                 level: 0,
                 name: 'N/D',
                 clan: 'N/D',
-                corp: 'N/D'
+                corp: 'N/D',
             };
         }
         let rndRanks = corpRanks;
         if (range !== undefined) {
-            rndRanks = rndRanks.filter(x => x.level >= range.minLevel && x.level <= range.maxLevel);
+            rndRanks = rndRanks.filter((x) => x.level >= range.minLevel && x.level <= range.maxLevel);
         }
 
         if (rndRanks.length === 0) {
@@ -484,21 +484,21 @@ export class GenerateCommand extends ChatCommandBase {
     public help(commandArgs: CommandArgs): CommandHelpDescriptor {
         const countOption = {
             command: '-count [some number]',
-            description: 'Generate the specified number of result.'
+            description: 'Generate the specified number of result.',
         };
         const seedOption = {
             command: '-seed [some random seed]',
-            description: 'Use the specified seed to generate the specified item. This can be used to replay random generation.'
+            description: 'Use the specified seed to generate the specified item. This can be used to replay random generation.',
         };
         const wisperOption = {
             command: '-whisper',
             alias: '-w',
-            description: 'The bot will whisper you the results instead of relying in the current channel.'
+            description: 'The bot will whisper you the results instead of relying in the current channel.',
         };
         const genderOption = {
             command: '-gender [f|m|...]',
             description:
-                'Generate a name based on the specified gender. Anything else than m or f will generate an alien with an unknown gender.'
+                'Generate a name based on the specified gender. Anything else than m or f will generate an alien with an unknown gender.',
         };
         const clanOption = {
             command: '-clan [empire|generic|rebels]',
@@ -507,22 +507,22 @@ export class GenerateCommand extends ChatCommandBase {
                 {
                     command:
                         '-corp [empire: {navy|army|compnor|appointments|ancillary|governance|intelligence}, generic: {army|navy}, rebels: {army|navy}]',
-                    description: 'Generate the NPC based on the specified corp. This setting depends on the selected clan'
-                }
-            ]
+                    description: 'Generate the NPC based on the specified corp. This setting depends on the selected clan',
+                },
+            ],
         };
         const minOption = {
             command: '-min [number]',
-            description: 'Select the minimum rank level (inclusive) for the generated NPC.'
+            description: 'Select the minimum rank level (inclusive) for the generated NPC.',
         };
         const maxOption = {
             command: '-max [number]',
-            description: 'Select the maximum rank level (inclusive) for the generated NPC.'
+            description: 'Select the maximum rank level (inclusive) for the generated NPC.',
         };
 
         const outputOption = {
             command: '-output [JSON|YAML]',
-            description: 'The selected output type (default: YAML)'
+            description: 'The selected output type (default: YAML)',
         };
 
         const helpObject: CommandHelpDescriptor = {
@@ -534,7 +534,7 @@ export class GenerateCommand extends ChatCommandBase {
                 {
                     command: 'uglyspaceship',
                     description: 'Generate a spaceship that is composed from 2 or 3 other spaceships.',
-                    options: [countOption]
+                    options: [countOption],
                 },
                 {
                     command: 'adventure',
@@ -549,11 +549,11 @@ export class GenerateCommand extends ChatCommandBase {
                                 countOption,
                                 {
                                     command: '-distinct',
-                                    description: 'Remove duplicate entries.'
-                                }
-                            ]
-                        }
-                    ]
+                                    description: 'Remove duplicate entries.',
+                                },
+                            ],
+                        },
+                    ],
                 },
                 {
                     command: 'alignmentandattitude',
@@ -565,35 +565,35 @@ export class GenerateCommand extends ChatCommandBase {
                         {
                             command: '-threshold [some number]',
                             description:
-                                'Change the alignment threshold needed to tell if a character is good, neutral or evil (default: 2).'
+                                'Change the alignment threshold needed to tell if a character is good, neutral or evil (default: 2).',
                         },
                         {
                             command: '-alignment [Lightside|Neutral|Darkside]',
-                            description: 'Generate a personality of the specified alignment.'
-                        }
-                    ]
+                            description: 'Generate a personality of the specified alignment.',
+                        },
+                    ],
                 },
                 {
                     command: 'spacecraft',
                     alias: '866, spaceship',
-                    description: 'Generate a spacecraft.'
+                    description: 'Generate a spacecraft.',
                 },
                 {
                     command: 'spacetraffic',
                     description: 'Generate space traffic; the amount of ship generated is defined by the count option (default: 1).',
-                    options: [countOption]
+                    options: [countOption],
                 },
                 {
                     command: 'imperialmission',
-                    description: 'Generate a Star Wars Imperial adventure.'
+                    description: 'Generate a Star Wars Imperial adventure.',
                 },
                 {
                     command: 'imperialbase',
-                    description: 'Generate a Star Wars Imperial base.'
+                    description: 'Generate a Star Wars Imperial base.',
                 },
                 {
                     command: 'rebelbase',
-                    description: 'Generate a Star Wars Rebel Alliance base.'
+                    description: 'Generate a Star Wars Rebel Alliance base.',
                 },
                 {
                     command: 'base',
@@ -601,9 +601,9 @@ export class GenerateCommand extends ChatCommandBase {
                     options: [
                         {
                             command: '-name [name of the base without space]',
-                            description: 'The name of the generated base.'
-                        }
-                    ]
+                            description: 'The name of the generated base.',
+                        },
+                    ],
                 },
                 {
                     command: 'motivations',
@@ -611,52 +611,52 @@ export class GenerateCommand extends ChatCommandBase {
                     subcommands: [
                         {
                             command: '[rival|nemesis]',
-                            description: "Indicate to generate a nemesis or a rival's motivations; default is nemesis."
-                        }
+                            description: "Indicate to generate a nemesis or a rival's motivations; default is nemesis.",
+                        },
                     ],
-                    options: [seedOption]
+                    options: [seedOption],
                 },
                 {
                     command: 'alienname',
                     description: 'Generate some alien names.',
-                    options: [countOption]
+                    options: [countOption],
                 },
                 {
                     command: 'name',
                     description: 'Generate some names.',
-                    options: [countOption, seedOption]
+                    options: [countOption, seedOption, genderOption],
                 },
                 {
                     command: 'droidname',
                     description: 'Generate some droid names.',
-                    options: [countOption, seedOption]
+                    options: [countOption, seedOption],
                 },
                 {
                     command: 'place',
                     description: 'Generate a place name.',
-                    options: [countOption, seedOption]
+                    options: [countOption, seedOption],
                 },
                 {
                     command: 'personality',
                     description: 'Generate a personality.',
-                    options: [countOption, seedOption]
+                    options: [countOption, seedOption],
                 },
                 {
                     command: 'rank',
                     description: 'Generate a rank.',
-                    options: [countOption, seedOption, clanOption, minOption, maxOption]
+                    options: [countOption, seedOption, clanOption, minOption, maxOption],
                 },
                 {
                     command: 'species',
                     description: 'Generate a species.',
-                    options: [countOption, seedOption]
+                    options: [countOption, seedOption],
                 },
                 {
                     command: 'default',
                     description: 'Generate a default Jekyll formatted default values for NPCs.',
-                    options: [seedOption, genderOption, clanOption, minOption, maxOption]
-                }
-            ]
+                    options: [seedOption, genderOption, clanOption, minOption, maxOption],
+                },
+            ],
         };
 
         // Some sub-command filter; this should be extracted in some sort of sub-command (along with the sub-command themselves).
@@ -681,7 +681,7 @@ interface Species {
 enum NpcType {
     Nemesis = 'nemesis',
     Rival = 'rival',
-    Minion = 'minion'
+    Minion = 'minion',
 }
 
 interface Motivations {

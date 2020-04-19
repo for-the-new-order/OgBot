@@ -85,6 +85,10 @@ And `!og g droidname -count 3 -output JSON` could output something like:
 
 # Release notes
 
+## 3.2.1
+
+-   Add missing `gender` option to the name generator help.
+
 ## 3.2.0
 
 -   Initial release on 2020-03-28, I'll start to keep track of changes from this point forward.
