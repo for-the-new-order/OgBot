@@ -10,7 +10,7 @@ pool:
 variables:
   bot.image: 'carlhugo/ogbot'
   bot.imageName: 'ogbot'
-  bot.sshEndpoint: 'Google Cloud Bots'
+  bot.sshEndpoint: 'OgBot Azure Bots'
   bot.dockerRegistryEndpoint: 'Docker Hub'
   bot.envFile: 'ogbot.env'
 
