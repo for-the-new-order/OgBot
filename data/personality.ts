@@ -48,5 +48,16 @@ export const personalityTraits = [
     'Rude',
     'Missing eye',
     'Walks with limp',
-    'Hiding something'
+    'Hiding something',
+    'Lacking empathy',
+    'Heavily absorbed in self',
+    'Egoist',
+    'Machiavellian',
+    'Morally disengaged',
+    'Narcissistic',
+    'Entitled to more than others',
+    'Sadistic',
+    'Selfish',
+    'Spiteful',
+    'Cold',
 ];
