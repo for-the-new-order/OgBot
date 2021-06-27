@@ -15,7 +15,7 @@ const chatCommandManager = new ChatCommandManager(chatterService, echoHelpServic
 
 bot.login(config.auth.token);
 
-bot.on('ready', function(evt: any) {
+bot.on('ready', function (evt: any) {
     console.info('Connected');
     console.info('Logged in as: ');
     console.info(bot.user.username + ' - (' + bot.user.id + ')');

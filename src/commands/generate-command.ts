@@ -20,6 +20,7 @@ import {
 import { CentralCastingHeroesForTomorrowHub, CentralCastingFactory } from '../CentralCasting/CentralCastingHeroesForTomorrowHub';
 import { isArray } from 'util';
 import { UglySpaceshipGenerator } from '../generators/ugly-spaceship-generator';
+import { DwarfNameGenerator } from '../generators/dwarf-name-generator';
 
 export class GenerateCommand extends ChatCommandBase {
     protected supportedCommands = ['generate', 'gen', 'g'];
@@ -32,6 +33,7 @@ export class GenerateCommand extends ChatCommandBase {
     private spaceTrafficGenerator: SpaceTrafficGenerator;
     private centralCastingHub: CentralCastingHeroesForTomorrowHub;
     private uglySpaceshipGenerator: UglySpaceshipGenerator;
+    private dwarfNameGenerator: DwarfNameGenerator;
 
     private baseGenerator: BaseGenerator;
     private baseName = '';
@@ -48,6 +50,7 @@ export class GenerateCommand extends ChatCommandBase {
         this.spaceTrafficGenerator = new SpaceTrafficGenerator(this.randomService);
         this.centralCastingHub = CentralCastingFactory.createHub(this.randomService);
         this.uglySpaceshipGenerator = new UglySpaceshipGenerator(this.randomService);
+        this.dwarfNameGenerator = new DwarfNameGenerator(this.randomService);
     }
 
     public handle(message: Message, commandArgs: CommandArgs) {
@@ -141,6 +144,16 @@ export class GenerateCommand extends ChatCommandBase {
         const switchCondition = subCommand ? subCommand.trigger : '';
         this.baseName = 'Base';
         switch (switchCondition) {
+            case 'dwarfname':
+                if (!gender) {
+                    gender = this.generateGender();
+                }
+                var dwarfNameResult = this.dwarfNameGenerator.firstName(gender);
+                sendChat(dwarfNameResult);
+                break;
+            case 'dwarfstronghold':
+                sendChat({ stronghold: true });
+                break;
             case 'uglyspaceship':
                 const vehicleOutput: any = {};
                 for (let i = 0; i < count; i++) {
@@ -374,9 +387,7 @@ export class GenerateCommand extends ChatCommandBase {
         return this.alienNamesGenerator.generate();
     }
 
-    private generateAnyName(
-        gender?: Gender
-    ): {
+    private generateAnyName(gender?: Gender): {
         name: string;
         isAlien: boolean;
         species: Species;
