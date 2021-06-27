@@ -151,7 +151,7 @@ export class GenerateCommand extends ChatCommandBase {
                 var dwarfNameResult = this.dwarfNameGenerator.firstName(gender);
                 sendChat(dwarfNameResult);
                 break;
-            case 'dwarfstronghold':
+            case 'dwarfstrongholdname':
                 var dwarfstrongholdNameResult = this.dwarfNameGenerator.strongholdName();
                 sendChat(dwarfstrongholdNameResult);
                 break;
@@ -543,6 +543,18 @@ export class GenerateCommand extends ChatCommandBase {
             description: 'Generate random stuff; by default a character.',
             options: [wisperOption, outputOption],
             subcommands: [
+                {
+                    command: 'dwarfname',
+                    description:
+                        'Generate a dwarf name (and a few options) based on AD&D 2e The Complete Book of Dwarves name generator tables.',
+                    options: [seedOption, genderOption],
+                },
+                {
+                    command: 'dwarfstrongholdname',
+                    description:
+                        'Generate a dwarf stronghold name (and a few options) based on AD&D 2e The Complete Book of Dwarves name generator tables.',
+                    options: [seedOption],
+                },
                 {
                     command: 'uglyspaceship',
                     description: 'Generate a spaceship that is composed from 2 or 3 other spaceships.',

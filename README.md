@@ -95,6 +95,10 @@ And `!og g droidname -count 3 -output JSON` could output something like:
 
 # Release notes
 
+## 3.3.0
+
+-   Add `!og g dwarfstrongholdname` and `!og g dwarfname` generators
+
 ## 3.2.2
 
 -   Add a few evil personalities to the `!og g personality` data set

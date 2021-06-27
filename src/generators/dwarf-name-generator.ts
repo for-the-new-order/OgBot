@@ -105,7 +105,6 @@ export class DwarfNameGenerator {
         for (let i = 0; i < 5; i++) {
             strongholdName.names.push(this.genStrongholdName(strongholdName, [spacers1[i], spacers2[i], spacers3[i], spacers4[i]]));
         }
-
         return strongholdName;
     }
 
