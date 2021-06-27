@@ -2,6 +2,16 @@
 
 This is bot offers multiple random generators for FFG Star Wars.
 
+# Run locally (Docker)
+
+```bash
+# If ogbot is already running
+npm run docker
+
+# If ogbot is not running
+npm run docker-start
+```
+
 # How to use
 
 All commands should start with `!og`.

@@ -11,7 +11,13 @@
     },
     "scripts": {
         "start": "node bot.js",
-        "build": "tsc -b"
+        "build": "tsc -b",
+        "docker-build": "docker build . -t ogbot",
+        "docker-run": "docker run -d --env-file .env --name ogbot ogbot",
+        "docker-stop": "docker stop ogbot",
+        "docker-remove": "docker rm ogbot",
+        "docker-start": "npm run docker-build && npm run docker-run",
+        "docker": "npm run docker-build && npm run docker-stop && npm run docker-remove && npm run docker-run"
     },
     "dependencies": {
         "@forevolve/bootstrap-dark": "^1.0.0-alpha.723",
