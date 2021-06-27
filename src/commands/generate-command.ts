@@ -152,7 +152,8 @@ export class GenerateCommand extends ChatCommandBase {
                 sendChat(dwarfNameResult);
                 break;
             case 'dwarfstronghold':
-                sendChat({ stronghold: true });
+                var dwarfstrongholdNameResult = this.dwarfNameGenerator.strongholdName();
+                sendChat(dwarfstrongholdNameResult);
                 break;
             case 'uglyspaceship':
                 const vehicleOutput: any = {};
