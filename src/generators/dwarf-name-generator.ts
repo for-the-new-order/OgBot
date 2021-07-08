@@ -55,11 +55,16 @@ export class DwarfNameGenerator {
     private formatUtility = new FormatUtility();
     constructor(private randomService: RandomService) {}
 
-    public firstName(gender: Gender): string[] {
+    public firstName(gender: Gender): DwarfName {
         const prefix = this.randomService.pickOne(this.prefixes).value;
         const suffixCollection = gender == Gender.Female ? this.femaleSuffix : this.maleSuffix;
         const suffix = this.randomService.pickOne(suffixCollection).value;
-        return this.spacerChars.map((spacer) => this.formatUtility.capitalize((prefix + spacer + suffix).toLowerCase()));
+        return {
+            names: this.spacerChars.map((spacer) => this.formatUtility.capitalize((prefix + spacer + suffix).toLowerCase())),
+            gender,
+            prefix,
+            suffix,
+        };
     }
 
     // public surname(): string {
@@ -118,6 +123,13 @@ export class DwarfNameGenerator {
     }
 }
 
+export interface DwarfName {
+    gender: Gender;
+    prefix: string;
+    suffix: string;
+    names: string[];
+}
+
 export class Stronghold {
     names: StrongholdName;
 }
@@ -137,3 +149,10 @@ enum StrongholdType {
     TradeEnclave = 'Trade Enclave',
     Family = 'Family',
 }
+
+// !og g place -count 10
+// !og g dwarfname
+// !og g dwarfname -count 5
+// !og g dwarfname -count 5 -gender f
+// !og g dwarfname -gender f|m
+// !og g dwarfstrongholdname

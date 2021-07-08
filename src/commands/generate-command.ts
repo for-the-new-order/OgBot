@@ -145,11 +145,15 @@ export class GenerateCommand extends ChatCommandBase {
         this.baseName = 'Base';
         switch (switchCondition) {
             case 'dwarfname':
-                if (!gender) {
-                    gender = this.generateGender();
+                const dwarfnameOutput = [];
+                for (let i = 0; i < count; i++) {
+                    if (!gender) {
+                        gender = this.generateGender();
+                    }
+                    var dwarfNameResult = this.dwarfNameGenerator.firstName(gender);
+                    dwarfnameOutput.push(dwarfNameResult);
                 }
-                var dwarfNameResult = this.dwarfNameGenerator.firstName(gender);
-                sendChat(dwarfNameResult);
+                sendChat(dwarfnameOutput);
                 break;
             case 'dwarfstrongholdname':
                 var dwarfstrongholdNameResult = this.dwarfNameGenerator.strongholdName();
@@ -547,7 +551,7 @@ export class GenerateCommand extends ChatCommandBase {
                     command: 'dwarfname',
                     description:
                         'Generate a dwarf name (and a few options) based on AD&D 2e The Complete Book of Dwarves name generator tables.',
-                    options: [seedOption, genderOption],
+                    options: [seedOption, genderOption, countOption],
                 },
                 {
                     command: 'dwarfstrongholdname',

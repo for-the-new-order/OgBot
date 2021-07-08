@@ -95,6 +95,11 @@ And `!og g droidname -count 3 -output JSON` could output something like:
 
 # Release notes
 
+## 3.3.1
+
+-   Tweak dwarf name generators
+-   Add support for `!og g dwarfname -count N`
+
 ## 3.3.0
 
 -   Add `!og g dwarfstrongholdname` and `!og g dwarfname` generators
