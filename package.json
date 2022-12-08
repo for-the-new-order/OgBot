@@ -22,7 +22,7 @@
     "dependencies": {
         "@forevolve/bootstrap-dark": "^1.0.0-alpha.723",
         "discord.js": "^11.5.1",
-        "express": "^4.16.3",
+        "express": "^4.17.3",
         "js-yaml": "^3.13.1",
         "random-js": "^1.0.8"
     },
